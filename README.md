@@ -1,6 +1,6 @@
 # stellaris_mod_deploy_action
 
-![Stellaris Mod Deploy Action](https://github.com/aerolfos/stellaris_mod_deploy_action/actions/workflows/updateStellarisMod.yml/badge.svg)
+![Stellaris Mod Deploy Action Status](https://github.com/aerolfos/stellaris_mod_deploy_action/actions/workflows/updateStellarisMod.yml/badge.svg)
 
 This is a custom tool to aid in updating Stellaris mods. It only makes sense to use this tool if you structure mods similarly, see below under usage.
 
