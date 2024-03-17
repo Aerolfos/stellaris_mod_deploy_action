@@ -9,7 +9,7 @@ WIP: How to use and structure mod setup
 
 ## License
 
-The scripts and documentation in this project are released under the [MIT License](LICENSE).
+Licensed under the [MIT License](LICENSE).
 
 ## Contributions
 If you for some reason want to contribute, why not. Open a pull request.
