@@ -1,8 +1,24 @@
 # This is an example workflow, which sets up and runs python and the supporting stuff needed
 
-name: Deploy Stellaris mod update
+name: 'Deploy Stellaris mod update'
 
 on:
+  # used to avoid having to retype all this, call from another (simple) workflow
+  # sadly you do need to copy the inputs everywhere
+  workflow_call:
+    inputs:
+      versionType:
+        description: 'Version type to bump'
+        required: true
+        default: 'Patch'
+        type: string
+      versionStellaris:
+        description: 'Stellaris version to support'
+        required: true
+        type: string
+  
+  # for testing can run this workflow directly
+  # this won't work because it lacks files to operate on, it's really just to see the inputs displayed and have a reference for them
   workflow_dispatch:
     inputs:
       versionType:
@@ -11,9 +27,9 @@ on:
         default: 'Patch'
         type: choice
         options:
-        - Major
-        - Minor
-        - Patch
+        - 'Major'
+        - 'Minor'
+        - 'Patch'
       versionStellaris:
         description: 'Stellaris version to support'
         required: true
@@ -35,5 +51,9 @@ jobs:
       with:
         python-version: "3.11"
 
-    - name: Run action
-      run: python main.py
+    - name: Run associated Python action
+      uses: aerolfos/stellaris_mod_deploy_action@main
+      with: 
+        versionType: ${{ inputs.versionType }}
+        versionStellaris: ${{ inputs.versionStellaris }}
+
