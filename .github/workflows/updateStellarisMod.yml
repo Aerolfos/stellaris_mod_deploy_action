@@ -1,10 +1,24 @@
 # This is an example workflow, which sets up and runs python and the supporting stuff needed
 
-name: Python application
+name: Deploy Stellaris mod update
 
 on:
-  workflow_dispatch
-  
+  workflow_dispatch:
+    inputs:
+      versionType:
+        description: 'Version type to bump'
+        required: true
+        default: 'Patch'
+        type: choice
+        options:
+        - Major
+        - Minor
+        - Patch
+      versionStellaris:
+        description: 'Stellaris version to support'
+        required: true
+        type: string
+      
 permissions:
   contents: write
 
@@ -20,5 +34,6 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: "3.11"
+
     - name: Run action
       run: python main.py
