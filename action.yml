@@ -16,7 +16,9 @@ inputs:
     required: true
     type: string
   useChangelog:
-    description: 'Whether to fill in changelog for release. Expects a `CHANGELOG.md` file in target repo'
+    description: |
+          'Fill in changelog for release?
+          Expects a `CHANGELOG.md` file in target repo'
     required: true
     type: boolean
 
