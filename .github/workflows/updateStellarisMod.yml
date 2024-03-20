@@ -16,6 +16,10 @@ on:
         description: 'Stellaris version to support'
         required: true
         type: string
+      useChangelog:
+        description: 'Whether to fill in changelog for release. Expects a `CHANGELOG.md` file in target repo'
+        required: true
+        type: boolean
   
   # for testing can run this workflow directly
   # this won't work because it lacks files to operate on, it's really just to see the inputs displayed and have a reference for them
@@ -34,6 +38,10 @@ on:
         description: 'Stellaris version to support'
         required: true
         type: string
+      useChangelog:
+        description: 'Whether to fill in changelog for release. Expects a `CHANGELOG.md` file in target repo'
+        required: true
+        type: boolean
       
 permissions:
   contents: write
@@ -56,4 +64,5 @@ jobs:
       with: 
         versionType: ${{ inputs.versionType }}
         versionStellaris: ${{ inputs.versionStellaris }}
+        useChangelog: ${{ inputs.useChangelog }}
 
