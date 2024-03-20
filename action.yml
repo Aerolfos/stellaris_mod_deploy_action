@@ -3,22 +3,26 @@ description: 'Run Python script to bump version numbers, set supported Stellaris
 author: 'Aerolfos'
 inputs:
   versionType:
-    description: 'Version type to bump'
+    description: 'Version type to bump, format v1.2.3'
     required: true
     default: 'Patch'
     type: choice
     options:
-    - Major
-    - Minor
-    - Patch
+    - 'Major'
+    - 'Minor'
+    - 'Patch'
   versionStellaris:
     description: 'Stellaris version to support'
     required: true
     type: string
+  useChangelog:
+    description: 'Whether to fill in changelog for release. Expects a `CHANGELOG.md` file in target repo'
+    required: true
+    type: boolean
 
 runs:
   using: 'composite'
   steps:
     - name: 'Run main script'
-      run: main.py ${{ inputs.versionType }} ${{ inputs.versionStellaris }}
+      run: main.py ${{ inputs.versionType }} ${{ inputs.versionStellaris }} ${{ inputs.useChangelog }}
       shell: python
