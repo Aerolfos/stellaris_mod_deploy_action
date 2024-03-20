@@ -18,7 +18,8 @@ inputs:
   useChangelog:
     description: |
           Fill in changelog for release?
-          Expects a `CHANGELOG.md` file in target repo
+
+          Expects a CHANGELOG.md file in target repo
     required: true
     type: boolean
 
