@@ -10,8 +10,24 @@ This tool uses the Github action functionality to trigger a Python script which 
 WIP: How to use and structure mod setup
 
 ## License
+Code and documentation are licensed under [GNU GPL v3.0](LICENSE).
 
-Licensed under the [MIT License](LICENSE).
+This project is meant to support creating Stellaris mods, which are subject to the [Paradox User Agreement](https://legal.paradoxplaza.com/eula).
+
+    Copyright (c) 2024 Aerolfos
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ## Contributions
 If you for some reason want to contribute, why not. Open a pull request.
