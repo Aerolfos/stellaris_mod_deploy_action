@@ -27,5 +27,5 @@ runs:
   using: 'composite'
   steps:
     - name: 'Run main script'
-      run: main.py "${{ inputs.versionType }}" "${{ inputs.versionStellaris }}" "${{ inputs.useChangelog }}"
-      shell: python
+      run: python main.py "${{ inputs.versionType }}" "${{ inputs.versionStellaris }}" "${{ inputs.useChangelog }}"
+      shell: bash
