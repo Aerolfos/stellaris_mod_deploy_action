@@ -2,6 +2,8 @@
 
 name: 'Deploy Stellaris mod update'
 
+run-name: "${{ github.actor }} triggered a ${{ inputs.versionType }} update"
+
 on:
   # used to avoid having to retype all this, call from another (simple) workflow
   # sadly you do need to copy the inputs everywhere
@@ -17,7 +19,9 @@ on:
         required: true
         type: string
       useChangelog:
-        description: 'Whether to fill in changelog for release. Expects a `CHANGELOG.md` file in target repo'
+        description: |
+          'Fill in changelog for release?
+          Expects a `CHANGELOG.md` file in target repo'
         required: true
         type: boolean
   
@@ -39,7 +43,9 @@ on:
         required: true
         type: string
       useChangelog:
-        description: 'Whether to fill in changelog for release. Expects a `CHANGELOG.md` file in target repo'
+        description: |
+          'Fill in changelog for release?
+          Expects a `CHANGELOG.md` file in target repo'
         required: true
         type: boolean
       
