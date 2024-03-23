@@ -62,13 +62,17 @@ def extract_and_replace_mod_version(file_string: str, pattern: str, patch_type: 
     
     Uses regular expressions, regex pattern must create a group for the version number
     """
-    if match := re.search(pattern, file_string, re.IGNORECASE):
+    if match := re.search(pattern, file_string, re.IGNORECASE, re.MULTILINE):
         extracted_mod_version = match.group(1)
 
     updated_mod_version = increment_mod_version(extracted_mod_version, patch_type)
 
-    # use re package to allow for regex replacement
-    file_string = (re.sub(pattern, subst, file_string))
+    replaced_version_substr = f"version=\"{updated_mod_version}\""
+
+    file_string, num_replacements = re.subn(pattern, replaced_version_substr, file_string, re.IGNORECASE, re.MULTILINE)
+
+    if not num_replacements: # 0 evaluates as falsy
+        print(f"Warning: Mod version not matched, {num_replacements} updates made")
 
     return updated_mod_version
 
