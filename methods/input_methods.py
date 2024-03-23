@@ -1,4 +1,5 @@
 import argparse
+import re
 from pathlib import Path
 
 def str2bool(v: str) -> bool:
@@ -31,4 +32,47 @@ def str2bool(v: str) -> bool:
         return False
     else:
         raise argparse.ArgumentTypeError('Boolean value expected.')
+
+# this is really simple boilerplate, wrapped in functions for less code repetition
+def extract_file_data(file: Path) -> str:
+    """Read contents from file into memory as a single string
     
+    Closes file immediately to avoid interference.
+    """
+    file_handle = open(file, 'r', encoding="utf-8")
+    file_string = file_handle.read()
+    file_handle.close()
+
+    return file_string
+
+def replace_file_data(file: Path, file_string: str) -> None:
+    """Write str data to file, replacing it
+    
+    Closes file immediately to avoid interference.
+    """
+    file_handle = open(file, 'w', encoding="utf-8")
+    file_handle.write(file_string)
+    file_handle.close()
+
+    return None
+
+# actual methods
+def extract_and_replace_mod_version(file_string: str, pattern: str, patch_type: str) -> str:
+    """Finds a version number from a paradox descriptor file, and increments it
+    
+    Uses regular expressions, regex pattern must create a group for the version number
+    """
+    if match := re.search(pattern, file_string, re.IGNORECASE):
+        extracted_mod_version = match.group(1)
+
+    updated_mod_version = increment_mod_version(extracted_mod_version, patch_type)
+
+    # use re package to allow for regex replacement
+    file_string = (re.sub(pattern, subst, file_string))
+
+    return updated_mod_version
+
+def increment_mod_version(input_mod_version: str, patch_type: str) -> str:
+    """Take a version of the form "1.2.3" and increment according to patch type
+    """
+    return updated_mod_version
