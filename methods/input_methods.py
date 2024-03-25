@@ -32,51 +32,85 @@ def str2bool(v: str) -> bool:
         return False
     else:
         raise argparse.ArgumentTypeError('Boolean value expected.')
-
-# this is really simple boilerplate, wrapped in functions for less code repetition
-def extract_file_data(file: Path) -> str:
-    """Read contents from file into memory as a single string
     
-    Closes file immediately to avoid interference.
-    """
-    file_handle = open(file, 'r', encoding="utf-8")
-    file_string = file_handle.read()
-    file_handle.close()
-
-    return file_string
-
-def replace_file_data(file: Path, file_string: str) -> None:
-    """Write str data to file, replacing it
+def parse_descriptor_to_dict(descriptor_file_object: Path) -> dict:
+    """Creates a dict of entries from a paradox descriptor.mod file
     
-    Closes file immediately to avoid interference.
+    This method relies on the fixed structure of pdx script, {} are indicators for blocks that go together.
+
+    Doing something like putting "}" in your version will break this script, but it will also break Stellaris and its mod upload tools, so, maybe don't do that.
     """
-    file_handle = open(file, 'w', encoding="utf-8")
-    file_handle.write(file_string)
-    file_handle.close()
+    descriptor_dict = {}
+    line_container = []
+    multiline_flag = False
+    with open(descriptor_file_object, 'r', encoding="utf-8") as descriptor:
+        for line in descriptor:
+            if not multiline_flag:    
+                if "=" in line:
+                    # strip line for trailing spaces and turn line into list with key and value
+                    line = line.rstrip().split("=")
+                    line[1] = line[1].strip("\"")
+                    # the multiline blocks like tags are a problem, so parse those
+                    if "{" in line[1]:
+                        multiline_key = line[0]
+                        multiline_flag = True
+                        # check for anything after the brace - you shouldn't do this but you never know...
+                        index_brace = line[1].find("{")
+                        if not (line[1].endswith("{") or line[1].endswith(" ")):
+                            # save anything after the brace unless it's last character (string was stripped already)
+                            line_container.append(line[1][index_brace+1:])
+                        continue #  goes to next line
+                    else:
+                        descriptor_dict[line[0]] = line[1]
+            elif multiline_flag:
+                if "}" in line:
+                    descriptor_dict[multiline_key] = line_container
+                    multiline_flag = False
+                    line_container = [] # clean up container
+                    continue #  goes to next line
+                else:
+                    line_container.append(line.strip().strip("\""))
+    return descriptor_dict
 
-    return None
-
-# actual methods
-def extract_and_replace_mod_version(file_string: str, pattern: str, patch_type: str) -> str:
-    """Finds a version number from a paradox descriptor file, and increments it
-    
-    Uses regular expressions, regex pattern must create a group for the version number
-    """
-    if match := re.search(pattern, file_string, re.IGNORECASE, re.MULTILINE):
-        extracted_mod_version = match.group(1)
-
-    updated_mod_version = increment_mod_version(extracted_mod_version, patch_type)
-
-    replaced_version_substr = f"version=\"{updated_mod_version}\""
-
-    file_string, num_replacements = re.subn(pattern, replaced_version_substr, file_string, re.IGNORECASE, re.MULTILINE)
-
-    if not num_replacements: # 0 evaluates as falsy
-        print(f"Warning: Mod version not matched, {num_replacements} updates made")
-
-    return updated_mod_version
-
-def increment_mod_version(input_mod_version: str, patch_type: str) -> str:
+def increment_mod_version(
+        input_mod_version: str, 
+        patch_type: str, 
+        use_format_check: bool = True, 
+        possible_version_types: list = ["Major", "Minor", "Patch"]
+    ) -> tuple[dict, str]:
     """Take a version of the form "1.2.3" and increment according to patch type
+
+    Uses a regex pattern to make sure the format is correct - can be optionally skipped
+
+    Possible versions list must be in the same order as the version is structured
     """
-    return updated_mod_version
+    if use_format_check:
+        # matches format "1.2.3" or alternatively "v1.2.3", * wildcards allowed
+        regex_version_pattern = r"^v?(?:(?:\d{1,3}|\*)\.){2}(?:\d{1,3}|\*)" # yeah regex be like that
+        if not re.search(regex_version_pattern, input_mod_version, re.IGNORECASE):
+            raise ValueError(f"Version format should be of type \"1.2.3\", got {input_mod_version}")
+
+    semantic_version_list = input_mod_version.split(".")
+    # save the v for later
+    if semantic_version_list[0].startswith("v"):
+        semantic_version_list[0] = semantic_version_list[0].lstrip("v")
+        using_v_prefix = True
+
+    current_semantic_versions = dict(zip(possible_version_types, semantic_version_list))
+
+    # check what versions follow from the currently selected version by slicing
+    subsequent_versions = possible_version_types[possible_version_types.index(patch_type)+1:]
+    # these should be zeroed if we're updating a higher version
+    # if there's no extra versions nothing happens
+    for version_to_zero in subsequent_versions:
+        if "*" not in current_semantic_versions[version_to_zero]:
+            current_semantic_versions[version_to_zero] = "0"
+    
+    # increment, but ignore asterisks
+    if "*" not in current_semantic_versions[patch_type]:
+        current_semantic_versions[patch_type] = str(int(current_semantic_versions[patch_type]) + 1)
+    
+    updated_mod_version = ".".join(current_semantic_versions.values())
+    if using_v_prefix:
+        updated_mod_version = "v" + updated_mod_version
+    return current_semantic_versions, updated_mod_version
