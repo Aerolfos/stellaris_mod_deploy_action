@@ -1,6 +1,7 @@
-# This is an example workflow, which sets up and runs python and the supporting stuff needed
+# This is a reusable workflow, which sets up and runs python and the supporting stuff needed
+# Call from another workflow, which will only need inputs
 
-name: 'Deploy Stellaris mod update'
+name: 'Trigger reusable workflow to deploy Stellaris mod update'
 
 run-name: "${{ github.actor }} triggered a ${{ inputs.versionType }} update"
 
