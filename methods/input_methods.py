@@ -86,15 +86,18 @@ def increment_mod_version(
     """
     if use_format_check:
         # matches format "1.2.3" or alternatively "v1.2.3", * wildcards allowed
-        regex_version_pattern = r"^v?(?:(?:\d{1,3}|\*)\.){2}(?:\d{1,3}|\*)" # yeah regex be like that
+        regex_version_pattern = r"^v?\s?(?:(?:\d{1,3}|\*)\.){2}(?:\d{1,3}|\*)" # yeah regex be like that
         if not re.search(regex_version_pattern, input_mod_version, re.IGNORECASE):
             raise ValueError(f"Version format should be of type \"1.2.3\", got {input_mod_version}")
 
     semantic_version_list = input_mod_version.split(".")
-    # save the v for later
+    # save the v and potential space for later
     if semantic_version_list[0].startswith("v"):
         semantic_version_list[0] = semantic_version_list[0].lstrip("v")
         using_v_prefix = True
+        if semantic_version_list[0].startswith(" "):
+            semantic_version_list[0] = semantic_version_list[0].lstrip(" ")
+            using_v_with_space_prefix = True
 
     current_semantic_versions = dict(zip(possible_version_types, semantic_version_list))
 
@@ -112,5 +115,7 @@ def increment_mod_version(
     
     updated_mod_version = ".".join(current_semantic_versions.values())
     if using_v_prefix:
+        if using_v_with_space_prefix:
+            updated_mod_version = " " + updated_mod_version
         updated_mod_version = "v" + updated_mod_version
     return current_semantic_versions, updated_mod_version
