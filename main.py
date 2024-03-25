@@ -1,6 +1,7 @@
 import argparse
 import re
-from methods.input_methods import str2bool, extract_file_data, replace_file_data, extract_and_replace_mod_version
+from pathlib import Path
+from methods.input_methods import str2bool, parse_descriptor_to_dict, increment_mod_version
 
 # handle command line inputs
 # the user shouldn't even see these, they're for the github action to call
@@ -20,22 +21,31 @@ print("useChangelog:", args.useChangelog)
 print("modfolderName:", args.modfolderName)
 
 # path and name for the descriptor file
-descriptor_file_object = "descriptor.mod"
+descriptor_file_name = "descriptor.mod"
+user_profile_path = Path.home()
+descriptor_file_object = user_profile_path / "Documents" / args.modfolderName / descriptor_file_name
+print(descriptor_file_object)
 
-# regex matches must be unique, if they aren't the solution is to clean up the file first
+# grab descriptor and break it down into a python dict
+descriptor_dict = parse_descriptor_to_dict(descriptor_file_object)
 
-# match the paradox descriptor version line, should be of form version="1.2.3", wildcards * are allowed
-# must create a regex group where the version is read to
-regex_version_pattern = r"^version=\"((?:(?:\d{1,3}|\*)\.){2}(?:\d{1,3}|\*))\"" # yeah regex be like that
+print("- Extracted dictionary: -")
+for key, item in descriptor_dict.items():
+    print(f"{key}: {item}")
 
-# match the supported stellaris version, must be version="1.2.3", wildcard * in any position are allowed
-regex_supportedstellaris_pattern = r"^supported_version=\"((?:(?:\d{1,3}|\*)\.){2}(?:\d{1,3}|\*))\""
+# takes the mod version str and increments the selected bit according to semantic versioning
+# also returns a dict with the split up semantic pieces (usually major version, minor version, and patch version)
+current_semantic_versions, updated_mod_version = increment_mod_version(descriptor_dict["version"], args.versionType, possible_version_types=possible_version_types)
+print(current_semantic_versions)
+print(updated_mod_version)
 
-# if the version="" and supported_version="" syntax ever needs to be changed it's hardcoded in the functions when updating string
+# update dict
+descriptor_dict["version"] = updated_mod_version
+descriptor_dict["supported_version"] = args.versionStellaris
 
-descriptor_string = extract_file_data(descriptor_file_object)
+print("- Updated dictionary: -")
+for key, item in descriptor_dict.items():
+    print(f"{key}: {item}")
 
-updated_mod_version = extract_and_replace_mod_version(descriptor_string, regex_version_pattern, args.versionType)
-
-replace_file_data(descriptor_file_object, descriptor_string)
+#replace_file_data(descriptor_file_object, descriptor_file_string)
 
