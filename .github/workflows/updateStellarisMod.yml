@@ -2,7 +2,7 @@
 # Call from another workflow, which will only need inputs
 
 name: 'Trigger reusable workflow to deploy Stellaris mod update'
-
+# Will run Python script to bump version numbers, set supported Stellaris version, and create a Github release.
 run-name: "${{ github.actor }} triggered a ${{ inputs.versionType }} update"
 
 on:
@@ -67,7 +67,7 @@ jobs:
       uses: actions/checkout@v4
       with:
         repository: aerolfos/stellaris_mod_deploy_action
-        path: stellaris_mod_deploy_action
+        path: ./stellaris_mod_deploy_action
         # avoid needlessly cloning the graphic assets, want root folder with script files and extra scripts in methods though
         sparse-checkout: |
           .github
@@ -77,10 +77,8 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: "3.11"
-
-    - name: test
-      run: ls
-
+    
+    # Action expects to be run from a directory that's alongside the relevant mod repo, see tools step above
     - name: Run associated Python action
       uses: aerolfos/stellaris_mod_deploy_action@main
       with: 

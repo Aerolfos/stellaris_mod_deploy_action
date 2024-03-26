@@ -1,3 +1,4 @@
+# Expects to be run from a directory that's alongside the relevant mod repo
 name: 'Deploy Stellaris mod update action'
 description: 'Run Python script to bump version numbers, set supported Stellaris version, and create a Github release.'
 author: 'Aerolfos'
@@ -26,13 +27,13 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - name: test ls
-      run: ls
+    - name: Change directory for python action
+      run: cd ./stellaris_mod_deploy_action
       shell: bash
     - name: test tree  
       run: tree
       shell: bash
     - name: 'Run main script'
       run: python main.py "${{ inputs.versionType }}" "${{ inputs.versionStellaris }}" "${{ inputs.useChangelog }}" "${{ github.event.repository.name }}"
-      # repo name passed as the folder name for the mod
+      # repo name from original caller passed as the folder name for the mod
       shell: bash
