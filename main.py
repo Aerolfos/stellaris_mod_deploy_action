@@ -2,7 +2,7 @@
 import argparse
 import re
 from pathlib import Path
-from methods.input_methods import str2bool, parse_descriptor_to_dict, increment_mod_version, search_and_replace_in_file
+from methods.input_methods import str2bool, parse_descriptor_to_dict, increment_mod_version, search_and_replace_in_file, create_descriptor_file
 
 ### Command line inputs ###
 # the user shouldn't even see these, they're for the github action to call
@@ -47,6 +47,7 @@ descriptor_dict = parse_descriptor_to_dict(descriptor_file_object)
 
 # if there are overrides, parse them too - use same structure as a paradox descriptor because we have the parser already
 override_enabled = False
+override_dict = {}
 if override_file_object.exists():
     override_enabled = True
     override_dict = parse_descriptor_to_dict(override_file_object)
@@ -69,14 +70,23 @@ current_semantic_versions, updated_mod_version = increment_mod_version(descripto
 print(current_semantic_versions)
 print(updated_mod_version)
 
+# make path manually, should always prefer relative path
+# don't want to leak a username with an absolute path
+# but allow override to manually specify a path setup
+try:
+    generated_path = override_dict["path_override"]
+except KeyError:
+    generated_path = f"mod/{args.modfolderName}/{args.modfolderName}"
+
 # update dict
 descriptor_dict["version"] = updated_mod_version
+descriptor_dict["path"] = generated_path
 if override_enabled:
     # check if override has a different stellaris version to support for descriptor
     # still want the normal version for updating description though
     try:
         descriptor_dict["supported_version"] = override_dict["supported_version_override"]
-    except:
+    except KeyError:
         descriptor_dict["supported_version"] = args.versionStellaris
 else:
     descriptor_dict["supported_version"] = args.versionStellaris
@@ -94,7 +104,7 @@ if workshop_description_file_object.exists():
     try:
         # format to look for can be overriden - must have two regex group references on the side of the version number to replace
         workshop_desc_version_pattern = override_dict["workshop_desc_version_pattern"]
-    except:
+    except KeyError:
         # by default look for "Supports Stellaris version: 1.2.x" with version number bolded in steam BBcode
         workshop_desc_version_pattern = r"(Supports Stellaris version: \[b\]).+(\[/b\])"
     
@@ -108,7 +118,7 @@ if readme_file_object.exists():
     try:
         # format to look for can be overriden - must have two regex group references on the side of the version number to replace
         readme_version_pattern = override_dict["readme_version_pattern"]
-    except:
+    except KeyError:
         # by default look for "Supports Stellaris version: `1.2.x`" with version number using code embed in markdown
         readme_version_pattern = r"(Supports Stellaris version: \`).+(\`)"
     
@@ -122,3 +132,5 @@ for loc_key in override_dict["loc_keys_to_match"]:
 
 
 ### File output ###
+create_descriptor_file(descriptor_dict, descriptor_file_object)
+
