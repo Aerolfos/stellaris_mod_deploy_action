@@ -25,32 +25,50 @@ print("modfolderName:", args.modfolderName)
 ### File paths ###
 # get the path to where this python file is
 working_folder = Path(__file__).resolve().parent
+print(working_folder)
 
-# descriptor file
-descriptor_file_name = "descriptor.mod"
+# do overrides immediately
 # file for potential overrides
 override_file_name = "OVERRIDE.txt"
-workshop_description_file_name = "workshop.txt"
-readme_file_name = "README.md"
+override_file_object = working_folder / override_file_name
+print(override_file_object)
+# if there are overrides, we parse them - use same structure as a paradox descriptor because we have the parser already
+override_enabled = False
+override_dict = {}
+if override_file_object.exists():
+    override_enabled = True
+    override_dict = parse_descriptor_to_dict(override_file_object)
+
+# file names
+try:
+    descriptor_file_name = override_dict["descriptor_file_name_override"]
+except KeyError:
+    descriptor_file_name = "descriptor.mod"
+
+try:
+    workshop_description_file_name = override_dict["workshop_description_file_name_override"]
+except KeyError:
+    workshop_description_file_name = "workshop.txt"
+
+try:
+    readme_file_name = override_dict["readme_file_name_override"]
+except KeyError:
+    readme_file_name = "README.md"
+
+try:
+    changelog_file_name = override_dict["changelog_file_name_override"]
+except KeyError:
+    changelog_file_name = "CHANGELOG.md"
 
 # make file paths
 descriptor_file_object = working_folder / descriptor_file_name
 print(descriptor_file_object)
-override_file_object = working_folder / override_file_name
-print(override_file_object)
 workshop_description_file_object = working_folder / workshop_description_file_name
 readme_file_object = working_folder / readme_file_name
 
 ### File parsing ###
 # grab descriptor and break it down into a python dict
 descriptor_dict = parse_descriptor_to_dict(descriptor_file_object)
-
-# if there are overrides, parse them too - use same structure as a paradox descriptor because we have the parser already
-override_enabled = False
-override_dict = {}
-if override_file_object.exists():
-    override_enabled = True
-    override_dict = parse_descriptor_to_dict(override_file_object)
 
 print("- Extracted dictionary: -")
 for key, item in descriptor_dict.items():
