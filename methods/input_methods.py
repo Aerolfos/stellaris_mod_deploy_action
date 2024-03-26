@@ -1,6 +1,7 @@
 import argparse
 import re
 from pathlib import Path
+from typing import Union
 
 def str2bool(v: str) -> bool:
     """Parses a string value for a true-like or false-like value to be turned into a `bool`
@@ -84,6 +85,9 @@ def increment_mod_version(
 
     Possible versions list must be in the same order as the version is structured
     """
+    using_v_prefix = False
+    using_v_with_space_prefix = False
+
     if use_format_check:
         # matches format "1.2.3" or alternatively "v1.2.3", * wildcards allowed
         regex_version_pattern = r"^v?\s?(?:(?:\d{1,3}|\*)\.){2}(?:\d{1,3}|\*)" # yeah regex be like that
@@ -119,3 +123,28 @@ def increment_mod_version(
             updated_mod_version = " " + updated_mod_version
         updated_mod_version = "v" + updated_mod_version
     return current_semantic_versions, updated_mod_version
+
+def search_and_replace_in_file(file_path: Path, pattern: Union[str, list], substr: str) -> None:
+    """Opens a file and replaces a part of it via regex
+
+    Use to update version number and similar in text descriptions
+
+    Can take in one pattern, or a list of them to go through and match
+    """
+    # read into holder string for searching
+    file_handle = open(file_path, 'r')
+    file_string = file_handle.read()
+    file_handle.close()
+
+    if isinstance(pattern, list):
+        for selected_pattern in pattern:
+            file_string = (re.sub(selected_pattern, substr, file_string))
+    elif isinstance(pattern, str):
+        file_string = (re.sub(pattern, substr, file_string))
+    else:
+        raise TypeError(f"Input search pattern must be a single str or a list of str, got {type(pattern)}")
+
+    # w overwrites file
+    file_handle = open(file_path, 'w')
+    file_handle.write(file_string)
+    file_handle.close()
