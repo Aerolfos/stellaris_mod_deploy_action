@@ -27,13 +27,8 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - name: Change directory for python action
-      run: cd ./stellaris_mod_deploy_action
-      shell: bash
-    - name: test tree  
-      run: tree
-      shell: bash
     - name: 'Run main script'
+      working-directory: ./stellaris_mod_deploy_action
       run: python main.py "${{ inputs.versionType }}" "${{ inputs.versionStellaris }}" "${{ inputs.useChangelog }}" "${{ github.event.repository.name }}"
       # repo name from original caller passed as the folder name for the mod
       shell: bash
