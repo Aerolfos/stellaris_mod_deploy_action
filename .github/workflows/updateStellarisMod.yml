@@ -78,6 +78,9 @@ jobs:
       with:
         python-version: "3.11"
 
+    - name: test
+      run: ls
+
     - name: Run associated Python action
       uses: aerolfos/stellaris_mod_deploy_action@main
       with: 
