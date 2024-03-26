@@ -77,6 +77,11 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: "3.11"
+
+    - name: Test print file structure
+      run: |
+        cd ./././
+        tree
     
     # Action expects to be run from a directory that's alongside the relevant mod repo, see tools step above
     - name: Run associated Python action
