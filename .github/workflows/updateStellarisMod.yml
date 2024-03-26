@@ -60,8 +60,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Clone the repo
+    - name: Clone the mod repo
       uses: actions/checkout@v4
+    
+    - name: Checkout tools repo
+      uses: actions/checkout@v4
+      with:
+        repository: aerolfos/stellaris_mod_deploy_action@main
+        path: stellaris_mod_deploy_action
+        # avoid needlessly cloning the graphic assets, want root folder with script files and extra scripts in methods though
+        sparse-checkout: |
+          .github
+          methods
     
     - name: Set up Python 3.11
       uses: actions/setup-python@v5
