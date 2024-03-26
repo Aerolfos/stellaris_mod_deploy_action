@@ -26,11 +26,13 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - name: 'Run main script'
+    - name: test ls
       run: ls
       shell: bash
+    - name: test tree  
       run: tree
       shell: bash
+    - name: 'Run main script'
       run: python main.py "${{ inputs.versionType }}" "${{ inputs.versionStellaris }}" "${{ inputs.useChangelog }}" "${{ github.event.repository.name }}"
       # repo name passed as the folder name for the mod
       shell: bash
