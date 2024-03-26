@@ -73,6 +73,27 @@ def parse_descriptor_to_dict(descriptor_file_object: Path) -> dict:
                     line_container.append(line.strip().strip("\""))
     return descriptor_dict
 
+def create_descriptor_file(descriptor_dict: dict, descriptor_file_object: Path) -> None:
+    """Creates a paradox descriptor.mod file from a dictionary
+    """
+    with open(descriptor_file_object, 'w', encoding="utf-8") as descriptor:
+        # dict order being insertion order is guaranteed in newer python versions so file structure should be preserved
+        for key, item in descriptor_dict.items():
+            # construct line - in case of list we need to write it out tabbed and encased in {}
+            if isinstance(item, str):
+                line = f"{key}=\"{item}\"\n"
+                descriptor.write(line)
+            elif isinstance(item, list):
+                line = f"{key}={{\n"
+                descriptor.write(line)
+                for tag in item:
+                    # \t for tab
+                    line = f"\t\"{tag}\"\n"
+                    descriptor.write(line)
+                # end block and continue other items
+                descriptor.write(f"}}\n")
+    print(f"File {descriptor_file_object} written")
+
 def increment_mod_version(
         input_mod_version: str, 
         patch_type: str, 
