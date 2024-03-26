@@ -25,7 +25,8 @@ print("modfolderName:", args.modfolderName)
 ### File paths ###
 # get the path to where this python file is
 working_folder = Path(__file__).resolve().parent
-print(working_folder)
+print("Python file folder path:", working_folder)
+print("cwd:", Path.cwd())
 
 # do overrides immediately
 # file for potential overrides
