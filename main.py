@@ -4,6 +4,10 @@ import re
 from pathlib import Path
 from methods.input_methods import str2bool, parse_descriptor_to_dict, increment_mod_version, search_and_replace_in_file, create_descriptor_file
 
+debug_level = 1
+# 0, 1, or 2
+# 0 prints nothing, 1 inputs and paths, 2 prints information about parsing and processing
+
 ### Command line inputs ###
 # the user shouldn't even see these, they're for the github action to call
 parser = argparse.ArgumentParser()
@@ -16,26 +20,25 @@ parser.add_argument("modfolderName", type=str, help="Name of mod folder (and rep
 args = parser.parse_args()
 
 ### Test ###
-print("- init -")
-print("versionType:", args.versionType)
-print("versionStellaris:", args.versionStellaris)
-print("useChangelog:", args.useChangelog)
-print("modfolderName:", args.modfolderName)
+if debug_level >= 1:
+    print("- Inputs -")
+    print("versionType:", args.versionType)
+    print("versionStellaris:", args.versionStellaris)
+    print("useChangelog:", args.useChangelog)
+    print("modfolderName:", args.modfolderName)
 
 ### File paths ###
-# get the path to where this python file is
-working_folder = Path(__file__).resolve().parent
-print("Python file folder path:", working_folder)
-print("cwd:", Path.cwd())
 # cwd is set to where the python file is, which should be next to the folder with the mod files from the originating mod repository
 mod_files_folder = (Path.cwd() / f"../{args.modfolderName}").resolve()
-print(mod_files_folder)
+
+if debug_level >= 1:
+    print("Python script file path:", Path.cwd())
+    print("Path to mod files:", mod_files_folder)
 
 # do overrides immediately
 # file for potential overrides
 override_file_name = "OVERRIDE.txt"
 override_file_object = mod_files_folder / override_file_name
-print(override_file_object)
 # if there are overrides, we parse them - use same structure as a paradox descriptor because we have the parser already
 override_enabled = False
 override_dict = {}
@@ -67,7 +70,8 @@ except KeyError:
 # make file paths
 # descriptor is nested twice
 descriptor_file_object = mod_files_folder / args.modfolderName / descriptor_file_name
-print(descriptor_file_object)
+if debug_level >= 1:
+    print("Descriptor file location:", descriptor_file_object)
 workshop_description_file_object = mod_files_folder / workshop_description_file_name
 readme_file_object = mod_files_folder / readme_file_name
 
@@ -75,23 +79,25 @@ readme_file_object = mod_files_folder / readme_file_name
 # grab descriptor and break it down into a python dict
 descriptor_dict = parse_descriptor_to_dict(descriptor_file_object)
 
-print("- Extracted dictionary: -")
-for key, item in descriptor_dict.items():
-    print(f"{key}: {item}")
-
-print("- Overrides: -")
-try:
-    for key, item in override_dict.items():
+if debug_level >= 2:
+    print("- Extracted dictionary: -")
+    for key, item in descriptor_dict.items():
         print(f"{key}: {item}")
-except:
-    print("No overrides")
+
+    print("- Overrides: -")
+    try:
+        for key, item in override_dict.items():
+            print(f"{key}: {item}")
+    except:
+        print("No overrides")
 
 ### Processing ###
 # takes the mod version str and increments the selected bit according to semantic versioning
 # also returns a dict with the split up semantic pieces (usually major version, minor version, and patch version)
 current_semantic_versions, updated_mod_version = increment_mod_version(descriptor_dict["version"], args.versionType, possible_version_types=possible_version_types)
-print(current_semantic_versions)
-print(updated_mod_version)
+if debug_level >= 2:
+    print("Broken down version dict:", current_semantic_versions)
+    print("Post-bump mod version:", updated_mod_version)
 
 # make path manually, should always prefer relative path
 # don't want to leak a username with an absolute path
@@ -114,13 +120,15 @@ if override_enabled:
 else:
     descriptor_dict["supported_version"] = args.versionStellaris
 
-print("- Updated dictionary: -")
-for key, item in descriptor_dict.items():
-    print(f"{key}: {item}")
+if debug_level >= 2:
+    print("- Updated dictionary: -")
+    for key, item in descriptor_dict.items():
+        print(f"{key}: {item}")
 
 # for display, change any asterisks to x
 supported_stellaris_version_display = args.versionStellaris.replace("*", "x")
-print(supported_stellaris_version_display)
+if debug_level >= 2:
+    print(supported_stellaris_version_display)
 
 ### Update workshop description, if it exists ###
 if workshop_description_file_object.exists():
