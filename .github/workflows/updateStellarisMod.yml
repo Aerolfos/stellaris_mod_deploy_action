@@ -67,7 +67,7 @@ jobs:
       uses: actions/checkout@v4
       with:
         repository: aerolfos/stellaris_mod_deploy_action
-        path: ./stellaris_mod_deploy_action
+        path: ../stellaris_mod_deploy_action
         # avoid needlessly cloning the graphic assets, want root folder with script files and extra scripts in methods though
         sparse-checkout: |
           .github
@@ -80,7 +80,7 @@ jobs:
 
     - name: Test print file structure
       run: |
-        cd ./././
+        cd ../../../
         tree
     
     # Action expects to be run from a directory that's alongside the relevant mod repo, see tools step above

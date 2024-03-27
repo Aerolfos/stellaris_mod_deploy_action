@@ -28,7 +28,7 @@ runs:
   using: 'composite'
   steps:
     - name: 'Run main script'
-      working-directory: ./stellaris_mod_deploy_action
+      working-directory: ../stellaris_mod_deploy_action
       run: python main.py "${{ inputs.versionType }}" "${{ inputs.versionStellaris }}" "${{ inputs.useChangelog }}" "${{ github.event.repository.name }}"
       # repo name from original caller passed as the folder name for the mod
       shell: bash
