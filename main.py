@@ -27,11 +27,14 @@ print("modfolderName:", args.modfolderName)
 working_folder = Path(__file__).resolve().parent
 print("Python file folder path:", working_folder)
 print("cwd:", Path.cwd())
+# cwd is set to where the python file is, which should be next to the folder with the mod files from the originating mod repository
+mod_files_folder = Path.cwd() / "../args.modfolderName"
+print(mod_files_folder)
 
 # do overrides immediately
 # file for potential overrides
 override_file_name = "OVERRIDE.txt"
-override_file_object = working_folder / override_file_name
+override_file_object = mod_files_folder / override_file_name
 print(override_file_object)
 # if there are overrides, we parse them - use same structure as a paradox descriptor because we have the parser already
 override_enabled = False
@@ -62,10 +65,10 @@ except KeyError:
     changelog_file_name = "CHANGELOG.md"
 
 # make file paths
-descriptor_file_object = working_folder / descriptor_file_name
+descriptor_file_object = mod_files_folder / descriptor_file_name
 print(descriptor_file_object)
-workshop_description_file_object = working_folder / workshop_description_file_name
-readme_file_object = working_folder / readme_file_name
+workshop_description_file_object = mod_files_folder / workshop_description_file_name
+readme_file_object = mod_files_folder / readme_file_name
 
 ### File parsing ###
 # grab descriptor and break it down into a python dict

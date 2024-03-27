@@ -62,12 +62,17 @@ jobs:
     steps:
     - name: Clone the mod repo
       uses: actions/checkout@v4
+      with:
+        # actions/checkout does not allow cloning to a folder above the default working folder, so to separate from tools place in this folder
+        # the path names become very long but needs checkout to fix their shit to change
+        path: ${{ github.event.repository.name }}
     
     - name: Checkout tools repo
       uses: actions/checkout@v4
       with:
         repository: aerolfos/stellaris_mod_deploy_action
-        path: ../stellaris_mod_deploy_action
+        # actions/checkout does not allow cloning to a folder above the default working folder, so to separate from mod files place in this folder
+        path: stellaris_mod_deploy_action
         # avoid needlessly cloning the graphic assets, want root folder with script files and extra scripts in methods though
         sparse-checkout: |
           .github
@@ -83,7 +88,7 @@ jobs:
         cd ../../../
         tree
     
-    # Action expects to be run from a directory that's alongside the relevant mod repo, see tools step above
+    # action expects to be run from a directory that's alongside the relevant mod repo, see tools step above
     - name: Run associated Python action
       uses: aerolfos/stellaris_mod_deploy_action@main
       with: 
