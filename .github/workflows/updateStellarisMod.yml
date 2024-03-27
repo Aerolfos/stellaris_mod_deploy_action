@@ -85,7 +85,7 @@ jobs:
 
     - name: Test print file structure
       run: |
-        cd ../../../
+        cd ../../
         tree
     
     # action expects to be run from a directory that's alongside the relevant mod repo, see tools step above

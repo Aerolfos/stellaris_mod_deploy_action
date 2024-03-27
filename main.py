@@ -28,7 +28,7 @@ working_folder = Path(__file__).resolve().parent
 print("Python file folder path:", working_folder)
 print("cwd:", Path.cwd())
 # cwd is set to where the python file is, which should be next to the folder with the mod files from the originating mod repository
-mod_files_folder = Path.cwd() / "../args.modfolderName"
+mod_files_folder = (Path.cwd() / f"../{args.modfolderName}").resolve()
 print(mod_files_folder)
 
 # do overrides immediately
@@ -65,7 +65,8 @@ except KeyError:
     changelog_file_name = "CHANGELOG.md"
 
 # make file paths
-descriptor_file_object = mod_files_folder / descriptor_file_name
+# descriptor is nested twice
+descriptor_file_object = mod_files_folder / args.modfolderName / descriptor_file_name
 print(descriptor_file_object)
 workshop_description_file_object = mod_files_folder / workshop_description_file_name
 readme_file_object = mod_files_folder / readme_file_name
