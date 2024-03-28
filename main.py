@@ -158,10 +158,23 @@ if readme_file_object.exists():
 
     search_and_replace_in_file(readme_file_object, readme_version_pattern, new_readme_version)
 
-for loc_key in override_dict["loc_keys_to_match"]:
-    override_loc_key_pattern = f"(\s{loc_key}:0\s\")(.+)(\")"
+### Update any loc files as requested ###
+try: 
+    loc_files_list = override_dict["extra_loc_files_to_update"]
+    for file_name in loc_files_list:
+        loc_file_object = (mod_files_folder / file_name).resolve()
+        
+        # change version in a loc file for access in-game
+        version_loc_key = override_dict["version_loc_key"]
+        override_loc_key_pattern = f"(\s{version_loc_key}:0\s\").+(\")"
+        new_version_loc_key = f"\g<1>{supported_stellaris_version_display}\g<2>"
 
+        search_and_replace_in_file(loc_file_object, override_loc_key_pattern, new_version_loc_key)
 
-### File output ###
+# if none then just skip
+except KeyError:
+    pass
+
+### Finish up with descriptor file ###
 create_descriptor_file(descriptor_dict, descriptor_file_object)
 

@@ -40,12 +40,21 @@ def parse_descriptor_to_dict(descriptor_file_object: Path) -> dict:
     This method relies on the fixed structure of pdx script, {} are indicators for blocks that go together.
 
     Doing something like putting "}" in your version will break this script, but it will also break Stellaris and its mod upload tools, so, maybe don't do that.
+    
+    Parses will skip empty lines and comments, indicated with #. This includes empty lines in multi-line blocks.
     """
     descriptor_dict = {}
     line_container = []
     multiline_flag = False
     with open(descriptor_file_object, 'r', encoding="utf-8") as descriptor:
         for line in descriptor:
+            # skip empty lines and # comments
+            if not line or line.isspace():
+                continue
+            # strip any spaces or tabs before the comment
+            if line.lstrip().startswith("#"):
+                continue
+            # check for normal parsing
             if not multiline_flag:    
                 if "=" in line:
                     # strip line for trailing spaces and turn line into list with key and value
@@ -63,6 +72,7 @@ def parse_descriptor_to_dict(descriptor_file_object: Path) -> dict:
                         continue #  goes to next line
                     else:
                         descriptor_dict[line[0]] = line[1]
+            # alternate flow
             elif multiline_flag:
                 if "}" in line:
                     descriptor_dict[multiline_key] = line_container
