@@ -32,6 +32,7 @@ if debug_level >= 1:
 mod_files_folder = (Path.cwd() / f"../{args.modfolderName}").resolve()
 
 if debug_level >= 1:
+    print("\n- Paths -")
     print("Python script file path:", Path.cwd())
     print("Path to mod files:", mod_files_folder)
 
