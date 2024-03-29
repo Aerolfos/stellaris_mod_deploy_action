@@ -29,6 +29,6 @@ runs:
   steps:
     - name: 'Run main script'
       working-directory: stellaris_mod_deploy_action
-      run: python main.py "${{ inputs.versionType }}" "${{ inputs.versionStellaris }}" "${{ inputs.useChangelog }}" "${{ github.event.repository.name }}"
+      run: python main.py "${{ inputs.versionType }}" "${{ inputs.versionStellaris }}" "${{ inputs.useChangelog }}" "${{ github.event.repository.name }}" "${{ github.repository }}"
       # repo name from original caller passed as the folder name for the mod
       shell: bash
