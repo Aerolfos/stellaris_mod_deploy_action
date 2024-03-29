@@ -2,11 +2,27 @@
 import argparse
 import re
 from pathlib import Path
-from methods.input_methods import str2bool, parse_descriptor_to_dict, increment_mod_version, search_and_replace_in_file, create_descriptor_file
+from methods.input_methods import str2bool, parse_descriptor_to_dict, increment_mod_version, search_and_replace_in_file, create_descriptor_file, generate_with_template_file
 
 debug_level = 1
 # 0, 1, or 2
 # 0 prints nothing, 1 inputs and paths, 2 prints information about parsing and processing
+
+### Constants ###
+# default search patterns
+# loc_something:0 "something" - 0 code intentional since numbers other than 0 are generated or messed with by some tool, usually
+loc_key_pattern = "(\s{}:0\s\").+(\")" # use with .format(loc_key)
+# "Supports Stellaris version: 1.2.x" with version number bolded in steam BBcode
+default_workshop_desc_version_pattern = r"(Supports Stellaris version: \[b\]).+(\[/b\])"
+# "Supports Stellaris version: `1.2.x`" with version number using code embed in markdown
+default_readme_version_pattern = r"(Supports Stellaris version: \`).+(\`)"
+# fill in with {username/repo_name} and {release-tag}
+github_release_link_pattern = r"https://github.com/{}/releases/tag/{}"
+# search pattern for extracting changelog
+changelog_search_pattern = r"(^---\n)(## .+? `.{5}`:\n)(.*?)(^---$)" # TODO
+# filenames
+release_note_template_filename = "release_note_template.md"
+generated_release_notes_filename = "generated_release_notes.md"
 
 ### Command line inputs ###
 # the user shouldn't even see these, they're for the github action to call
@@ -17,6 +33,7 @@ parser.add_argument("versionStellaris", type=str, help="Stellaris version to sup
 # argparse does not have a proper bool method, so custom implementation in module
 parser.add_argument("useChangelog", type=str2bool, help="Whether to use changelog file")
 parser.add_argument("modfolderName", type=str, help="Name of mod folder (and repository)") # this is set to just be the repo name
+parser.add_argument("repoGithubpath", type=str, help="Mod repository Github path, username+repo_name") # used for constructing links - just use ${{ github.repository }}
 args = parser.parse_args()
 
 ### Test ###
@@ -26,6 +43,7 @@ if debug_level >= 1:
     print("versionStellaris:", args.versionStellaris)
     print("useChangelog:", args.useChangelog)
     print("modfolderName:", args.modfolderName)
+    print("repoGithubpath:", args.repoGithubpath)
 
 ### File paths ###
 # cwd is set to where the python file is, which should be next to the folder with the mod files from the originating mod repository
@@ -75,6 +93,11 @@ if debug_level >= 1:
     print("Descriptor file location:", descriptor_file_object)
 workshop_description_file_object = mod_files_folder / workshop_description_file_name
 readme_file_object = mod_files_folder / readme_file_name
+changelog_file_object = mod_files_folder / changelog_file_name
+# template file is generic and with the script
+release_note_template_object = Path.cwd() / release_note_template_filename
+# not in the folder with the mod repo so this doesn't get comitted
+generated_release_notes_object = Path.cwd() / generated_release_notes_filename
 
 ### File parsing ###
 # grab descriptor and break it down into a python dict
@@ -96,9 +119,14 @@ if debug_level >= 2:
 # takes the mod version str and increments the selected bit according to semantic versioning
 # also returns a dict with the split up semantic pieces (usually major version, minor version, and patch version)
 current_semantic_versions, updated_mod_version = increment_mod_version(descriptor_dict["version"], args.versionType, possible_version_types=possible_version_types)
+# and we make a version suitable for a github release tag - this should be v1.2.3
+# because updated mod version supports a space (v 1.2.3) it's not valid for github so need to re-make it
+github_release_tag = "v" + ".".join(current_semantic_versions.values())
+
 if debug_level >= 2:
     print("Broken down version dict:", current_semantic_versions)
     print("Post-bump mod version:", updated_mod_version)
+    print("Github release tag to use:", github_release_tag)
 
 # make path manually, should always prefer relative path
 # don't want to leak a username with an absolute path
@@ -118,6 +146,14 @@ if override_enabled:
         descriptor_dict["supported_version"] = override_dict["supported_version_override"]
     except KeyError:
         descriptor_dict["supported_version"] = args.versionStellaris
+
+    # check if we want another name - make supported stellaris version available
+    # useful for say gigastructures' mod naming convention
+    try:
+        descriptor_dict["name"] = override_dict["name_override"].format(descriptor_dict["supported_version"])
+    # else skip
+    except KeyError:
+        pass
 else:
     descriptor_dict["supported_version"] = args.versionStellaris
 
@@ -138,12 +174,12 @@ if workshop_description_file_object.exists():
         workshop_desc_version_pattern = override_dict["workshop_desc_version_pattern"]
     except KeyError:
         # by default look for "Supports Stellaris version: 1.2.x" with version number bolded in steam BBcode
-        workshop_desc_version_pattern = r"(Supports Stellaris version: \[b\]).+(\[/b\])"
+        workshop_desc_version_pattern = default_workshop_desc_version_pattern
     
     # uses regex groups from above
     new_workshop_desc_version = f"\g<1>{supported_stellaris_version_display}\g<2>"
 
-    search_and_replace_in_file(workshop_description_file_object, workshop_desc_version_pattern, new_workshop_desc_version)
+    workshop_file_string = search_and_replace_in_file(workshop_description_file_object, workshop_desc_version_pattern, new_workshop_desc_version)
 
 ### Similarly update readme file, if it exists ###
 if readme_file_object.exists():
@@ -152,12 +188,12 @@ if readme_file_object.exists():
         readme_version_pattern = override_dict["readme_version_pattern"]
     except KeyError:
         # by default look for "Supports Stellaris version: `1.2.x`" with version number using code embed in markdown
-        readme_version_pattern = r"(Supports Stellaris version: \`).+(\`)"
+        readme_version_pattern = default_readme_version_pattern
     
     # uses regex groups from above
     new_readme_version = f"\g<1>{supported_stellaris_version_display}\g<2>"
 
-    search_and_replace_in_file(readme_file_object, readme_version_pattern, new_readme_version)
+    readme_file_string = search_and_replace_in_file(readme_file_object, readme_version_pattern, new_readme_version)
 
 ### Update any loc files as requested ###
 try: 
@@ -167,13 +203,25 @@ try:
         
         # change version in a loc file for access in-game
         version_loc_key = override_dict["version_loc_key"]
-        override_loc_key_pattern = f"(\s{version_loc_key}:0\s\").+(\")"
+        version_loc_key_pattern = loc_key_pattern.format(version_loc_key)
         new_version_loc_key = f"\g<1>{supported_stellaris_version_display}\g<2>"
 
-        search_and_replace_in_file(loc_file_object, override_loc_key_pattern, new_version_loc_key)
+        # potential other keys to change to go here
+
+        loc_file_string = search_and_replace_in_file(loc_file_object, version_loc_key_pattern, new_version_loc_key)
 
 # if none then just skip
 except KeyError:
+    pass
+
+### Process changelog ###
+if args.useChangelog:
+    if not changelog_file_object.exists():
+        raise ValueError(f"Requested adding changelog to release notes, but no file {changelog_file_name} was provided in repository")
+    
+    github_release_link = github_release_link_pattern.format(args.repoGithubpath, github_release_tag)
+    changelog_file_string = search_and_replace_in_file(changelog_file_object, "", "")
+    template_file_string = generate_with_template_file(release_note_template_object, generated_release_notes_object, "", "")
     pass
 
 ### Finish up with descriptor file ###

@@ -161,6 +161,8 @@ def search_and_replace_in_file(file_path: Path, pattern: Union[str, list], subst
     Use to update version number and similar in text descriptions
 
     Can take in one pattern, or a list of them to go through and match
+
+    Returns the file string in case info from file is useful
     """
     # read into holder string for searching
     file_handle = open(file_path, 'r')
@@ -179,3 +181,35 @@ def search_and_replace_in_file(file_path: Path, pattern: Union[str, list], subst
     file_handle = open(file_path, 'w')
     file_handle.write(file_string)
     file_handle.close()
+
+    return file_string
+
+def generate_with_template_file(template_file_path: Path, generated_file_path: Path, pattern: Union[str, list], substr: str) -> None:
+    """Uses a template file to generate a new file with part of it replaced via regex
+
+    Useful for filling in changelog to a release note template
+
+    Can take in one pattern, or a list of them to go through and match
+
+    Returns the file string in case info from file is useful
+    """
+    # read template into holder string
+    file_handle = open(template_file_path, 'r')
+    file_string = file_handle.read()
+    file_handle.close()
+
+    # fill in to template via regex search
+    if isinstance(pattern, list):
+        for selected_pattern in pattern:
+            file_string = (re.sub(selected_pattern, substr, file_string))
+    elif isinstance(pattern, str):
+        file_string = (re.sub(pattern, substr, file_string))
+    else:
+        raise TypeError(f"Input search pattern must be a single str or a list of str, got {type(pattern)}")
+
+    # w writes new file
+    file_handle = open(generated_file_path, 'w')
+    file_handle.write(file_string)
+    file_handle.close()
+
+    return file_string
