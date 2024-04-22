@@ -11,15 +11,16 @@ debug_level = 1
 ### Constants ###
 # default search patterns
 # loc_something:0 "something" - 0 code intentional since numbers other than 0 are generated or messed with by some tool, usually
-loc_key_pattern = "(\s{}:0\s\").+(\")" # use with .format(loc_key)
+loc_key_pattern = "(\\s{}:0\\s\").+?(\")" # use with .format(loc_key)
 # "Supports Stellaris version: 1.2.x" with version number bolded in steam BBcode
-default_workshop_desc_version_pattern = r"(Supports Stellaris version: \[b\]).+(\[/b\])"
+default_workshop_desc_version_pattern = r"(Supports Stellaris version: \[b\]).+?(\[/b\])"
 # "Supports Stellaris version: `1.2.x`" with version number using code embed in markdown
-default_readme_version_pattern = r"(Supports Stellaris version: \`).+(\`)"
+default_readme_version_pattern = r"(Supports Stellaris version: \`).+?(\`)"
 # fill in with {username/repo_name} and {release-tag}
 github_release_link_pattern = r"https://github.com/{}/releases/tag/{}"
-# search pattern for extracting changelog
-changelog_search_pattern = r"(^---\n)(## .+? `.{5}`:\n)(.*?)(^---$)" # TODO
+# search pattern for extracting changelog - expects latest changes to be under "WIP"
+default_changelog_search_pattern = r"(^---\n)(## .+?\s`)WIP(`:\n)(.*?)(^---$)"
+# regex r"(^---\n)(## .+?\s`.{1,13}`:\n)(.*?)(^---$)" matches arbitrary version numbers
 # filenames
 release_note_template_filename = "release_note_template.md"
 generated_release_notes_filename = "generated_release_notes.md"
@@ -32,11 +33,10 @@ parser.add_argument("versionType", type=str, choices=possible_version_types, hel
 parser.add_argument("versionStellaris", type=str, help="Stellaris version to support")
 # argparse does not have a proper bool method, so custom implementation in module
 parser.add_argument("useChangelog", type=str2bool, help="Whether to use changelog file")
-parser.add_argument("modfolderName", type=str, help="Name of mod folder (and repository)") # this is set to just be the repo name
+parser.add_argument("modfolderName", type=str, help="Name of mod folder (and repository)") # this is set to just be the repo name, use ${{ github.event.repository.name }}
 parser.add_argument("repoGithubpath", type=str, help="Mod repository Github path, username+repo_name") # used for constructing links - just use ${{ github.repository }}
 args = parser.parse_args()
 
-### Test ###
 if debug_level >= 1:
     print("- Inputs -")
     print("versionType:", args.versionType)
@@ -177,7 +177,7 @@ if workshop_description_file_object.exists():
         workshop_desc_version_pattern = default_workshop_desc_version_pattern
     
     # uses regex groups from above
-    new_workshop_desc_version = f"\g<1>{supported_stellaris_version_display}\g<2>"
+    new_workshop_desc_version = f"\\g<1>{supported_stellaris_version_display}\\g<2>"
 
     workshop_file_string = search_and_replace_in_file(workshop_description_file_object, workshop_desc_version_pattern, new_workshop_desc_version)
 
@@ -191,7 +191,7 @@ if readme_file_object.exists():
         readme_version_pattern = default_readme_version_pattern
     
     # uses regex groups from above
-    new_readme_version = f"\g<1>{supported_stellaris_version_display}\g<2>"
+    new_readme_version = f"\\g<1>{supported_stellaris_version_display}\\g<2>"
 
     readme_file_string = search_and_replace_in_file(readme_file_object, readme_version_pattern, new_readme_version)
 
@@ -204,7 +204,7 @@ try:
         # change version in a loc file for access in-game
         version_loc_key = override_dict["version_loc_key"]
         version_loc_key_pattern = loc_key_pattern.format(version_loc_key)
-        new_version_loc_key = f"\g<1>{supported_stellaris_version_display}\g<2>"
+        new_version_loc_key = f"\\g<1>{supported_stellaris_version_display}\\g<2>"
 
         # potential other keys to change to go here
 
@@ -219,10 +219,19 @@ if args.useChangelog:
     if not changelog_file_object.exists():
         raise ValueError(f"Requested adding changelog to release notes, but no file {changelog_file_name} was provided in repository")
     
+    try:
+        # changelog format to search for can be overriden - must have matching regex group references
+        changelog_search_pattern = override_dict["changelog_search_pattern"]
+    except KeyError:
+        # fallback to default
+        changelog_search_pattern = default_changelog_search_pattern
+    
+    # uses regex groups from above
+    changelog_replace = f"\\g<1>{github_release_tag}\\g<2>"
+    
     github_release_link = github_release_link_pattern.format(args.repoGithubpath, github_release_tag)
-    changelog_file_string = search_and_replace_in_file(changelog_file_object, "", "")
+    original_changelog_file_string, new_changelog_file_string = search_and_replace_in_file(changelog_search_pattern, "", "", return_old_str=True)
     template_file_string = generate_with_template_file(release_note_template_object, generated_release_notes_object, "", "")
-    pass
 
 ### Finish up with descriptor file ###
 create_descriptor_file(descriptor_dict, descriptor_file_object)
