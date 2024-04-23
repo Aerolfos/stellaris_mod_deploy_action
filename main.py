@@ -19,7 +19,7 @@ default_readme_version_pattern = r"(Supports Stellaris version: \`).+?(\`)"
 # fill in with {username/repo_name} and {release-tag}
 github_release_link_pattern = r"https://github.com/{}/releases/tag/{}"
 # search pattern for extracting changelog - expects latest changes to be under "WIP"
-default_changelog_search_pattern = r"(^---\n)(## .+?\s`)WIP(`:\n)(.*?)(^---$)"
+default_changelog_search_pattern = r"(^---\n)(##\s)(.+?\s`)WIP(`)(:\n)(.*?)(^---$)"
 # regex r"(^---\n)(## .+?\s`.{1,13}`:\n)(.*?)(^---$)" matches arbitrary version numbers
 # filenames
 release_note_template_filename = "release_note_template.md"
@@ -226,11 +226,11 @@ if args.useChangelog:
         # fallback to default
         changelog_search_pattern = default_changelog_search_pattern
     
-    # uses regex groups from above
-    changelog_replace = f"\\g<1>{github_release_tag}\\g<2>"
-    
+    # uses regex groups from above, and makes a link
     github_release_link = github_release_link_pattern.format(args.repoGithubpath, github_release_tag)
-    original_changelog_file_string, new_changelog_file_string = search_and_replace_in_file(changelog_search_pattern, "", "", return_old_str=True)
+    changelog_replace = f"\\g<1>\\g<2>[\\g<3>{github_release_tag}\\g<4>]({github_release_link})\\g<5>\\g<6>\\g<7>"
+    
+    original_changelog_file_string, new_changelog_file_string = search_and_replace_in_file(changelog_search_pattern, changelog_search_pattern, changelog_replace, return_old_str=True)
     template_file_string = generate_with_template_file(release_note_template_object, generated_release_notes_object, "", "")
 
 ### Finish up with descriptor file ###
