@@ -21,6 +21,7 @@ github_release_link_pattern = r"https://github.com/{}/releases/tag/{}"
 # search pattern for extracting changelog - expects latest changes to be under "WIP"
 default_changelog_search_pattern = r"(^---\n)(##\s)(.+?\s`)WIP(`)(:\n)(.*?)(^---$)"
 # regex r"(^---\n)(## .+?\s`.{1,13}`:\n)(.*?)(^---$)" matches arbitrary version numbers
+default_template_search_pattern = r"(^---\n)(\nChanges\n\n)(^---$)"
 # filenames
 release_note_template_filename = "release_note_template.md"
 generated_release_notes_filename = "generated_release_notes.md"
@@ -158,7 +159,7 @@ else:
     descriptor_dict["supported_version"] = args.versionStellaris
 
 if debug_level >= 2:
-    print("- Updated dictionary: -")
+    print("- Updated descriptor dictionary: -")
     for key, item in descriptor_dict.items():
         print(f"{key}: {item}")
 
@@ -219,19 +220,39 @@ if args.useChangelog:
     if not changelog_file_object.exists():
         raise ValueError(f"Requested adding changelog to release notes, but no file {changelog_file_name} was provided in repository")
     
+    # changelog format to search for can be overriden - must have matching regex group references
     try:
-        # changelog format to search for can be overriden - must have matching regex group references
         changelog_search_pattern = override_dict["changelog_search_pattern"]
     except KeyError:
         # fallback to default
         changelog_search_pattern = default_changelog_search_pattern
+
+    try:
+        template_search_pattern = override_dict["template_search_pattern"]
+    except KeyError:
+        # fallback to default
+        template_search_pattern = default_template_search_pattern
     
     # uses regex groups from above, and makes a link
     github_release_link = github_release_link_pattern.format(args.repoGithubpath, github_release_tag)
-    changelog_replace = f"\\g<1>\\g<2>[\\g<3>{github_release_tag}\\g<4>]({github_release_link})\\g<5>\\g<6>\\g<7>"
+    changelog_replace = f"\\g<1>\\g<2>[\\g<3>{updated_mod_version}\\g<4>]({github_release_link})\\g<5>\\g<6>\\g<7>"
     
+    # this replaces the WIP on the latest change entry in the original changelog file from the mod repo
+    # and also turns it into a link that will lead to the release we will be creating
     original_changelog_file_string, new_changelog_file_string = search_and_replace_in_file(changelog_search_pattern, changelog_search_pattern, changelog_replace, return_old_str=True)
-    template_file_string = generate_with_template_file(release_note_template_object, generated_release_notes_object, "", "")
+    
+    # grab the changelog entry from the original file, change the WIP to version number, then grab template file and fill it in
+    if match := re.match(changelog_search_pattern, original_changelog_file_string, flags=re.IGNORECASE | re.MULTILINE | re.DOTALL):
+        release_changelog_entry = f"\\g<1>\\g<2>\\g<3>{updated_mod_version}\\g<4>\\g<5>\\g<6>\\g<7>"
+    
+    template_file_string = generate_with_template_file(release_note_template_object, generated_release_notes_object, template_search_pattern, "")
+
+    # TODO: pass the changelog header and version in to github actions environment
+    # reference later for release name
+
+else:
+    # use auto-generated release notes?
+    pass
 
 ### Finish up with descriptor file ###
 create_descriptor_file(descriptor_dict, descriptor_file_object)
