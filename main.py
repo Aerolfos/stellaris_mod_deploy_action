@@ -218,7 +218,7 @@ try:
         # change version in a loc file for access in-game
         version_loc_key = override_dict["version_loc_key"]
         version_loc_key_pattern = loc_key_pattern.format(version_loc_key)
-        new_version_loc_key = f"\\g<1>{supported_stellaris_version_display}\\g<2>"
+        new_version_loc_key = f"\\g<1>{updated_mod_version}\\g<2>"
 
         # potential other keys to change to go here
 

@@ -128,6 +128,8 @@ jobs:
     - name: 'Create a release object, attach zip of mod files + descriptor'
       id: main_gh_release
       working-directory: ${{ github.event.repository.name }}
+      env:
+        GH_TOKEN: ${{ github.token }}
       run: |
         gh release create $MOD_RELEASE_TAG release.tar.xz --title "$MOD_RELEASE_TITLE" --notes-file $MOD_RELEASENOTES_FILE
       shell: bash
