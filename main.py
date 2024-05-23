@@ -1,5 +1,6 @@
 ### Imports ###
 import argparse
+import os
 import re
 from pathlib import Path
 from methods.input_methods import str2bool, parse_descriptor_to_dict, increment_mod_version, search_and_replace_in_file, create_descriptor_file, generate_with_template_file
@@ -9,6 +10,10 @@ debug_level = 1
 # 0 prints nothing, 1 inputs and paths, 2 prints information about parsing and processing
 
 ### Constants ###
+# environment variable names (passed to github action environment)
+github_env_modreleasetag_name = "MOD_RELEASE_TAG"
+github_env_releasetitle_name = "MOD_RELEASE_TITLE"
+
 # default search patterns
 # loc_something:0 "something" - 0 code intentional since numbers other than 0 are generated or messed with by some tool, usually
 loc_key_pattern = "(\\s{}:0\\s\").+?(\")" # use with .format(loc_key)
@@ -22,6 +27,7 @@ github_release_link_pattern = r"https://github.com/{}/releases/tag/{}"
 default_changelog_search_pattern = r"(^---\n)(##\s)(.+?\s`)WIP(`)(:\n)(.*?)(^---$)"
 # regex r"(^---\n)(## .+?\s`.{1,13}`:\n)(.*?)(^---$)" matches arbitrary version numbers
 default_template_search_pattern = r"(^---\n)(\nChanges\n\n)(^---$)"
+
 # filenames
 release_note_template_filename = "release_note_template.md"
 generated_release_notes_filename = "generated_release_notes.md"
@@ -242,13 +248,28 @@ if args.useChangelog:
     original_changelog_file_string, new_changelog_file_string = search_and_replace_in_file(changelog_search_pattern, changelog_search_pattern, changelog_replace, return_old_str=True)
     
     # grab the changelog entry from the original file, change the WIP to version number, then grab template file and fill it in
-    if match := re.match(changelog_search_pattern, original_changelog_file_string, flags=re.IGNORECASE | re.MULTILINE | re.DOTALL):
-        release_changelog_entry = f"\\g<1>\\g<2>\\g<3>{updated_mod_version}\\g<4>\\g<5>\\g<6>\\g<7>"
-    
-    template_file_string = generate_with_template_file(release_note_template_object, generated_release_notes_object, template_search_pattern, "")
+    if match := re.search(changelog_search_pattern, original_changelog_file_string, flags=re.IGNORECASE | re.MULTILINE | re.DOTALL):
+        # fills in string with groups retrieved from regex search, in order
+        release_changelog_entry = f"{match[1]}{match[2]}{match[3]}{updated_mod_version}{match[4]}{match[5]}{match[6]}{match[7]}"
 
-    # TODO: pass the changelog header and version in to github actions environment
+        # grab a title from the header of the changelog
+        # groups 2,3,4,5 correspond to title without --- padding and changelog notes
+        release_title = f"{match[2]}{match[3]}{github_release_tag}{match[4]}{match[5]}"
+        
+        if debug_level >= 2:
+            print("- Finished changelog entry going into release notes: -")
+            print(release_changelog_entry)
+            print("- Isolated title header: -")
+            print(release_title)
+    
+    template_file_string = generate_with_template_file(release_note_template_object, generated_release_notes_object, template_search_pattern, release_changelog_entry)
+
+    # TODO: pass the changelog header and mod version in to github actions environment
     # reference later for release name
+    env_file_path = os.getenv('GITHUB_ENV')
+    with open(env_file_path, "a") as envfile: # type: ignore - false error from parsing a str filename which works fine when the file exists in the actual github env
+        print(f'{github_env_modreleasetag_name}={github_release_tag}', file=envfile)
+        print(f'{github_env_releasetitle_name}={release_title}', file=envfile)
 
 else:
     # use auto-generated release notes?

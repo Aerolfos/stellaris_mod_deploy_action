@@ -28,7 +28,20 @@ runs:
   using: 'composite'
   steps:
     - name: 'Run main script'
+      id: python_main
       working-directory: stellaris_mod_deploy_action
       run: python main.py "${{ inputs.versionType }}" "${{ inputs.versionStellaris }}" "${{ inputs.useChangelog }}" "${{ github.event.repository.name }}" "${{ github.repository }}"
       # repo name from original caller passed as the folder name for the mod
+      shell: bash
+
+    - name: 'Test print release tag'
+      id: test_one
+      working-directory: stellaris_mod_deploy_action
+      run: printf '%s\n' "$MOD_RELEASE_TAG"
+      shell: bash
+
+    - name: 'Test print release title'
+      id: test_two
+      working-directory: stellaris_mod_deploy_action
+      run: printf '%s\n' "$MOD_RELEASE_TITLE"
       shell: bash
