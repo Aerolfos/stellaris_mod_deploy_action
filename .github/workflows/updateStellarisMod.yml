@@ -131,6 +131,6 @@ jobs:
       env:
         GH_TOKEN: ${{ github.token }}
       run: |
-        gh release create $MOD_RELEASE_TAG release.tar.xz --title "$MOD_RELEASE_TITLE" --notes-file $MOD_RELEASENOTES_FILE
+        gh release create $MOD_RELEASE_TAG $MOD_RELEASE_ZIP_FILE --title "$MOD_RELEASE_TITLE" --notes-file $MOD_RELEASENOTES_FILE
       shell: bash
 
