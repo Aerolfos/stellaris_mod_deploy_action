@@ -13,6 +13,9 @@ debug_level = 1
 # environment variable names (passed to github action environment)
 github_env_modreleasetag_name = "MOD_RELEASE_TAG"
 github_env_releasetitle_name = "MOD_RELEASE_TITLE"
+github_env_releasenotesfile_name = "MOD_RELEASENOTES_FILE"
+github_env_descriptorfile_name = "MOD_DESCRIPTOR_FILE"
+github_env_releasezipfile_name = "MOD_RELEASE_ZIP_FILE"
 
 # default search patterns
 # loc_something:0 "something" - 0 code intentional since numbers other than 0 are generated or messed with by some tool, usually
@@ -129,6 +132,10 @@ current_semantic_versions, updated_mod_version = increment_mod_version(descripto
 # and we make a version suitable for a github release tag - this should be v1.2.3
 # because updated mod version supports a space (v 1.2.3) it's not valid for github so need to re-make it
 github_release_tag = "v" + ".".join(current_semantic_versions.values())
+
+# make yet another version of version number, this one with underscores so it's valid as a filename
+# v1.2.3 -> 1_2_3
+filename_mod_version = "_".join(current_semantic_versions.values())
 
 if debug_level >= 2:
     print("Broken down version dict:", current_semantic_versions)
@@ -253,14 +260,16 @@ if args.useChangelog:
         release_changelog_entry = f"{match[1]}{match[2]}{match[3]}{updated_mod_version}{match[4]}{match[5]}{match[6]}{match[7]}"
 
         # grab a title from the header of the changelog
-        # groups 2,3,4,5 correspond to title without --- padding and changelog notes
-        release_title = f"{match[2]}{match[3]}{github_release_tag}{match[4]}{match[5]}"
+        # groups 3,4,5 correspond to title without --- padding and changelog notes
+        release_title = f"{match[3]}{github_release_tag}{match[4]}"
         
         if debug_level >= 2:
             print("- Finished changelog entry going into release notes: -")
             print(release_changelog_entry)
             print("- Isolated title header: -")
             print(release_title)
+            print("- Name and path of output file with release notes: -")
+            print(generated_release_notes_object)
     
     template_file_string = generate_with_template_file(release_note_template_object, generated_release_notes_object, template_search_pattern, release_changelog_entry)
 
@@ -268,12 +277,22 @@ if args.useChangelog:
     # reference later for release name
     env_file_path = os.getenv('GITHUB_ENV')
     with open(env_file_path, "a") as envfile: # type: ignore - false error from parsing a str filename which works fine when the file exists in the actual github env
-        print(f'{github_env_modreleasetag_name}={github_release_tag}', file=envfile)
         print(f'{github_env_releasetitle_name}={release_title}', file=envfile)
+        print(f'{github_env_releasenotesfile_name}={generated_release_notes_object}', file=envfile)
 
 else:
     # use auto-generated release notes?
     pass
+
+### Processing for just release object ###
+# release zipfile name must be acceptable format
+release_zipfile_name = f"{args.modfolderName}_{filename_mod_version}.zip"
+# make useful environment variables
+env_file_path = os.getenv('GITHUB_ENV')
+with open(env_file_path, "a") as envfile: # type: ignore - false error from parsing a str filename which works fine when the file exists in the actual github env
+    print(f'{github_env_modreleasetag_name}={github_release_tag}', file=envfile)
+    print(f'{github_env_descriptorfile_name}={descriptor_file_name}', file=envfile)
+    print(f'{github_env_releasezipfile_name}={release_zipfile_name}', file=envfile)
 
 ### Finish up with descriptor file ###
 create_descriptor_file(descriptor_dict, descriptor_file_object)

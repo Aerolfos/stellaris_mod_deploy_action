@@ -45,3 +45,4 @@ runs:
       working-directory: stellaris_mod_deploy_action
       run: printf '%s\n' "$MOD_RELEASE_TITLE"
       shell: bash
+      
