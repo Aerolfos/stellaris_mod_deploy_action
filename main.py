@@ -245,7 +245,7 @@ if args.useChangelog:
     
     # this replaces the WIP on the latest change entry in the original changelog file from the mod repo
     # and also turns it into a link that will lead to the release we will be creating
-    original_changelog_file_string, new_changelog_file_string = search_and_replace_in_file(changelog_search_pattern, changelog_search_pattern, changelog_replace, return_old_str=True)
+    original_changelog_file_string, new_changelog_file_string = search_and_replace_in_file(changelog_file_object, changelog_search_pattern, changelog_replace, return_old_str=True)
     
     # grab the changelog entry from the original file, change the WIP to version number, then grab template file and fill it in
     if match := re.search(changelog_search_pattern, original_changelog_file_string, flags=re.IGNORECASE | re.MULTILINE | re.DOTALL):
