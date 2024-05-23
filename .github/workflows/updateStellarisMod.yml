@@ -82,12 +82,6 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: "3.11"
-
-    # TODO
-    - name: Test print file structure
-      run: |
-        cd ../
-        tree
     
     # action expects to be run from a directory that's alongside the relevant mod repo, see tools step above
     - name: Run associated Python action
@@ -97,21 +91,20 @@ jobs:
         versionType: ${{ inputs.versionType }}
         versionStellaris: ${{ inputs.versionStellaris }}
         useChangelog: ${{ inputs.useChangelog }}
-
-    - name: 'Test print release title'
-      id: test_release_title_print
-      working-directory: ${{ github.event.repository.name }}
-      run: printf '%s\n' "$MOD_RELEASE_TITLE"
-      shell: bash
     
     - name: 'Commit and push changes from Python script'
       id: main_commit_push
       working-directory: ${{ github.event.repository.name }}
+      # shenanigans: use the email of the triggerer for the workflow to author the commit,
+      # but then set a bot, amend, and do the actual push - this will make the message say "user authored and bot committed"
       run: |
+        git config user.name "${GITHUB_ACTOR}"
+        git config user.email "${GITHUB_ACTOR_ID}+${GITHUB_ACTOR}@users.noreply.github.com"
+        git add .
+        git commit -m "Placeholder"
         git config user.name "github-actions[bot]"
         git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-        git add .
-        git commit -m "Generate release for $MOD_RELEASE_TITLE"
+        git commit --amend -m "Generate release for $MOD_RELEASE_TITLE"
         git push
       shell: bash
 
@@ -120,6 +113,8 @@ jobs:
       working-directory: ${{ github.event.repository.name }}
       # copy descriptor file from mod files up one folder, renamed to same as mod folder
       # this matches what the user needs to drop in Stellaris/mod - zip this for release
+      # we are doing this after push, so we use updated files, and by not pushing here 
+      # we do not leave the descriptor or zip in the repo - they are discarded when workflow ends
       run: |
         cp ${{ github.event.repository.name }}/$MOD_DESCRIPTOR_FILE ${{ github.event.repository.name }}.mod
         zip -r ${MOD_RELEASE_ZIP_FILE} ${{ github.event.repository.name }} ${{ github.event.repository.name }}.mod
