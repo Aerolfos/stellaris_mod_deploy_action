@@ -258,16 +258,10 @@ if args.useChangelog:
     if match := re.search(changelog_search_pattern, original_changelog_file_string, flags=re.IGNORECASE | re.MULTILINE | re.DOTALL):
         # fills in string with groups retrieved from regex search, in order
         release_changelog_entry = f"{match[1]}{match[2]}{match[3]}{updated_mod_version}{match[4]}{match[5]}{match[6]}{match[7]}"
-
-        # grab a title from the header of the changelog
-        # groups 3,4,5 correspond to title without --- padding and changelog notes
-        release_title = f"{match[3]}{github_release_tag}{match[4]}"
         
         if debug_level >= 2:
             print("- Finished changelog entry going into release notes: -")
             print(release_changelog_entry)
-            print("- Isolated title header: -")
-            print(release_title)
             print("- Name and path of output file with release notes: -")
             print(generated_release_notes_object)
     
@@ -277,7 +271,6 @@ if args.useChangelog:
     # reference later for release name
     env_file_path = os.getenv('GITHUB_ENV')
     with open(env_file_path, "a") as envfile: # type: ignore - false error from parsing a str filename which works fine when the file exists in the actual github env
-        print(f'{github_env_releasetitle_name}={release_title}', file=envfile)
         print(f'{github_env_releasenotesfile_name}={generated_release_notes_object}', file=envfile)
 
 else:
@@ -285,11 +278,14 @@ else:
     pass
 
 ### Processing for just release object ###
+# create title from mod name + the release tag - used for commit message and release title
+release_title = f"{descriptor_dict['name']} {github_release_tag}"
 # release zipfile name must be acceptable format
 release_zipfile_name = f"{args.modfolderName}_{filename_mod_version}.zip"
 # make useful environment variables
 env_file_path = os.getenv('GITHUB_ENV')
 with open(env_file_path, "a") as envfile: # type: ignore - false error from parsing a str filename which works fine when the file exists in the actual github env
+    print(f'{github_env_releasetitle_name}={release_title}', file=envfile)
     print(f'{github_env_modreleasetag_name}={github_release_tag}', file=envfile)
     print(f'{github_env_descriptorfile_name}={descriptor_file_name}', file=envfile)
     print(f'{github_env_releasezipfile_name}={release_zipfile_name}', file=envfile)

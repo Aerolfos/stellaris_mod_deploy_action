@@ -9,4 +9,4 @@ Changes
 ---
 
 ## Past change notes
-[Can be found here.](CHANGELOG.md)
+[Can be found here.](../main/CHANGELOG.md)
