@@ -134,8 +134,8 @@ current_semantic_versions, updated_mod_version = increment_mod_version(descripto
 github_release_tag = "v" + ".".join(current_semantic_versions.values())
 
 # make yet another version of version number, this one with underscores so it's valid as a filename
-# v1.2.3 -> 1_2_3
-filename_mod_version = "_".join(current_semantic_versions.values())
+# v1.2.3 -> v1_2_3
+filename_mod_version = "v" + "_".join(current_semantic_versions.values())
 
 if debug_level >= 2:
     print("Broken down version dict:", current_semantic_versions)
