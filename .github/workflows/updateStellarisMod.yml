@@ -112,10 +112,12 @@ jobs:
       id: main_zip_for_release
       working-directory: ${{ github.event.repository.name }}
       # copy descriptor file from mod files up one folder, renamed to same as mod folder
-      # this matches what the user needs to drop in Stellaris/mod - zip this for release
+      # use sed tool to deduplicate the path in our descriptor file - for user's download this should be one layer deep
+      # this matches what the user needs and should drop in Stellaris/mod - zip this for release
       # we are doing this after push, so we use updated files, and by not pushing here 
       # we do not leave the descriptor or zip in the repo - they are discarded when workflow ends
       run: |
+        sed -i 's|path="mod/${{ github.event.repository.name }}/${{ github.event.repository.name }}"|path="mod/${{ github.event.repository.name }}"|' "${{ github.event.repository.name }}/$MOD_DESCRIPTOR_FILE"
         cp ${{ github.event.repository.name }}/$MOD_DESCRIPTOR_FILE ${{ github.event.repository.name }}.mod
         zip -r ${MOD_RELEASE_ZIP_FILE} ${{ github.event.repository.name }} ${{ github.event.repository.name }}.mod
       shell: bash
