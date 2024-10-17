@@ -110,7 +110,7 @@ def increment_mod_version(
         use_format_check: bool = True, 
         possible_version_types: list = ["Major", "Minor", "Patch"]
     ) -> tuple[dict, str]:
-    """Take a version of the form "1.2.3" and increment according to patch type
+    """Take a version of the form "v1.2.3" and increment according to patch type
 
     Uses a regex pattern to make sure the format is correct - can be optionally skipped
 
@@ -123,7 +123,7 @@ def increment_mod_version(
         # matches format "1.2.3" or alternatively "v1.2.3", * wildcards allowed
         regex_version_pattern = r"^v?\s?(?:(?:\d{1,3}|\*)\.){2}(?:\d{1,3}|\*)" # yeah regex be like that
         if not re.search(regex_version_pattern, input_mod_version, re.IGNORECASE):
-            raise ValueError(f"Version format should be of type \"1.2.3\", got {input_mod_version}")
+            raise ValueError(f"Version format should be of type \"v1.2.3\", got {input_mod_version}")
 
     semantic_version_list = input_mod_version.split(".")
     # save the v and potential space for later
@@ -148,7 +148,8 @@ def increment_mod_version(
     if "*" not in current_semantic_versions[patch_type]:
         current_semantic_versions[patch_type] = str(int(current_semantic_versions[patch_type]) + 1)
     
-    updated_mod_version = ".".join(current_semantic_versions.values())
+    # stellaris wants v1.2.3 now
+    updated_mod_version = "v" + ".".join(current_semantic_versions.values())
     if using_v_prefix:
         if using_v_with_space_prefix:
             updated_mod_version = " " + updated_mod_version
