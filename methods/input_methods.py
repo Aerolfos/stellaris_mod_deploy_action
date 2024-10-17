@@ -189,12 +189,14 @@ def search_and_replace_in_file(file_path: Path, pattern: Union[str, list], repla
     else:
         return file_string
 
-def generate_with_template_file(template_file_path: Path, generated_file_path: Path, pattern: Union[str, list], replacestr: str) -> str:
+def generate_with_template_file(template_file_path: Path, generated_file_path: Path, pattern: Union[str, list], replacestr: str, skip_regex_replace=False) -> str:
     """Uses a template file to generate a new file with part of it replaced via regex
 
     Useful for filling in changelog to a release note template
 
     Can take in one pattern, or a list of them to go through and match
+
+    If skip is enabled, skips the regex search - just pass empty strings for pattern and replacestr
 
     Returns the file string in case info from file is useful
     """
@@ -203,14 +205,15 @@ def generate_with_template_file(template_file_path: Path, generated_file_path: P
     file_string = file_handle.read()
     file_handle.close()
 
-    # fill in to template via regex search
-    if isinstance(pattern, list):
-        for selected_pattern in pattern:
-            file_string = re.sub(selected_pattern, replacestr, file_string, flags=re.IGNORECASE | re.MULTILINE | re.DOTALL)
-    elif isinstance(pattern, str):
-        file_string = re.sub(pattern, replacestr, file_string, flags=re.IGNORECASE | re.MULTILINE | re.DOTALL)
-    else:
-        raise TypeError(f"Input search pattern must be a single str or a list of str, got {type(pattern)}")
+    if skip_regex_replace is False:
+        # fill in to template via regex search
+        if isinstance(pattern, list):
+            for selected_pattern in pattern:
+                file_string = re.sub(selected_pattern, replacestr, file_string, flags=re.IGNORECASE | re.MULTILINE | re.DOTALL)
+        elif isinstance(pattern, str):
+            file_string = re.sub(pattern, replacestr, file_string, flags=re.IGNORECASE | re.MULTILINE | re.DOTALL)
+        else:
+            raise TypeError(f"Input search pattern must be a single str or a list of str, got {type(pattern)}")
 
     # w writes new file
     file_handle = open(generated_file_path, 'w')
