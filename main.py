@@ -32,7 +32,8 @@ default_changelog_search_pattern = r"(^---\n)(##\s)(.+?\s`)WIP(`)(:\n)(.*?)(^---
 default_template_search_pattern = r"(^---\n)(\nChanges\n\n)(^---$)"
 
 # filenames
-release_note_template_filename = "release_note_template.md"
+default_release_note_template_filename = "release_note_template.md"
+default_release_note_template_no_changelog_filename = "release_note_template_no_changelog.md"
 generated_release_notes_filename = "generated_release_notes.md"
 
 ### Command line inputs ###
@@ -96,6 +97,14 @@ try:
 except KeyError:
     changelog_file_name = "CHANGELOG.md"
 
+# use flag to carry information on whether this override happened
+release_note_template_overriden = False
+try:
+    release_note_template_filename = override_dict["release_note_template_filename_override"]
+    release_note_template_overriden = True
+except KeyError:
+    release_note_template_filename = default_release_note_template_filename
+
 # make file paths
 # descriptor is nested twice
 descriptor_file_object = mod_files_folder / args.modfolderName / descriptor_file_name
@@ -104,9 +113,15 @@ if debug_level >= 1:
 workshop_description_file_object = mod_files_folder / workshop_description_file_name
 readme_file_object = mod_files_folder / readme_file_name
 changelog_file_object = mod_files_folder / changelog_file_name
-# template file is generic and with the script
-release_note_template_object = Path.cwd() / release_note_template_filename
-# not in the folder with the mod repo so this doesn't get comitted
+# default template file is generic and with the script
+# but otherwise, check user provided one (which can only come from *their* repo)
+if release_note_template_overriden:
+    release_note_template_object = mod_files_folder / release_note_template_filename
+else:
+    release_note_template_object = Path.cwd() / release_note_template_filename
+# no changelog version
+default_release_note_template_no_changelog_object = Path.cwd() / default_release_note_template_no_changelog_filename
+# not in the folder with the mod repo so this doesn't get comitted, it's a temp file
 generated_release_notes_object = Path.cwd() / generated_release_notes_filename
 
 ### File parsing ###
@@ -177,7 +192,9 @@ if debug_level >= 2:
         print(f"{key}: {item}")
 
 # for display, change any asterisks to x
+# and remove the initial v too (matter of preference tbh)
 supported_stellaris_version_display = args.versionStellaris.replace("*", "x")
+supported_stellaris_version_display = supported_stellaris_version_display.replace("v", "")
 if debug_level >= 2:
     print(supported_stellaris_version_display)
 
@@ -267,15 +284,26 @@ if args.useChangelog:
     
     template_file_string = generate_with_template_file(release_note_template_object, generated_release_notes_object, template_search_pattern, release_changelog_entry)
 
-    # TODO: pass the changelog header and mod version in to github actions environment
-    # reference later for release name
     env_file_path = os.getenv('GITHUB_ENV')
     with open(env_file_path, "a") as envfile: # type: ignore - false error from parsing a str filename which works fine when the file exists in the actual github env
         print(f'{github_env_releasenotesfile_name}={generated_release_notes_object}', file=envfile)
 
 else:
-    # use auto-generated release notes?
-    pass
+    # check if special template requested
+    if not release_note_template_overriden:
+        # it wasn't, rename the template object so we actually use the bare version
+        release_note_template_object = default_release_note_template_no_changelog_object
+        # use auto-generated release notes here instead? somehow need to pass change in behaviour to github release command in workflow later
+
+    # if special template was requested, it's already being passed, do nothing
+
+    # no change notes, uses template directly without dynamic changes
+    template_file_string = generate_with_template_file(release_note_template_object, generated_release_notes_object, "", "", skip_regex_replace=True)
+
+    env_file_path = os.getenv('GITHUB_ENV')
+    with open(env_file_path, "a") as envfile: # type: ignore - false error from parsing a str filename which works fine when the file exists in the actual github env
+        print(f'{github_env_releasenotesfile_name}={generated_release_notes_object}', file=envfile)
+    
 
 ### Processing for just release object ###
 # create title from mod name + the release tag - used for commit message and release title
