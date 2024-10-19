@@ -156,7 +156,7 @@ def increment_mod_version(
         updated_mod_version = "v" + updated_mod_version
     return current_semantic_versions, updated_mod_version
 
-def search_and_replace_in_file(file_path: Path, pattern: Union[str, list], replacestr: str, return_old_str: bool = False) -> Union[str, tuple[str, str]]:
+def search_and_replace_in_file(file_path: Path, pattern: Union[str, list], replacestr: Union[str, list], return_old_str: bool = False) -> Union[str, tuple[str, str]]:
     """Opens a file and replaces a part of it via regex
 
     Use to update version number and similar in text descriptions
@@ -172,10 +172,18 @@ def search_and_replace_in_file(file_path: Path, pattern: Union[str, list], repla
     original_file_string = file_string
 
     if isinstance(pattern, list):
-        for selected_pattern in pattern:
-            file_string = re.sub(selected_pattern, replacestr, file_string, flags=re.IGNORECASE | re.MULTILINE | re.DOTALL)
+        if isinstance(replacestr, list):
+            for selected_pattern, selected_replacementstr in zip(pattern, replacestr):
+                file_string = re.sub(selected_pattern, selected_replacementstr, file_string, flags=re.IGNORECASE | re.MULTILINE | re.DOTALL)
+        else:
+            # reuse the same pattern multiple times
+            for selected_pattern in pattern:
+                file_string = re.sub(selected_pattern, replacestr, file_string, flags=re.IGNORECASE | re.MULTILINE | re.DOTALL)
     elif isinstance(pattern, str):
-        file_string = re.sub(pattern, replacestr, file_string, flags=re.IGNORECASE | re.MULTILINE | re.DOTALL)
+        if isinstance(replacestr, str):
+            file_string = re.sub(pattern, replacestr, file_string, flags=re.IGNORECASE | re.MULTILINE | re.DOTALL)
+        else:
+            raise TypeError(f"Passed only one pattern but multiple replacement strings, types must match")
     else:
         raise TypeError(f"Input search pattern must be a single str or a list of str, got {type(pattern)}")
 
@@ -189,7 +197,7 @@ def search_and_replace_in_file(file_path: Path, pattern: Union[str, list], repla
     else:
         return file_string
 
-def generate_with_template_file(template_file_path: Path, generated_file_path: Path, pattern: Union[str, list], replacestr: str, skip_regex_replace=False) -> str:
+def generate_with_template_file(template_file_path: Path, generated_file_path: Path, pattern: Union[str, list], replacestr: Union[str, list], skip_regex_replace=False) -> str:
     """Uses a template file to generate a new file with part of it replaced via regex
 
     Useful for filling in changelog to a release note template
@@ -208,10 +216,18 @@ def generate_with_template_file(template_file_path: Path, generated_file_path: P
     if skip_regex_replace is False:
         # fill in to template via regex search
         if isinstance(pattern, list):
-            for selected_pattern in pattern:
-                file_string = re.sub(selected_pattern, replacestr, file_string, flags=re.IGNORECASE | re.MULTILINE | re.DOTALL)
+            if isinstance(replacestr, list):
+                for selected_pattern, selected_replacementstr in zip(pattern, replacestr):
+                    file_string = re.sub(selected_pattern, selected_replacementstr, file_string, flags=re.IGNORECASE | re.MULTILINE | re.DOTALL)
+            else:
+                # reuse the same pattern multiple times
+                for selected_pattern in pattern:
+                    file_string = re.sub(selected_pattern, replacestr, file_string, flags=re.IGNORECASE | re.MULTILINE | re.DOTALL)
         elif isinstance(pattern, str):
-            file_string = re.sub(pattern, replacestr, file_string, flags=re.IGNORECASE | re.MULTILINE | re.DOTALL)
+            if isinstance(replacestr, str):
+                file_string = re.sub(pattern, replacestr, file_string, flags=re.IGNORECASE | re.MULTILINE | re.DOTALL)
+            else:
+                raise TypeError(f"Passed only one pattern but multiple replacement strings, types must match")
         else:
             raise TypeError(f"Input search pattern must be a single str or a list of str, got {type(pattern)}")
 

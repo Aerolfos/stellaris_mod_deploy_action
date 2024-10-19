@@ -30,6 +30,7 @@ github_release_link_pattern = r"https://github.com/{}/releases/tag/{}"
 default_changelog_search_pattern = r"(^---\n)(##\s)(.+?\s`)WIP(`)(:\n)(.*?)(^---$)"
 # regex r"(^---\n)(## .+?\s`.{1,13}`:\n)(.*?)(^---$)" matches arbitrary version numbers
 default_template_search_pattern = r"(^---\n)(\nChanges\n\n)(^---$)"
+default_template_insert_version_pattern = r"(##\s)(Supports Stellaris version:\s\`).+?(\`)"
 
 # filenames
 default_release_note_template_filename = "release_note_template.md"
@@ -246,6 +247,15 @@ except KeyError:
     pass
 
 ### Process changelog ###
+try:
+    template_insert_version_pattern = override_dict["template_insert_version_pattern"]
+except KeyError:
+    # fallback to default
+    template_insert_version_pattern = default_template_insert_version_pattern
+
+# uses regex groups from above
+new_template_insert_version = f"\\g<1>\\g<2>{supported_stellaris_version_display}\\g<3>"
+
 if args.useChangelog:
     if not changelog_file_object.exists():
         raise ValueError(f"Requested adding changelog to release notes, but no file {changelog_file_name} was provided in repository")
@@ -282,7 +292,7 @@ if args.useChangelog:
             print("- Name and path of output file with release notes: -")
             print(generated_release_notes_object)
     
-    template_file_string = generate_with_template_file(release_note_template_object, generated_release_notes_object, template_search_pattern, release_changelog_entry)
+    template_file_string = generate_with_template_file(release_note_template_object, generated_release_notes_object, [template_insert_version_pattern, template_search_pattern], [new_template_insert_version, release_changelog_entry])
 
     env_file_path = os.getenv('GITHUB_ENV')
     with open(env_file_path, "a") as envfile: # type: ignore - false error from parsing a str filename which works fine when the file exists in the actual github env
@@ -297,8 +307,9 @@ else:
 
     # if special template was requested, it's already being passed, do nothing
 
-    # no change notes, uses template directly without dynamic changes
-    template_file_string = generate_with_template_file(release_note_template_object, generated_release_notes_object, "", "", skip_regex_replace=True)
+    # no change notes, uses template directly
+    # dynamically change the supported stellaris version though
+    template_file_string = generate_with_template_file(release_note_template_object, generated_release_notes_object, template_insert_version_pattern, new_template_insert_version, skip_regex_replace=False)
 
     env_file_path = os.getenv('GITHUB_ENV')
     with open(env_file_path, "a") as envfile: # type: ignore - false error from parsing a str filename which works fine when the file exists in the actual github env
