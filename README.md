@@ -8,10 +8,61 @@
 
 This is a custom tool to aid in updating Stellaris mods. It only makes sense to use this tool if you structure mods similarly, see below under usage.
 
-This tool uses the Github action functionality to trigger a Python script which bumps version numbers and supported Stellaris version, and also creates a Github release for the mod.
+This tool uses the [Github action](https://github.com/features/actions) functionality to trigger a Python script which bumps version numbers and supported Stellaris version, and also creates a Github release for the mod.
 
-## Basic usage
+## Usage
 WIP: How to use and structure mod setup
+
+https://github.com/Aerolfos/stellaris_mod_deploy_action/wiki/Mod-file-locations
+
+`Paradox Interactive/Stellaris/mod/`
+
+https://stellaris.paradoxwikis.com/Mods
+
+`Paradox Interactive/Stellaris/mod/`
+
+https://stellaris.paradoxwikis.com/Modding#Mod_management
+
+`.../Paradox Interactive/Stellaris/mod/mod_name`
+
+`mod_name`
+
+https://github.com/Aerolfos/dubstep_launchers
+
+https://github.com/Aerolfos/dubstep_launchers/blob/main/dubstep_launchers/descriptor.mod
+
+https://github.com/Aerolfos/stellaris_mod_deploy_action/wiki/Expected-mod-structure
+
+## In practice
+https://github.com/Aerolfos/stellaris_mod_deploy_action/blob/main/.github/workflows/example.yml
+
+`.../Paradox Interactive/Stellaris/mod/mod_name`
+
+https://docs.github.com/en/actions/about-github-actions/understanding-github-actions
+
+![action run button UI](https://github.com/user-attachments/assets/da909f08-7a52-4e7f-b7f8-eb74b546b80c)
+
+![action run button UI](https://github.com/user-attachments/assets/da909f08-7a52-4e7f-b7f8-eb74b546b80c)
+
+`version="v1.2.0"`
+
+`supported_version="v3.*.*"`
+
+https://en.wikipedia.org/wiki/Software_versioning#Semantic_versioning
+
+https://github.com/Aerolfos/stellaris_mod_deploy_action/wiki/Tool-setup
+
+https://github.com/Aerolfos/dubstep_launchers/blob/main/CHANGELOG.md
+
+![workflow dispatch trigger UI](https://github.com/user-attachments/assets/61fe3527-5eca-4160-9520-1383b2203a6e)
+
+![actions name in UI](https://github.com/user-attachments/assets/c96d32a7-12ef-4b92-b212-9167a3ba0361)
+
+![github actions button UI position](https://github.com/user-attachments/assets/55c539cf-c86b-4a5f-aabf-1b1f675c5425)
+
+
+
+
 
 ## License
 Code and documentation are licensed under [GNU GPL v3.0](LICENSE).
