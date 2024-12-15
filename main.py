@@ -9,6 +9,9 @@ debug_level = 1
 # 0, 1, or 2
 # 0 prints nothing, 1 inputs and paths, 2 prints information about parsing and processing
 
+# whether to add a new WIP entry to changelogs for filling in
+add_changelog_WIP_entry = True
+
 ### Constants ###
 # environment variable names (passed to github action environment)
 github_env_modreleasetag_name = "MOD_RELEASE_TAG"
@@ -27,6 +30,18 @@ default_readme_version_pattern = r"(Supports Stellaris version: \`).+?(\`)"
 # fill in with {username/repo_name} and {release-tag}
 github_release_link_pattern = r"https://github.com/{}/releases/tag/{}"
 # search pattern for extracting changelog - expects latest changes to be under "WIP"
+# changelog entries by default are of the form:
+"""
+---
+## ModName Version `WIP`:
+- Latest
+- Change
+- Entries
+---
+
+[Older versions]
+
+"""
 default_changelog_search_pattern = r"(^---\n)(##\s)(.+?\s`)WIP(`)(:\n)(.*?)(^---$)"
 # regex r"(^---\n)(## .+?\s`.{1,13}`:\n)(.*?)(^---$)" matches arbitrary version numbers
 default_template_search_pattern = r"(^---\n)(\nChanges\n\n)(^---$)"
@@ -275,7 +290,14 @@ if args.useChangelog:
     
     # uses regex groups from above, and makes a link
     github_release_link = github_release_link_pattern.format(args.repoGithubpath, github_release_tag)
-    changelog_replace = f"\\g<1>\\g<2>[\\g<3>{updated_mod_version}\\g<4>]({github_release_link})\\g<5>\\g<6>\\g<7>"
+    # straightforward replacing with link and version number
+    if add_changelog_WIP_entry:
+        # add an extra WIP entry to be filled when dev gets to it
+        WIP_entry = f"\\g<1>\\g<2>\\g<3>WIP\\g<4>\\g<5>- Newest changes\n\\g<7>\n\n"
+        changelog_replace = WIP_entry + f"\\g<1>\\g<2>[\\g<3>{updated_mod_version}\\g<4>]({github_release_link})\\g<5>\\g<6>\\g<7>"
+    else:
+        changelog_replace = f"\\g<1>\\g<2>[\\g<3>{updated_mod_version}\\g<4>]({github_release_link})\\g<5>\\g<6>\\g<7>"
+    
     
     # this replaces the WIP on the latest change entry in the original changelog file from the mod repo
     # and also turns it into a link that will lead to the release we will be creating
