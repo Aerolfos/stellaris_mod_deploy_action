@@ -105,7 +105,8 @@ jobs:
       if: ${{ inputs.updateLoc }}
       uses: TTFTCUTS/Stellaris-Loc-Action@main
       with:
-        path: ${{ github.event.repository.name }}/localisation
+        # just trust this nesting is right I had to experiment with prints to figure it out
+        path: ${{ github.event.repository.name }}/${{ github.event.repository.name }}/localisation
         source-language: english
         output-languages: braz_por, french, german, polish, russian, simp_chinese, spanish
     - name: Same as above but for /localisation/replace
@@ -113,7 +114,7 @@ jobs:
       if: ${{ inputs.updateLoc }}
       uses: TTFTCUTS/Stellaris-Loc-Action@main
       with:
-        path: ${{ github.event.repository.name }}/localisation/replace
+        path: ${{ github.event.repository.name }}/${{ github.event.repository.name }}/localisation/replace
         source-language: english
         output-languages: braz_por, french, german, polish, russian, simp_chinese, spanish
     
