@@ -30,15 +30,20 @@ on:
           Expects a CHANGELOG.md file in target repo
         required: true
         type: boolean
-      
+      updateLoc:
+        description: 'Copy english loc entries to other languages?'
+        required: true
+        type: boolean
+
 permissions:
   contents: write
 
 jobs:
   use_updateStellarisMod_workflow:
     uses: aerolfos/stellaris_mod_deploy_action/.github/workflows/updateStellarisMod.yml@main
-    with: 
+    with:
       versionType: ${{ inputs.versionType }}
       versionStellaris: ${{ inputs.versionStellaris }}
       useChangelog: ${{ inputs.useChangelog }}
+      updateLoc: ${{ inputs.updateLoc }}
 
