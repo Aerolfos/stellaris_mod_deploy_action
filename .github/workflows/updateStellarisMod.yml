@@ -86,10 +86,10 @@ jobs:
           .github
           methods
     
-    - name: Set up Python 3.11
+    - name: Set up Python 3.12
       uses: actions/setup-python@v5
       with:
-        python-version: "3.11"
+        python-version: "3.12"
     
     # action expects to be run from a directory that's alongside the relevant mod repo, see tools step above
     - name: Run associated Python action
