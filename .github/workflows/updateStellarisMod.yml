@@ -30,6 +30,22 @@ on:
         description: 'Copy english loc entries to other languages?'
         required: true
         type: boolean
+      experimentalSteamWorkshopUpload:
+        description: 'Automatically upload to Steam Workshop'
+        required: false
+        type: boolean
+        default: false
+      steam_appID:
+        description: 'The Steam App ID belonging to the game whose workshop is being uploaded to'
+        required: false
+        type: string
+        default: ''
+
+    secrets:
+      STEAM_DEPLOYMENT_USERNAME:
+        required: false
+      STEAM_CONFIG_VDF:
+        required: false
 
   # for testing can run this workflow directly
   # this won't work because it lacks files to operate on, it's really just to see the inputs displayed and have a reference for them
@@ -105,7 +121,7 @@ jobs:
       if: ${{ inputs.updateLoc }}
       uses: TTFTCUTS/Stellaris-Loc-Action@main
       with:
-        # just trust this nesting is right I had to experiment with prints to figure it out
+        # nesting is necessary
         path: ${{ github.event.repository.name }}/${{ github.event.repository.name }}/localisation
         source-language: english
         output-languages: braz_por, french, german, polish, russian, simp_chinese, spanish
@@ -155,5 +171,35 @@ jobs:
         GH_TOKEN: ${{ github.token }}
       run: |
         gh release create $MOD_RELEASE_TAG $MOD_RELEASE_ZIP_FILE --title "$MOD_RELEASE_TITLE" --notes-file $MOD_RELEASENOTES_FILE
+      shell: bash
+
+
+    # SteamCMD
+    - name: Experimental Steam workshop upload, set up SteamCMD
+      id: steam_workshop_upload_step_steamcmd
+      if: ${{ inputs.experimentalSteamWorkshopUpload }}
+      # as according to https://developer.valvesoftware.com/wiki/SteamCMD
+      run: |
+        sudo useradd -m steam
+        sudo passwd steam
+
+        sudo -u steam -s
+        cd /home/steam
+
+        sudo add-apt-repository multiverse; sudo dpkg --add-architecture i386; sudo apt update
+        sudo apt install steamcmd
+
+    - name: Experimental Steam workshop upload, run Python script
+      id: steam_workshop_upload_step_python
+      if: ${{ inputs.experimentalSteamWorkshopUpload }}
+      env:
+        steam_username: ${{ secrets.STEAM_DEPLOYMENT_USERNAME }}
+        configVdf: ${{ secrets.STEAM_CONFIG_VDF }}
+        appID: ${{ inputs.steam_appID }}
+        #itemId: ${{ inputs.publishedFileId }}
+        #rootPath: ${{ inputs.path }}
+        #changeNote: ${{ inputs.changeNote }}
+      run: |
+        python stellaris_mod_deploy_action/steam_workshop_upload.py
       shell: bash
 

@@ -10,6 +10,8 @@ This is a custom tool to aid in updating Stellaris mods. It only makes sense to 
 
 This tool uses the [Github action](https://github.com/features/actions) functionality to trigger a Python script which bumps version numbers and supported Stellaris version, and also creates a Github release for the mod.
 
+Also integrates [TTFTCUTS' localisation processing action](https://github.com/TTFTCUTS/Stellaris-Loc-Action) as an optional step that can be triggered, which will propagate loc entries from English to other languages before generating a release.
+
 ## Usage
 WIP: How to use and structure mod setup
 
