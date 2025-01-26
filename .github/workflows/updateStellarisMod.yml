@@ -186,8 +186,8 @@ jobs:
         sudo -u steam -s
         cd /home/steam
 
-        sudo add-apt-repository -y multiverse; sudo dpkg --add-architecture i386; sudo apt update
-        sudo apt install -y steamcmd
+        sudo add-apt-repository -y multiverse; sudo dpkg --add-architecture i386; sudo apt-get update
+        sudo apt-get install -y steamcmd
 
     - name: Experimental Steam workshop upload, run Python script
       id: steam_workshop_upload_step_python
