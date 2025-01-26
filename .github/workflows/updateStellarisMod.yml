@@ -181,13 +181,13 @@ jobs:
       # as according to https://developer.valvesoftware.com/wiki/SteamCMD
       run: |
         sudo useradd -m steam
-        sudo passwd steam
+        echo "steam:temporary_password_1" | sudo chpasswd
 
         sudo -u steam -s
         cd /home/steam
 
-        sudo add-apt-repository multiverse; sudo dpkg --add-architecture i386; sudo apt update
-        sudo apt install steamcmd
+        sudo add-apt-repository -y multiverse; sudo dpkg --add-architecture i386; sudo apt update
+        sudo apt install -y steamcmd
 
     - name: Experimental Steam workshop upload, run Python script
       id: steam_workshop_upload_step_python
