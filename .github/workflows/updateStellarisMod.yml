@@ -203,6 +203,7 @@ jobs:
         #rootPath: ${{ inputs.path }}
         #changeNote: ${{ inputs.changeNote }}
       run: |
+        tree
         python stellaris_mod_deploy_action/steam_workshop_upload.py
       shell: bash
 
