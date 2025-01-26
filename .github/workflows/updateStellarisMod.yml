@@ -192,6 +192,8 @@ jobs:
         echo steam steam/license note '' | sudo debconf-set-selections
         sudo apt-get install -y steamcmd
 
+        steamcmd +quit
+
     - name: Experimental Steam workshop upload, run Python script
       id: steam_workshop_upload_step_python
       if: ${{ inputs.experimentalSteamWorkshopUpload }}
