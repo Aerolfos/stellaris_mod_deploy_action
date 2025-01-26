@@ -149,7 +149,7 @@ def increment_mod_version(
         current_semantic_versions[patch_type] = str(int(current_semantic_versions[patch_type]) + 1)
     
     # stellaris wants v1.2.3 now
-    updated_mod_version = "v" + ".".join(current_semantic_versions.values())
+    updated_mod_version = ".".join(current_semantic_versions.values())
     if using_v_prefix:
         if using_v_with_space_prefix:
             updated_mod_version = " " + updated_mod_version
