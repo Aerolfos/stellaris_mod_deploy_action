@@ -48,7 +48,7 @@ with open(manifest_path, 'w') as manifest_file:
 print("Manifest:")
 print(manifest_content)
 
-test_cmd = f"cd ~ && tree"
+test_cmd = f"cd $HOME && tree"
 subprocess.run(test_cmd, shell=True, check=True)
 
 # function to run shell commands
