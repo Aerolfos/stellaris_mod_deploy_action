@@ -7,6 +7,7 @@ import sys
 # get environment variables
 steam_home = os.getenv('STEAM_HOME', os.path.join(os.getenv('HOME'), 'Steam'))
 print(os.getenv('HOME'))
+print(steam_home)
 root_path = os.getenv('rootPath', '')
 content_root = os.path.join(os.getcwd(), root_path)
 manifest_path = os.path.join(os.getcwd(), 'manifest.vdf')
