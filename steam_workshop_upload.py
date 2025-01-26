@@ -48,6 +48,9 @@ with open(manifest_path, 'w') as manifest_file:
 print("Manifest:")
 print(manifest_content)
 
+test_cmd = f"cd ~ && tree"
+subprocess.run(test_cmd, shell=True, check=True)
+
 # function to run shell commands
 def run_command(command):
     try:
@@ -77,6 +80,7 @@ else:
     sys.exit(1)
 
 # upload the item
+sys.exit(1)
 upload_command = f'steamcmd +login "{steam_username}" +workshop_build_item "{manifest_path}" +quit'
 if not run_command(upload_command):
     # In case of error, handle logs
