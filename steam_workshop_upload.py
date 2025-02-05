@@ -74,7 +74,7 @@ os.chmod(config_path, 0o777)
 
 # test
 print(config_path)
-os.listdir(config_path)
+os.listdir(os.path.join(steam_home, 'config'))
 
 command = f'steamcmd +login "{steam_username}" +quit'
 if run_command(command):
