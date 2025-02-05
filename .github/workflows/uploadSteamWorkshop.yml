@@ -1,0 +1,72 @@
+# This is a reusable workflow, which sets up and runs python/steamcmd etc.
+# Call from another workflow, which will only need inputs
+
+name: 'Trigger reusable workflow to deploy Stellaris mod to steam workshop'
+# Will upload source mod to workshop (expects the other workflow to have been ran already)
+run-name: "${{ github.actor }} triggered Steam Workshop upload workflow"
+
+on:
+  # used to avoid having to retype all this file, call from another (simple) workflow
+  # sadly you do need to copy the inputs everywhere
+  workflow_call:
+    inputs:
+      steam_appID:
+        description: 'The Steam App ID belonging to the game whose workshop is being uploaded to'
+        required: false
+        type: string
+        default: ''
+
+    secrets:
+      STEAM_DEPLOYMENT_USERNAME:
+        required: false
+      STEAM_CONFIG_VDF:
+        required: false
+      
+permissions:
+  contents: write
+
+jobs:
+  jobSteamWorkshopUpload:
+    runs-on: ubuntu-latest
+    container:
+      image: steamcmd/steamcmd:ubuntu
+
+    steps:
+    - name: Clone the mod repo
+      uses: actions/checkout@v4
+      with:
+        # actions/checkout does not allow cloning to a folder above the default working folder, so to separate from tools place in this folder
+        # the path names become very long but needs tools to fix before change
+        path: ${{ github.event.repository.name }}
+    
+    - name: Checkout tools repo
+      uses: actions/checkout@v4
+      with:
+        repository: aerolfos/stellaris_mod_deploy_action
+        # actions/checkout does not allow cloning to a folder above the default working folder, so to separate from mod files place in this folder
+        path: stellaris_mod_deploy_action
+        # avoid needlessly cloning the graphic assets, want root folder with script files and extra scripts in methods though
+        # (root folder files are always cloned)
+        sparse-checkout: |
+          methods
+    
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+    
+    # SteamCMD, see also https://developer.valvesoftware.com/wiki/SteamCMD
+    - name: Experimental Steam workshop upload, run Python management script
+      id: steam_workshop_upload_step_python
+      env:
+        steam_username: ${{ secrets.STEAM_DEPLOYMENT_USERNAME }}
+        configVdf: ${{ secrets.STEAM_CONFIG_VDF }}
+        appID: ${{ inputs.steam_appID }}
+        #itemId: ${{ inputs.publishedFileId }}
+        #rootPath: ${{ inputs.path }}
+        #changeNote: ${{ inputs.changeNote }}
+      run: |
+        tree
+        python stellaris_mod_deploy_action/steam_workshop_upload.py
+        shell: bash
+
