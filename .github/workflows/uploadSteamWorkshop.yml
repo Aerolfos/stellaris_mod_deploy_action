@@ -56,6 +56,10 @@ jobs:
         python-version: "3.12"
     
     # SteamCMD, see also https://developer.valvesoftware.com/wiki/SteamCMD
+    - name: Check for SteamCMD updates
+      id: steam_workshop_upload_step_steamcmdupdate
+      run: |
+        steamcmd +quit
     - name: Experimental Steam workshop upload, run Python management script
       id: steam_workshop_upload_step_python
       env:
@@ -66,7 +70,4 @@ jobs:
         #rootPath: ${{ inputs.path }}
         #changeNote: ${{ inputs.changeNote }}
       run: |
-        ls
         python stellaris_mod_deploy_action/steam_workshop_upload.py
-        shell: bash
-
