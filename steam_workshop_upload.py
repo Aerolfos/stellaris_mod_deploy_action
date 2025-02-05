@@ -48,8 +48,8 @@ with open(manifest_path, 'w') as manifest_file:
 print("Manifest:")
 print(manifest_content)
 
-test_cmd = f"cd $HOME && ls"
-subprocess.run(test_cmd, shell=True, check=True)
+# test
+os.listdir(os.getenv('HOME'))
 
 # function to run shell commands
 def run_command(command):
@@ -71,6 +71,10 @@ config_path = os.path.join(steam_home, 'config', 'config.vdf')
 with open(config_path, 'wb') as config_file:
     config_file.write(base64.b64decode(config_vdf))
 os.chmod(config_path, 0o777)
+
+# test
+print(config_path)
+os.listdir(config_path)
 
 command = f'steamcmd +login "{steam_username}" +quit'
 if run_command(command):
