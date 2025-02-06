@@ -59,7 +59,7 @@ jobs:
     - name: Check for SteamCMD updates
       id: steam_workshop_upload_step_steamcmdupdate
       run: |
-        steamcmd +quit
+        steamcmd +login anonymous +quit
     - name: Experimental Steam workshop upload, run Python management script
       id: steam_workshop_upload_step_python
       env:
