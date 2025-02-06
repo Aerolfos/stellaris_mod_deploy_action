@@ -1,33 +1,41 @@
+## code based on https://github.com/m00nl1ght-dev/steam-workshop-deploy/ and https://github.com/game-ci/steam-deploy
+
 ### Imports ###
 import os
 from pathlib import Path
 import subprocess
 import base64
 import sys
-from methods.input_methods import str2bool, parse_descriptor_to_dict, increment_mod_version, search_and_replace_in_file, create_descriptor_file, generate_with_template_file
+from methods.input_methods import str2bool, get_env_variable, run_command, parse_descriptor_to_dict, increment_mod_version, search_and_replace_in_file, create_descriptor_file, generate_with_template_file
 
+### Settings ###
 debug_level = 1
 
-# helper to get environment variables
-def get_env_variable(env_var_name, default=None):
-    """Simple getenv wrapper with debug print"""
-    env_var = os.getenv(env_var_name, default)
-    if debug_level >= 1:
-        print(f"{env_var_name}={env_var}")
-    return env_var
-
-home_dir_path = Path(get_env_variable('HOME', '/home')).resolve()
-steam_home_dir_path = get_env_variable('STEAM_HOME', home_dir_path / '.local/share/Steam')
-root_path = get_env_variable('rootPath', '') # TODO
+### Environment variables, paths ###
+home_dir_path = Path(get_env_variable('HOME', '/home', debug_level=debug_level)).resolve()
+steam_home_dir_path = get_env_variable('STEAM_HOME', home_dir_path / '.local/share/Steam', debug_level=debug_level)
+root_path = get_env_variable('rootPath', '', debug_level=debug_level) # TODO
 content_root = Path.cwd() / root_path # TODO
 manifest_file_path = Path.cwd() / 'manifest.vdf'
 
-app_id = get_env_variable('appID', '')
-item_id = get_env_variable('itemID', '')
-change_note = get_env_variable('changeNote', 'Test')
-steam_username = get_env_variable('steam_username', '')
-config_vdf_contents = get_env_variable('configVdf', '')
+app_id = get_env_variable('appID', '', debug_level=debug_level)
+item_id = get_env_variable('itemID', '', debug_level=debug_level)
+change_note = get_env_variable('changeNote', 'Test', debug_level=debug_level)
+steam_username = get_env_variable('steam_username', '', debug_level=debug_level)
+config_vdf_contents = get_env_variable('configVdf', '', debug_level=debug_level)
 
+### Errors ###
+if not app_id:
+    raise ValueError("Steam app ID is missing or incomplete, must have a game to upload mod for")
+#if not item_id:
+#    raise ValueError("Published file ID is missing or incomplete, must have an already uploaded workshop object")
+if not steam_username:
+    raise ValueError("Steam username is missing or incomplete, must have an account to upload with")
+# check SteamGuard authentication
+if not config_vdf_contents:
+    raise ValueError("Config VDF input file is missing or incomplete, must have configured account to upload with")
+
+### Metadata ###
 # make manifest file with metadata
 manifest_content = f'''"workshopitem"
 {{
@@ -56,28 +64,14 @@ manifest_content = f'''"workshopitem"
 with open(manifest_file_path, 'w') as manifest_file_object:
     manifest_file_object.write(manifest_content)
 
-print("Manifest:")
-print(manifest_content)
-
 if debug_level >= 1:
     print("Home contents:", os.listdir(home_dir_path))
     print("Steam home contents:", os.listdir(steam_home_dir_path))
     print(".steam/steam contents:", os.listdir(home_dir_path / ".steam/steam"))
     print(".steam/root contents:", os.listdir(home_dir_path / ".steam/root"))
 
-# function to run shell commands, for error handling
-def run_command(command):
-    try:
-        subprocess.run(command, shell=True, check=True)
-        return True
-    except subprocess.CalledProcessError as err:
-        print(err)
-        return False
-
-# check SteamGuard authentication
-if not config_vdf_contents:
-    print("Config VDF input is missing or incomplete! Cannot proceed.")
-    sys.exit(1)
+    print("Manifest:")
+    print(manifest_content)
 
 os.makedirs(steam_home_dir_path / 'config', exist_ok=True)
 
@@ -87,7 +81,6 @@ with open(config_file_path, 'wb') as config_file_object:
     config_file_object.write(decoded_config_vdf)
 os.chmod(config_file_path, 0o777)
 
-# test
 if debug_level >= 1:
     print(f"{config_file_path=}")
     print("Steam/config contents:", os.listdir(steam_home_dir_path / 'config'))

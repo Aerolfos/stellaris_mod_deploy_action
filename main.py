@@ -3,8 +3,9 @@ import argparse
 import os
 import re
 from pathlib import Path
-from methods.input_methods import str2bool, parse_descriptor_to_dict, increment_mod_version, search_and_replace_in_file, create_descriptor_file, generate_with_template_file
+from methods.input_methods import str2bool, get_env_variable, parse_descriptor_to_dict, increment_mod_version, search_and_replace_in_file, create_descriptor_file, generate_with_template_file
 
+### Settings ###
 debug_level = 1
 # 0, 1, or 2
 # 0 prints nothing, 1 inputs and paths, 2 prints information about parsing and processing
@@ -20,6 +21,7 @@ github_env_releasenotesfile_name = "MOD_RELEASENOTES_FILE"
 github_env_descriptorfile_name = "MOD_DESCRIPTOR_FILE"
 github_env_releasezipfile_name = "MOD_RELEASE_ZIP_FILE"
 
+### Defaults ###
 # default search patterns
 # loc_something:0 "something" - 0 code intentional since numbers other than 0 are generated or messed with by some tool, usually
 loc_key_pattern = "(\\s{}:0\\s\").+?(\")" # use with .format(loc_key)
@@ -72,7 +74,7 @@ if debug_level >= 1:
     print("modfolderName:", args.modfolderName)
     print("repoGithubpath:", args.repoGithubpath)
 
-### File paths ###
+### Overrides ###
 # cwd is set to where the python file is, which should be next to the folder with the mod files from the originating mod repository
 mod_files_folder_path = (Path.cwd() / f"../{args.modfolderName}").resolve()
 
@@ -126,6 +128,7 @@ try:
 except KeyError:
     release_note_template_filename = default_release_note_template_filename
 
+### File paths ###
 # make file paths
 # descriptor is nested twice
 descriptor_file_path = mod_files_folder_path / args.modfolderName / descriptor_file_name
@@ -321,7 +324,7 @@ if args.useChangelog:
     
     template_file_string = generate_with_template_file(release_note_template_file_path, generated_release_notes_file_path, [template_insert_version_pattern, template_search_pattern], [new_template_insert_version, release_changelog_entry])
 
-    env_file_path = os.getenv('GITHUB_ENV')
+    env_file_path = get_env_variable('GITHUB_ENV', None, debug_level=debug_level)
     with open(env_file_path, "a") as envfile: # type: ignore - false error from parsing a str filename which works fine when the file exists in the actual github env
         print(f'{github_env_releasenotesfile_name}={generated_release_notes_file_path}', file=envfile)
 
@@ -338,7 +341,7 @@ else:
     # dynamically change the supported stellaris version though
     template_file_string = generate_with_template_file(release_note_template_file_path, generated_release_notes_file_path, template_insert_version_pattern, new_template_insert_version, skip_regex_replace=False)
 
-    env_file_path = os.getenv('GITHUB_ENV')
+    env_file_path = get_env_variable('GITHUB_ENV', None, debug_level=debug_level)
     with open(env_file_path, "a") as envfile: # type: ignore - false error from parsing a str filename which works fine when the file exists in the actual github env
         print(f'{github_env_releasenotesfile_name}={generated_release_notes_file_path}', file=envfile)
     
@@ -349,7 +352,7 @@ release_title = f"{descriptor_dict['name']} {github_release_tag}"
 # release zipfile name must be acceptable format
 release_zipfile_name = f"{args.modfolderName}_{for_filename_mod_version}.zip"
 # make useful environment variables
-env_file_path = os.getenv('GITHUB_ENV')
+env_file_path = get_env_variable('GITHUB_ENV', None, debug_level=debug_level)
 with open(env_file_path, "a") as envfile: # type: ignore - false error from parsing a str filename which works fine when the file exists in the actual github env
     print(f'{github_env_releasetitle_name}={release_title}', file=envfile)
     print(f'{github_env_modreleasetag_name}={github_release_tag}', file=envfile)

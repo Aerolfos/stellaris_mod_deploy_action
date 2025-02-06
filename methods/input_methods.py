@@ -1,5 +1,7 @@
 import argparse
+import os
 import re
+import subprocess
 from pathlib import Path
 from typing import Union
 
@@ -33,6 +35,22 @@ def str2bool(v: str) -> bool:
         return False
     else:
         raise argparse.ArgumentTypeError('Boolean value expected.')
+    
+def get_env_variable(env_var_name: str, default: str=None, debug_level: int=1):
+    """Simple getenv wrapper with debug print"""
+    env_var = os.getenv(env_var_name, default)
+    if debug_level >= 1:
+        print(f"{env_var_name}={env_var}")
+    return env_var
+
+def run_command(command):
+    """Helper function to run shell commands, wrapped for error handling"""
+    try:
+        subprocess.run(command, shell=True, check=True)
+        return True
+    except subprocess.CalledProcessError as err:
+        print(err)
+        return False
     
 def parse_descriptor_to_dict(descriptor_file_path: Path) -> dict:
     """Creates a dict of entries from a paradox descriptor.mod file
