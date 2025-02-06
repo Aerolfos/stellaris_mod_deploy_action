@@ -17,7 +17,7 @@ def get_env_variable(env_var_name, default=None):
     return env_var
 
 home_dir = Path(get_env_variable('HOME', '/home')).resolve()
-steam_home_dir = get_env_variable('STEAM_HOME', home_dir / '.steam')
+steam_home_dir = get_env_variable('STEAM_HOME', home_dir / '.local/share/Steam')
 root_path = get_env_variable('rootPath', '')
 content_root = Path.cwd() / root_path
 manifest_path_object = Path.cwd() / 'manifest.vdf'
@@ -60,7 +60,9 @@ print(manifest_content)
 
 # test
 print("Home contents:", os.listdir(home_dir))
-print("Home contents:", os.listdir(home_dir / ".steam"))
+print("Steam home contents:", os.listdir(steam_home_dir))
+print(".steam/steam contents:", os.listdir(home_dir / ".steam/steam"))
+print(".steam/root contents:", os.listdir(home_dir / ".steam/root"))
 
 # function to run shell commands
 def run_command(command):
