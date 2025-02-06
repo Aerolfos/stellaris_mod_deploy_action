@@ -10,7 +10,7 @@ debug_level = 1
 # 0 prints nothing, 1 inputs and paths, 2 prints information about parsing and processing
 
 # whether to add a new WIP entry to changelogs for filling in
-add_changelog_WIP_entry = True
+default_add_changelog_WIP_entry = True
 
 ### Constants ###
 # environment variable names (passed to github action environment)
@@ -74,23 +74,23 @@ if debug_level >= 1:
 
 ### File paths ###
 # cwd is set to where the python file is, which should be next to the folder with the mod files from the originating mod repository
-mod_files_folder = (Path.cwd() / f"../{args.modfolderName}").resolve()
+mod_files_folder_path = (Path.cwd() / f"../{args.modfolderName}").resolve()
 
 if debug_level >= 1:
     print("\n- Paths -")
     print("Python script file path:", Path.cwd())
-    print("Path to mod files:", mod_files_folder)
+    print("Path to mod files:", mod_files_folder_path)
 
 # do overrides immediately
 # file for potential overrides
 override_file_name = "OVERRIDE.txt"
-override_file_object = mod_files_folder / override_file_name
+override_file_path = mod_files_folder_path / override_file_name
 # if there are overrides, we parse them - use same structure as a paradox descriptor because we have the parser already
 override_enabled = False
 override_dict = {}
-if override_file_object.exists():
+if override_file_path.exists():
     override_enabled = True
-    override_dict = parse_descriptor_to_dict(override_file_object)
+    override_dict = parse_descriptor_to_dict(override_file_path)
 
 # file names
 try:
@@ -113,6 +113,11 @@ try:
 except KeyError:
     changelog_file_name = "CHANGELOG.md"
 
+try:
+    add_changelog_WIP_entry = override_dict["add_changelog_WIP_entry_override"]
+except KeyError:
+    add_changelog_WIP_entry = default_add_changelog_WIP_entry
+
 # use flag to carry information on whether this override happened
 release_note_template_overriden = False
 try:
@@ -123,26 +128,26 @@ except KeyError:
 
 # make file paths
 # descriptor is nested twice
-descriptor_file_object = mod_files_folder / args.modfolderName / descriptor_file_name
+descriptor_file_path = mod_files_folder_path / args.modfolderName / descriptor_file_name
 if debug_level >= 1:
-    print("Descriptor file location:", descriptor_file_object)
-workshop_description_file_object = mod_files_folder / workshop_description_file_name
-readme_file_object = mod_files_folder / readme_file_name
-changelog_file_object = mod_files_folder / changelog_file_name
+    print("Descriptor file location:", descriptor_file_path)
+workshop_description_file_path = mod_files_folder_path / workshop_description_file_name
+readme_file_path = mod_files_folder_path / readme_file_name
+changelog_file_path = mod_files_folder_path / changelog_file_name
 # default template file is generic and with the script
 # but otherwise, check user provided one (which can only come from *their* repo)
 if release_note_template_overriden:
-    release_note_template_object = mod_files_folder / release_note_template_filename
+    release_note_template_file_path = mod_files_folder_path / release_note_template_filename
 else:
-    release_note_template_object = Path.cwd() / release_note_template_filename
+    release_note_template_file_path = Path.cwd() / release_note_template_filename
 # no changelog version
-default_release_note_template_no_changelog_object = Path.cwd() / default_release_note_template_no_changelog_filename
+default_release_note_template_no_changelog_file_path = Path.cwd() / default_release_note_template_no_changelog_filename
 # not in the folder with the mod repo so this doesn't get comitted, it's a temp file
-generated_release_notes_object = Path.cwd() / generated_release_notes_filename
+generated_release_notes_file_path = Path.cwd() / generated_release_notes_filename
 
 ### File parsing ###
 # grab descriptor and break it down into a python dict
-descriptor_dict = parse_descriptor_to_dict(descriptor_file_object)
+descriptor_dict = parse_descriptor_to_dict(descriptor_file_path)
 
 if debug_level >= 2:
     print("- Extracted dictionary: -")
@@ -166,7 +171,7 @@ github_release_tag = "v" + ".".join(current_semantic_versions.values())
 
 # make yet another version of version number, this one with underscores so it's valid as a filename
 # v1.2.3 -> v1_2_3
-filename_mod_version = "v" + "_".join(current_semantic_versions.values())
+for_filename_mod_version = "v" + "_".join(current_semantic_versions.values())
 
 if debug_level >= 2:
     print("Broken down version dict:", current_semantic_versions)
@@ -212,10 +217,10 @@ if debug_level >= 2:
 supported_stellaris_version_display = args.versionStellaris.replace("*", "x")
 supported_stellaris_version_display = supported_stellaris_version_display.replace("v", "")
 if debug_level >= 2:
-    print(supported_stellaris_version_display)
+    print(f"{supported_stellaris_version_display=}")
 
 ### Update workshop description, if it exists ###
-if workshop_description_file_object.exists():
+if workshop_description_file_path.exists():
     try:
         # format to look for can be overriden - must have two regex group references on the side of the version number to replace
         workshop_desc_version_pattern = override_dict["workshop_desc_version_pattern"]
@@ -226,10 +231,10 @@ if workshop_description_file_object.exists():
     # uses regex groups from above
     new_workshop_desc_version = f"\\g<1>{supported_stellaris_version_display}\\g<2>"
 
-    workshop_file_string = search_and_replace_in_file(workshop_description_file_object, workshop_desc_version_pattern, new_workshop_desc_version)
+    workshop_file_string = search_and_replace_in_file(workshop_description_file_path, workshop_desc_version_pattern, new_workshop_desc_version)
 
 ### Similarly update readme file, if it exists ###
-if readme_file_object.exists():
+if readme_file_path.exists():
     try:
         # format to look for can be overriden - must have two regex group references on the side of the version number to replace
         readme_version_pattern = override_dict["readme_version_pattern"]
@@ -240,13 +245,13 @@ if readme_file_object.exists():
     # uses regex groups from above
     new_readme_version = f"\\g<1>{supported_stellaris_version_display}\\g<2>"
 
-    readme_file_string = search_and_replace_in_file(readme_file_object, readme_version_pattern, new_readme_version)
+    readme_file_string = search_and_replace_in_file(readme_file_path, readme_version_pattern, new_readme_version)
 
 ### Update any loc files as requested ###
 try: 
     loc_files_list = override_dict["extra_loc_files_to_update"]
     for file_name in loc_files_list:
-        loc_file_object = (mod_files_folder / file_name).resolve()
+        loc_file_path = (mod_files_folder_path / file_name).resolve()
         
         # change version in a loc file for access in-game
         version_loc_key = override_dict["version_loc_key"]
@@ -255,7 +260,7 @@ try:
 
         # potential other keys to change to go here
 
-        loc_file_string = search_and_replace_in_file(loc_file_object, version_loc_key_pattern, new_version_loc_key)
+        loc_file_string = search_and_replace_in_file(loc_file_path, version_loc_key_pattern, new_version_loc_key)
 
 # if none then just skip
 except KeyError:
@@ -272,7 +277,7 @@ except KeyError:
 new_template_insert_version = f"\\g<1>\\g<2>{supported_stellaris_version_display}\\g<3>"
 
 if args.useChangelog:
-    if not changelog_file_object.exists():
+    if not changelog_file_path.exists():
         raise ValueError(f"Requested adding changelog to release notes, but no file {changelog_file_name} was provided in repository")
     
     # changelog format to search for can be overriden - must have matching regex group references
@@ -301,7 +306,7 @@ if args.useChangelog:
     
     # this replaces the WIP on the latest change entry in the original changelog file from the mod repo
     # and also turns it into a link that will lead to the release we will be creating
-    original_changelog_file_string, new_changelog_file_string = search_and_replace_in_file(changelog_file_object, changelog_search_pattern, changelog_replace, return_old_str=True)
+    original_changelog_file_string, new_changelog_file_string = search_and_replace_in_file(changelog_file_path, changelog_search_pattern, changelog_replace, return_old_str=True)
     
     # grab the changelog entry from the original file, change the WIP to version number, then grab template file and fill it in
     if match := re.search(changelog_search_pattern, original_changelog_file_string, flags=re.IGNORECASE | re.MULTILINE | re.DOTALL):
@@ -312,37 +317,37 @@ if args.useChangelog:
             print("- Finished changelog entry going into release notes: -")
             print(release_changelog_entry)
             print("- Name and path of output file with release notes: -")
-            print(generated_release_notes_object)
+            print(generated_release_notes_file_path)
     
-    template_file_string = generate_with_template_file(release_note_template_object, generated_release_notes_object, [template_insert_version_pattern, template_search_pattern], [new_template_insert_version, release_changelog_entry])
+    template_file_string = generate_with_template_file(release_note_template_file_path, generated_release_notes_file_path, [template_insert_version_pattern, template_search_pattern], [new_template_insert_version, release_changelog_entry])
 
     env_file_path = os.getenv('GITHUB_ENV')
     with open(env_file_path, "a") as envfile: # type: ignore - false error from parsing a str filename which works fine when the file exists in the actual github env
-        print(f'{github_env_releasenotesfile_name}={generated_release_notes_object}', file=envfile)
+        print(f'{github_env_releasenotesfile_name}={generated_release_notes_file_path}', file=envfile)
 
 else:
     # check if special template requested
     if not release_note_template_overriden:
         # it wasn't, rename the template object so we actually use the bare version
-        release_note_template_object = default_release_note_template_no_changelog_object
+        release_note_template_file_path = default_release_note_template_no_changelog_file_path
         # use auto-generated release notes here instead? somehow need to pass change in behaviour to github release command in workflow later
 
     # if special template was requested, it's already being passed, do nothing
 
     # no change notes, uses template directly
     # dynamically change the supported stellaris version though
-    template_file_string = generate_with_template_file(release_note_template_object, generated_release_notes_object, template_insert_version_pattern, new_template_insert_version, skip_regex_replace=False)
+    template_file_string = generate_with_template_file(release_note_template_file_path, generated_release_notes_file_path, template_insert_version_pattern, new_template_insert_version, skip_regex_replace=False)
 
     env_file_path = os.getenv('GITHUB_ENV')
     with open(env_file_path, "a") as envfile: # type: ignore - false error from parsing a str filename which works fine when the file exists in the actual github env
-        print(f'{github_env_releasenotesfile_name}={generated_release_notes_object}', file=envfile)
+        print(f'{github_env_releasenotesfile_name}={generated_release_notes_file_path}', file=envfile)
     
 
 ### Processing for just release object ###
 # create title from mod name + the release tag - used for commit message and release title
 release_title = f"{descriptor_dict['name']} {github_release_tag}"
 # release zipfile name must be acceptable format
-release_zipfile_name = f"{args.modfolderName}_{filename_mod_version}.zip"
+release_zipfile_name = f"{args.modfolderName}_{for_filename_mod_version}.zip"
 # make useful environment variables
 env_file_path = os.getenv('GITHUB_ENV')
 with open(env_file_path, "a") as envfile: # type: ignore - false error from parsing a str filename which works fine when the file exists in the actual github env
@@ -352,5 +357,5 @@ with open(env_file_path, "a") as envfile: # type: ignore - false error from pars
     print(f'{github_env_releasezipfile_name}={release_zipfile_name}', file=envfile)
 
 ### Finish up with descriptor file ###
-create_descriptor_file(descriptor_dict, descriptor_file_object)
+create_descriptor_file(descriptor_dict, descriptor_file_path)
 

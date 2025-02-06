@@ -8,7 +8,7 @@ from methods.input_methods import str2bool, parse_descriptor_to_dict, increment_
 
 debug_level = 1
 
-# get environment variables
+# helper to get environment variables
 def get_env_variable(env_var_name, default=None):
     """Simple getenv wrapper with debug print"""
     env_var = os.getenv(env_var_name, default)
@@ -16,17 +16,17 @@ def get_env_variable(env_var_name, default=None):
         print(f"{env_var_name}={env_var}")
     return env_var
 
-home_dir = Path(get_env_variable('HOME', '/home')).resolve()
-steam_home_dir = get_env_variable('STEAM_HOME', home_dir / '.local/share/Steam')
-root_path = get_env_variable('rootPath', '')
-content_root = Path.cwd() / root_path
-manifest_path_object = Path.cwd() / 'manifest.vdf'
+home_dir_path = Path(get_env_variable('HOME', '/home')).resolve()
+steam_home_dir_path = get_env_variable('STEAM_HOME', home_dir_path / '.local/share/Steam')
+root_path = get_env_variable('rootPath', '') # TODO
+content_root = Path.cwd() / root_path # TODO
+manifest_file_path = Path.cwd() / 'manifest.vdf'
 
 app_id = get_env_variable('appID', '')
 item_id = get_env_variable('itemID', '')
 change_note = get_env_variable('changeNote', 'Test')
 steam_username = get_env_variable('steam_username', '')
-config_vdf = get_env_variable('configVdf', '')
+config_vdf_contents = get_env_variable('configVdf', '')
 
 # make manifest file with metadata
 manifest_content = f'''"workshopitem"
@@ -34,6 +34,7 @@ manifest_content = f'''"workshopitem"
     "appid" "{app_id}"
     "publishedfileid" "{item_id}"
     "contentfolder" "{content_root}"
+    "previewfile" "{content_root}/thumbnail.png"
     "changenote" "{change_note}"
 }}
 '''
@@ -52,19 +53,19 @@ manifest_content = f'''"workshopitem"
 }
 '''
 
-with open(manifest_path_object, 'w') as manifest_file:
-    manifest_file.write(manifest_content)
+with open(manifest_file_path, 'w') as manifest_file_object:
+    manifest_file_object.write(manifest_content)
 
 print("Manifest:")
 print(manifest_content)
 
-# test
-print("Home contents:", os.listdir(home_dir))
-print("Steam home contents:", os.listdir(steam_home_dir))
-print(".steam/steam contents:", os.listdir(home_dir / ".steam/steam"))
-print(".steam/root contents:", os.listdir(home_dir / ".steam/root"))
+if debug_level >= 1:
+    print("Home contents:", os.listdir(home_dir_path))
+    print("Steam home contents:", os.listdir(steam_home_dir_path))
+    print(".steam/steam contents:", os.listdir(home_dir_path / ".steam/steam"))
+    print(".steam/root contents:", os.listdir(home_dir_path / ".steam/root"))
 
-# function to run shell commands
+# function to run shell commands, for error handling
 def run_command(command):
     try:
         subprocess.run(command, shell=True, check=True)
@@ -73,22 +74,23 @@ def run_command(command):
         print(err)
         return False
 
-# handling SteamGuard authentication
-if not config_vdf:
+# check SteamGuard authentication
+if not config_vdf_contents:
     print("Config VDF input is missing or incomplete! Cannot proceed.")
     sys.exit(1)
 
-os.makedirs(steam_home_dir / 'config', exist_ok=True)
+os.makedirs(steam_home_dir_path / 'config', exist_ok=True)
 
-decoded_config_vdf = base64.b64decode(config_vdf)
-config_path_object = steam_home_dir / 'config' / 'config.vdf'
-with open(config_path_object, 'wb') as config_file:
-    config_file.write(decoded_config_vdf)
-os.chmod(config_path_object, 0o777)
+decoded_config_vdf = base64.b64decode(config_vdf_contents)
+config_file_path = steam_home_dir_path / 'config' / 'config.vdf'
+with open(config_file_path, 'wb') as config_file_object:
+    config_file_object.write(decoded_config_vdf)
+os.chmod(config_file_path, 0o777)
 
 # test
-print(f"{config_path_object=}")
-print("Steam/config contents:", os.listdir(steam_home_dir / 'config'))
+if debug_level >= 1:
+    print(f"{config_file_path=}")
+    print("Steam/config contents:", os.listdir(steam_home_dir_path / 'config'))
 
 # test login
 print("test login")
@@ -99,13 +101,14 @@ else:
     print("FAILED login")
     subprocess.run("ls -alh", shell=True)
     subprocess.run(f"ls -alh {root_path} || true", shell=True)
-    subprocess.run(f"ls -Ralph {steam_home_dir / 'logs'}", shell=True)
+    subprocess.run(f"ls -Ralph {steam_home_dir_path / 'logs'}", shell=True)
     sys.exit(1)
 
 # upload the item
 print("deliberate halt")
-sys.exit(1)
-upload_command = f'steamcmd +login "{steam_username}" +workshop_build_item "{manifest_path_object}" +quit'
+sys.exit(0)
+
+upload_command = f'steamcmd +login "{steam_username}" +workshop_build_item "{manifest_file_path}" +quit'
 if run_command(upload_command):
     print("Successful upload")
 else:
@@ -113,20 +116,20 @@ else:
     print("Errors during upload")
     subprocess.run("ls -alh", shell=True)
     subprocess.run(f"ls -alh {root_path} || true", shell=True)
-    subprocess.run(f"ls -Ralph {steam_home_dir / 'logs'}", shell=True)
+    subprocess.run(f"ls -Ralph {steam_home_dir_path / 'logs'}", shell=True)
 
-    log_dir = steam_home_dir / 'logs'
-    #os.makedirs(log_dir, exist_ok=True)
-    if os.path.isdir(log_dir):
-        for log_file in os.listdir(log_dir):
-            log_path = log_dir / log_file
-            with open(log_path) as f:
-                print(f"######## {log_file}")
+    log_dir_path = steam_home_dir_path / 'logs'
+    if os.path.isdir(log_dir_path):
+        for log_filename in os.listdir(log_dir_path):
+            log_file_path = log_dir_path / log_filename
+            with open(log_file_path) as f:
+                print(f"######## {log_filename}")
                 print(f.read())
 
     sys.exit(1)
 
 # Output the manifest path
+# TODO: use github upload artifact to upload the manifest file for inspection
 github_output = os.getenv('GITHUB_OUTPUT', '')
 with open(github_output, 'a') as gh_output_file:
-    gh_output_file.write(f"manifest={manifest_path_object}\n")
+    gh_output_file.write(f"manifest={manifest_file_path}\n")

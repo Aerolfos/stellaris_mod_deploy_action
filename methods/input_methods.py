@@ -34,7 +34,7 @@ def str2bool(v: str) -> bool:
     else:
         raise argparse.ArgumentTypeError('Boolean value expected.')
     
-def parse_descriptor_to_dict(descriptor_file_object: Path) -> dict:
+def parse_descriptor_to_dict(descriptor_file_path: Path) -> dict:
     """Creates a dict of entries from a paradox descriptor.mod file
     
     This method relies on the fixed structure of pdx script, {} are indicators for blocks that go together.
@@ -46,63 +46,86 @@ def parse_descriptor_to_dict(descriptor_file_object: Path) -> dict:
     descriptor_dict = {}
     line_container = []
     multiline_flag = False
-    with open(descriptor_file_object, 'r', encoding="utf-8") as descriptor:
-        for line in descriptor:
+    with open(descriptor_file_path, 'r', encoding="utf-8") as descriptor_object:
+        for line in descriptor_object:
             # skip empty lines and # comments
             if not line or line.isspace():
                 continue
-            # strip any spaces or tabs before the comment
+            # strip any spaces or tabs before any comment
+            # the simple descriptor format does NOT support inline comments, hence ignoring # not at beginning
             if line.lstrip().startswith("#"):
                 continue
             # check for normal parsing
-            if not multiline_flag:    
+            if not multiline_flag:
                 if "=" in line:
                     # strip line for trailing spaces and turn line into list with key and value
                     line = line.rstrip().split("=")
                     line[1] = line[1].strip("\"")
-                    # the multiline blocks like tags are a problem, so parse those
-                    if "{" in line[1]:
-                        multiline_key = line[0]
-                        multiline_flag = True
-                        # check for anything after the brace - you shouldn't do this but you never know...
-                        index_brace = line[1].find("{")
-                        if not (line[1].endswith("{") or line[1].endswith(" ")):
-                            # save anything after the brace unless it's last character (string was stripped already)
-                            line_container.append(line[1][index_brace+1:])
-                        continue #  goes to next line
-                    else:
+
+                    if not "{" in line[1]:
                         descriptor_dict[line[0]] = line[1]
+                    # the multiline blocks like tags are a problem, so parse those
+                    elif "{" in line[1]:
+                        if not "}" in line:
+                            multiline_key = line[0]
+                            multiline_flag = True
+                            # check for anything after the brace - you shouldn't do this but you never know...
+                            index_brace = line[1].find("{")
+                            if not (line[1].endswith("{") or line[1].endswith(" ")):
+                                # save anything after the brace unless the brace is last character (string was stripped already)
+                                line_container.append(line[1][index_brace+1:])
+                            continue #  goes to next line
+                        else:
+                            # line is like 
+                            # tags = { "tag1" "tag2" "tag3" "tag4" "tag5"}
+                            multiline_key = line[0]
+                            index_lbrace = line[1].find("{")
+                            index_rbrace = line[1].find("}")
+                            contents = line[1][index_lbrace+1:index_rbrace].strip()
+                            line_container = contents.split("\" \"")
+                            line_container = [word.strip("\"") for word in line_container]
+                            descriptor_dict[multiline_key] = line_container
+                    
             # alternate flow
             elif multiline_flag:
+                if not "}" in line:
+                    line_container.append(line.strip().strip("\""))
                 if "}" in line:
+                    line = line.lstrip().strip("\"")
+                    # check for anything before the brace - you shouldn't do this but you never know...
+                    index_brace = line.find("}")
+                    if not (line.startswith("}") or line.startswith(" ")):
+                        # save anything before the brace unless it's last character (string was stripped already)
+                        line_container.append(line[:index_brace])
+                    
+                    # end multiline
                     descriptor_dict[multiline_key] = line_container
                     multiline_flag = False
                     line_container = [] # clean up container
                     continue #  goes to next line
-                else:
-                    line_container.append(line.strip().strip("\""))
+                
     return descriptor_dict
 
-def create_descriptor_file(descriptor_dict: dict, descriptor_file_object: Path) -> None:
+def create_descriptor_file(descriptor_dict: dict, descriptor_file_path: Path) -> None:
     """Creates a paradox descriptor.mod file from a dictionary
     """
-    with open(descriptor_file_object, 'w', encoding="utf-8") as descriptor:
+    with open(descriptor_file_path, 'w', encoding="utf-8") as descriptor_object:
         # dict order being insertion order is guaranteed in newer python versions so file structure should be preserved
         for key, item in descriptor_dict.items():
             # construct line - in case of list we need to write it out tabbed and encased in {}
             if isinstance(item, str):
                 line = f"{key}=\"{item}\"\n"
-                descriptor.write(line)
+                descriptor_object.write(line)
             elif isinstance(item, list):
                 line = f"{key}={{\n"
-                descriptor.write(line)
+                descriptor_object.write(line)
                 for tag in item:
                     # \t for tab
                     line = f"\t\"{tag}\"\n"
-                    descriptor.write(line)
+                    descriptor_object.write(line)
                 # end block and continue other items
-                descriptor.write(f"}}\n")
-    print(f"File {descriptor_file_object} written")
+                descriptor_object.write(f"}}\n")
+    print(f"File {descriptor_file_path} written")
 
 def increment_mod_version(
         input_mod_version: str, 
