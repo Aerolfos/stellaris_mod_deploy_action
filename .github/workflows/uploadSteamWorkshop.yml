@@ -10,6 +10,14 @@ on:
   # sadly you do need to copy the inputs everywhere
   workflow_call:
     inputs:
+      versionStellaris:
+        description: 'Stellaris version to support'
+        required: true
+        type: string
+      useChangelog:
+        description: 'Use CHANGELOG.md file in target repo for changenote passed to steam'
+        required: true
+        type: boolean
       steam_appID:
         description: 'The Steam App ID belonging to the game whose workshop is being uploaded to'
         required: false
@@ -18,9 +26,9 @@ on:
 
     secrets:
       STEAM_DEPLOYMENT_USERNAME:
-        required: false
+        required: true
       STEAM_CONFIG_VDF:
-        required: false
+        required: true
       
 permissions:
   contents: write
@@ -28,6 +36,7 @@ permissions:
 jobs:
   jobSteamWorkshopUpload:
     runs-on: ubuntu-latest
+    # docker container with steamcmd set up
     container:
       image: steamcmd/steamcmd:ubuntu
 
@@ -66,8 +75,12 @@ jobs:
         steam_username: ${{ secrets.STEAM_DEPLOYMENT_USERNAME }}
         configVdf: ${{ secrets.STEAM_CONFIG_VDF }}
         appID: ${{ inputs.steam_appID }}
+        versionStellaris: ${{ inputs.versionStellaris }}
+        useChangelog: ${{ inputs.useChangelog }}
+        modfolderName: ${{ github.event.repository.name }}
         #itemId: ${{ inputs.publishedFileId }}
         #rootPath: ${{ inputs.path }}
         #changeNote: ${{ inputs.changeNote }}
+      working-directory: stellaris_mod_deploy_action
       run: |
-        python stellaris_mod_deploy_action/steam_workshop_upload.py
+        python steam_workshop_upload.py

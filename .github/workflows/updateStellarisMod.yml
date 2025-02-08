@@ -30,22 +30,6 @@ on:
         description: 'Copy english loc entries to other languages?'
         required: true
         type: boolean
-      experimentalSteamWorkshopUpload:
-        description: 'Automatically upload to Steam Workshop'
-        required: false
-        type: boolean
-        default: false
-      steam_appID:
-        description: 'The Steam App ID belonging to the game whose workshop is being uploaded to'
-        required: false
-        type: string
-        default: ''
-
-    secrets:
-      STEAM_DEPLOYMENT_USERNAME:
-        required: false
-      STEAM_CONFIG_VDF:
-        required: false
 
   # for testing can run this workflow directly
   # this won't work because it lacks files to operate on, it's really just to see the inputs displayed and have a reference for them

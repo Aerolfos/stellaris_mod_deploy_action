@@ -76,17 +76,19 @@ if debug_level >= 1:
 
 ### Overrides ###
 # cwd is set to where the python file is, which should be next to the folder with the mod files from the originating mod repository
-mod_files_folder_path = (Path.cwd() / f"../{args.modfolderName}").resolve()
+mod_github_folder_path = (Path.cwd() / f"../{args.modfolderName}").resolve()
+# and the folder with the actual game mod files (nested one down from github)
+mod_files_folder_path = mod_github_folder_path / args.modfolderName
 
 if debug_level >= 1:
     print("\n- Paths -")
     print("Python script file path:", Path.cwd())
-    print("Path to mod files:", mod_files_folder_path)
+    print("Path to mod files:", mod_github_folder_path)
 
 # do overrides immediately
 # file for potential overrides
 override_file_name = "OVERRIDE.txt"
-override_file_path = mod_files_folder_path / override_file_name
+override_file_path = mod_github_folder_path / override_file_name
 # if there are overrides, we parse them - use same structure as a paradox descriptor because we have the parser already
 override_enabled = False
 override_dict = {}
@@ -131,16 +133,16 @@ except KeyError:
 ### File paths ###
 # make file paths
 # descriptor is nested twice
-descriptor_file_path = mod_files_folder_path / args.modfolderName / descriptor_file_name
+descriptor_file_path = mod_files_folder_path / descriptor_file_name
 if debug_level >= 1:
     print("Descriptor file location:", descriptor_file_path)
-workshop_description_file_path = mod_files_folder_path / workshop_description_file_name
-readme_file_path = mod_files_folder_path / readme_file_name
-changelog_file_path = mod_files_folder_path / changelog_file_name
+workshop_description_file_path = mod_github_folder_path / workshop_description_file_name
+readme_file_path = mod_github_folder_path / readme_file_name
+changelog_file_path = mod_github_folder_path / changelog_file_name
 # default template file is generic and with the script
 # but otherwise, check user provided one (which can only come from *their* repo)
 if release_note_template_overriden:
-    release_note_template_file_path = mod_files_folder_path / release_note_template_filename
+    release_note_template_file_path = mod_github_folder_path / release_note_template_filename
 else:
     release_note_template_file_path = Path.cwd() / release_note_template_filename
 # no changelog version
