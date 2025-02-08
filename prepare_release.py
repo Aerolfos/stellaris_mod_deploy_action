@@ -3,23 +3,9 @@ import argparse
 import os
 import re
 from pathlib import Path
+
+from constants_and_overrides import debug_level, default_add_changelog_WIP_entry, github_env_modreleasetag_name, github_env_releasetitle_name, github_env_releasenotesfile_name, github_env_descriptorfile_name, github_env_releasezipfile_name
 from methods.input_methods import str2bool, get_env_variable, parse_descriptor_to_dict, increment_mod_version, search_and_replace_in_file, create_descriptor_file, generate_with_template_file
-
-### Settings ###
-debug_level = 1
-# 0, 1, or 2
-# 0 prints nothing, 1 inputs and paths, 2 prints information about parsing and processing
-
-# whether to add a new WIP entry to changelogs for filling in
-default_add_changelog_WIP_entry = True
-
-### Constants ###
-# environment variable names (passed to github action environment)
-github_env_modreleasetag_name = "MOD_RELEASE_TAG"
-github_env_releasetitle_name = "MOD_RELEASE_TITLE"
-github_env_releasenotesfile_name = "MOD_RELEASENOTES_FILE"
-github_env_descriptorfile_name = "MOD_DESCRIPTOR_FILE"
-github_env_releasezipfile_name = "MOD_RELEASE_ZIP_FILE"
 
 ### Defaults ###
 # default search patterns

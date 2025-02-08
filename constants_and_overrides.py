@@ -14,3 +14,12 @@ debug_level = 1
 # whether to add a new WIP entry to changelogs for filling in
 default_add_changelog_WIP_entry = True
 
+### Constants ###
+# environment variable names (passed to github action environment)
+github_env_modreleasetag_name = "MOD_RELEASE_TAG"
+github_env_releasetitle_name = "MOD_RELEASE_TITLE"
+github_env_releasenotesfile_name = "MOD_RELEASENOTES_FILE"
+github_env_descriptorfile_name = "MOD_DESCRIPTOR_FILE"
+github_env_releasezipfile_name = "MOD_RELEASE_ZIP_FILE"
+
+

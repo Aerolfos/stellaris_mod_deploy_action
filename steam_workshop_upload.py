@@ -8,10 +8,9 @@ from pathlib import Path
 import subprocess
 import base64
 import sys
-from methods.input_methods import str2bool, get_env_variable, run_command, parse_descriptor_to_dict, increment_mod_version, search_and_replace_in_file, create_descriptor_file, generate_with_template_file
 
-### Settings ###
-debug_level = 1
+from constants_and_overrides import debug_level, default_add_changelog_WIP_entry
+from methods.input_methods import str2bool, get_env_variable, run_command, parse_descriptor_to_dict, increment_mod_version, search_and_replace_in_file, create_descriptor_file, generate_with_template_file
 
 ### Environment variables, paths ###
 # secrets
