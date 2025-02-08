@@ -92,10 +92,10 @@ jobs:
         python-version: "3.12"
     
     # action expects to be run from a directory that's alongside the relevant mod repo, see tools step above
-    - name: Run main Python script
-      id: main_python_script
+    - name: Run supporting Python release script
+      id: main_prepare_release_python
       working-directory: stellaris_mod_deploy_action
-      run: python main.py "${{ inputs.versionType }}" "${{ inputs.versionStellaris }}" "${{ inputs.useChangelog }}" "${{ github.event.repository.name }}" "${{ github.repository }}"
+      run: python prepare_release.py "${{ inputs.versionType }}" "${{ inputs.versionStellaris }}" "${{ inputs.useChangelog }}" "${{ github.event.repository.name }}" "${{ github.repository }}"
       # repo name from original caller passed as the folder name for the mod
       shell: bash
 
