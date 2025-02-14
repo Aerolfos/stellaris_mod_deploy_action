@@ -59,7 +59,7 @@ class OverrideClass():
 
 ### Settings ###
 # debug level 0 prints nothing, 1 inputs and paths, 2 prints information about parsing and processing
-debug_level = 1
+debug_level = 2
 # 0, 1, or 2
 
 # whether to add a new WIP entry to changelogs for filling in

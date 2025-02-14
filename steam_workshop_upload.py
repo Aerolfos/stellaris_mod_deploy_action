@@ -76,7 +76,7 @@ if cao.debug_level >= 1:
     print(".steam/steam contents:", os.listdir(home_dir_path / ".steam/steam"))
     print(".steam/root contents:", os.listdir(home_dir_path / ".steam/root"))
 
-    print("Manifest:")
+    print("- Manifest: -")
     print(manifest_content)
 
 ### Login ###
