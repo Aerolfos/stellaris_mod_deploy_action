@@ -1,5 +1,5 @@
 # This is an example workflow, which you should copy to your own mod repository to create a usable action from it
-# This workflow calls the reusable main workflow that handles setting up and running python
+# This workflow calls the reusable main workflow (updateStellarisMod.yml) that handles all the actual work
 
 # can modify these two for labelling purposes
 name: 'Deploy Stellaris mod update'
@@ -30,10 +30,12 @@ on:
           Expects a CHANGELOG.md file in target repo
         required: true
         type: boolean
+        default: false # change if you want the checkbox to be ticked by default
       updateLoc:
         description: 'Copy english loc entries to other languages?'
         required: true
         type: boolean
+        default: false # change if you want the checkbox to be ticked by default
 
 permissions:
   contents: write
