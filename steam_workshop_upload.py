@@ -20,7 +20,6 @@ config_vdf_contents = get_env_variable('configVdf', None, debug_level=cao.debug_
 app_id = get_env_variable('appID', None, debug_level=cao.debug_level)
 versionStellaris = get_env_variable('versionStellaris', None, debug_level=cao.debug_level)
 useChangelog = get_env_variable('useChangelog', 'false', debug_level=cao.debug_level)
-modfolderName = get_env_variable('modfolderName', None, debug_level=cao.debug_level)
 
 item_id = get_env_variable('itemID', None, debug_level=cao.debug_level) # TODO, change flow
 change_note = "TEST deployment from Github"
@@ -34,7 +33,7 @@ if not app_id:
     raise ValueError("Steam app ID is missing or incomplete, must have a game to upload mod for")
 #if not item_id:
 #    raise ValueError("Published file ID is missing or incomplete, must have an already uploaded workshop object")
-if not modfolderName:
+if not cao.mod_folder_name:
     raise ValueError("Mod folder name is missing or incomplete, it should be Github repo name, how did you manage that?")
 if not steam_username:
     raise ValueError("Steam username is missing or incomplete, must have an account to upload with")
