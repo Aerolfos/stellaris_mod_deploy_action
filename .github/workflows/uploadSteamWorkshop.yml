@@ -77,7 +77,7 @@ jobs:
         appID: ${{ inputs.steam_appID }}
         versionStellaris: ${{ inputs.versionStellaris }}
         useChangelog: ${{ inputs.useChangelog }}
-        modfolderName: ${{ github.event.repository.name }}
+        modFolderName: ${{ github.event.repository.name }}
         #itemId: ${{ inputs.publishedFileId }}
         #rootPath: ${{ inputs.path }}
         #changeNote: ${{ inputs.changeNote }}

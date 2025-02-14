@@ -9,41 +9,25 @@ import subprocess
 import base64
 import sys
 
-from constants_and_overrides import debug_level, default_add_changelog_WIP_entry
+import constants_and_overrides as cao
 from methods.input_methods import str2bool, get_env_variable, run_command, parse_descriptor_to_dict, increment_mod_version, search_and_replace_in_file, create_descriptor_file, generate_with_template_file
 
 ### Environment variables, paths ###
 # secrets
-steam_username = get_env_variable('steam_username', None, debug_level=debug_level)
-config_vdf_contents = get_env_variable('configVdf', None, debug_level=debug_level)
+steam_username = get_env_variable('steam_username', None, debug_level=cao.debug_level)
+config_vdf_contents = get_env_variable('configVdf', None, debug_level=cao.debug_level)
 # normal env variables
-app_id = get_env_variable('appID', None, debug_level=debug_level)
-versionStellaris = get_env_variable('versionStellaris', None, debug_level=debug_level)
-useChangelog = get_env_variable('useChangelog', 'false', debug_level=debug_level)
-modfolderName = get_env_variable('modfolderName', None, debug_level=debug_level)
+app_id = get_env_variable('appID', None, debug_level=cao.debug_level)
+versionStellaris = get_env_variable('versionStellaris', None, debug_level=cao.debug_level)
+useChangelog = get_env_variable('useChangelog', 'false', debug_level=cao.debug_level)
+modfolderName = get_env_variable('modfolderName', None, debug_level=cao.debug_level)
 
-item_id = get_env_variable('itemID', None, debug_level=debug_level) # TODO, change flow
+item_id = get_env_variable('itemID', None, debug_level=cao.debug_level) # TODO, change flow
+change_note = "TEST deployment from Github"
 
-# filenames
-descriptor_file_name = "descriptor.mod"
-workshop_description_file_name = "workshop.txt"
-readme_file_name = "README.md"
-changelog_file_name = "CHANGELOG.md"
-
-# cwd is set to where the python file is, which should be next to the folder with the mod files from the originating mod repository
-mod_github_folder_path = (Path.cwd() / f"../{modfolderName}").resolve()
-# and the folder with the actual game mod files (nested one down from github)
-mod_files_folder_path = mod_github_folder_path / modfolderName
-
-descriptor_file_path = mod_files_folder_path / descriptor_file_name
-workshop_description_file_path = mod_github_folder_path / workshop_description_file_name
-readme_file_path = mod_github_folder_path / readme_file_name
-changelog_file_path = mod_github_folder_path / changelog_file_name
-
-home_dir_path = Path(get_env_variable('HOME', '/home', debug_level=debug_level)).resolve()
-steam_home_dir_path = get_env_variable('STEAM_HOME', home_dir_path / '.local/share/Steam', debug_level=debug_level)
-content_root = Path.cwd() / root_path # TODO
-manifest_file_path = Path.cwd() / 'manifest.vdf'
+# dependent on docker container image used to set up steamcmd
+home_dir_path = Path(get_env_variable('HOME', '/home', debug_level=cao.debug_level)).resolve()
+steam_home_dir_path = get_env_variable('STEAM_HOME', home_dir_path / '.local/share/Steam', debug_level=cao.debug_level)
 
 ### Errors ###
 if not app_id:
@@ -64,8 +48,8 @@ manifest_content = f'''"workshopitem"
 {{
     "appid" "{app_id}"
     "publishedfileid" "{item_id}"
-    "contentfolder" "{content_root}"
-    "previewfile" "{content_root}/thumbnail.png"
+    "contentfolder" "{cao.mod_files_folder_path}"
+    "previewfile" "{cao.mod_files_folder_path}/thumbnail.png"
     "changenote" "{change_note}"
 }}
 '''
@@ -84,10 +68,10 @@ manifest_content = f'''"workshopitem"
 }
 '''
 
-with open(manifest_file_path, 'w') as manifest_file_object:
+with open(cao.manifest_file_path, 'w') as manifest_file_object:
     manifest_file_object.write(manifest_content)
 
-if debug_level >= 1:
+if cao.debug_level >= 1:
     print("Home contents:", os.listdir(home_dir_path))
     print("Steam home contents:", os.listdir(steam_home_dir_path))
     print(".steam/steam contents:", os.listdir(home_dir_path / ".steam/steam"))
@@ -104,7 +88,7 @@ with open(config_file_path, 'wb') as config_file_object:
     config_file_object.write(decoded_config_vdf)
 os.chmod(config_file_path, 0o777)
 
-if debug_level >= 1:
+if cao.debug_level >= 1:
     print(f"{config_file_path=}")
     print("Steam/config contents:", os.listdir(steam_home_dir_path / 'config'))
 
@@ -115,7 +99,7 @@ if run_command(command):
 else:
     print("FAILED login")
     subprocess.run("ls -alh", shell=True)
-    subprocess.run(f"ls -alh {root_path} || true", shell=True)
+    subprocess.run(f"ls -alh {cao.mod_files_folder_path} || true", shell=True)
     subprocess.run(f"ls -Ralph {steam_home_dir_path / 'logs'}", shell=True)
     sys.exit(1)
 

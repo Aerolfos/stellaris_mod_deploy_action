@@ -145,13 +145,12 @@ def create_descriptor_file(descriptor_dict: dict, descriptor_file_path: Path) ->
                 descriptor_object.write(f"}}\n")
     print(f"File {descriptor_file_path} written")
 
-def increment_mod_version(
-        input_mod_version: str, 
-        patch_type: str, 
-        use_format_check: bool = True, 
+def mod_version_to_dict(
+        input_mod_version: str,
+        use_format_check: bool = True,
         possible_version_types: list = ["Major", "Minor", "Patch"]
-    ) -> tuple[dict, str]:
-    """Take a version of the form "v1.2.3" and increment according to patch type
+    ) -> tuple[dict, bool, bool]:
+    """Take a string with a version of the form "v1.2.3" and return a dict with the version components
 
     Uses a regex pattern to make sure the format is correct - can be optionally skipped
 
@@ -176,6 +175,23 @@ def increment_mod_version(
             using_v_with_space_prefix = True
 
     current_semantic_versions = dict(zip(possible_version_types, semantic_version_list))
+    
+    return current_semantic_versions, using_v_prefix, using_v_with_space_prefix
+
+def increment_mod_version(
+        input_mod_version: str,
+        patch_type: str, 
+        use_format_check: bool = True,
+        possible_version_types: list = ["Major", "Minor", "Patch"]
+    ) -> tuple[dict, str]:
+    """Take a version of the form "v1.2.3" and increment according to patch type
+
+    Uses a regex pattern to make sure the format is correct - can be optionally skipped
+
+    Possible versions list must be in the same order as the version is structured
+    """
+    # break down with helper function
+    current_semantic_versions, using_v_prefix, using_v_with_space_prefix = mod_version_to_dict(input_mod_version, use_format_check, possible_version_types)
 
     # check what versions follow from the currently selected version by slicing
     subsequent_versions = possible_version_types[possible_version_types.index(patch_type)+1:]
@@ -189,7 +205,7 @@ def increment_mod_version(
     if "*" not in current_semantic_versions[patch_type]:
         current_semantic_versions[patch_type] = str(int(current_semantic_versions[patch_type]) + 1)
     
-    # stellaris wants v1.2.3 now
+    # NOTE: stellaris prefers v1.2.3 now
     updated_mod_version = ".".join(current_semantic_versions.values())
     if using_v_prefix:
         if using_v_with_space_prefix:

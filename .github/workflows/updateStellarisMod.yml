@@ -94,9 +94,11 @@ jobs:
     # action expects to be run from a directory that's alongside the relevant mod repo, see tools step above
     - name: Run supporting Python release script
       id: main_prepare_release_python
+      # repo name from original caller passed as the folder name for the mod
+      env:
+        modFolderName: ${{ github.event.repository.name }}
       working-directory: stellaris_mod_deploy_action
       run: python prepare_release.py "${{ inputs.versionType }}" "${{ inputs.versionStellaris }}" "${{ inputs.useChangelog }}" "${{ github.event.repository.name }}" "${{ github.repository }}"
-      # repo name from original caller passed as the folder name for the mod
       shell: bash
 
     - name: Optionally propagate new entries from one source language to target languages via TTFTCUTS' loc action
