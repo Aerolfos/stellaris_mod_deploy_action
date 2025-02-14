@@ -52,7 +52,7 @@ def run_command(command):
         print(err)
         return False
     
-def parse_descriptor_to_dict(descriptor_file_path: Path) -> dict:
+def parse_descriptor_to_dict(descriptor_file_path: Path, debug_level: int=0) -> dict:
     """Creates a dict of entries from a paradox descriptor.mod file
     
     This method relies on the fixed structure of pdx script, {} are indicators for blocks that go together.
@@ -61,11 +61,17 @@ def parse_descriptor_to_dict(descriptor_file_path: Path) -> dict:
     
     Parses will skip empty lines and comments, indicated with #. This includes empty lines in multi-line blocks.
     """
+    if debug_level >= 2:
+        print("Parsing descriptor style file")
     descriptor_dict = {}
     line_container = []
     multiline_flag = False
     with open(descriptor_file_path, 'r', encoding="utf-8") as descriptor_object:
         for line in descriptor_object:
+            # debug prints
+            if debug_level >= 2:
+                print(f"Current line: {line}")
+            
             # skip empty lines and # comments
             if not line or line.isspace():
                 continue
@@ -121,7 +127,11 @@ def parse_descriptor_to_dict(descriptor_file_path: Path) -> dict:
                     multiline_flag = False
                     line_container = [] # clean up container
                     continue #  goes to next line
-                
+
+    if debug_level >= 2:
+        print("Finished parsing")
+        print(f"result = {descriptor_dict}")
+
     return descriptor_dict
 
 def create_descriptor_file(descriptor_dict: dict, descriptor_file_path: Path) -> None:

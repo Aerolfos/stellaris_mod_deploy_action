@@ -25,12 +25,13 @@ class OverrideClass():
         self.override_dict = {}
         if override_file_path.exists():
             self.overrides_enabled = True
-            self.override_dict = parse_descriptor_to_dict(override_file_path)
+            self.override_dict = parse_descriptor_to_dict(override_file_path, debug_level=debug_level)
 
         self.overriden_params = {}
 
         if debug_level >= 2:
             print("- Overrides: -")
+            print(f"Override setting: {self.overrides_enabled}")
             if self.overrides_enabled:
                 for key, item in self.override_dict.items():
                     print(f"{key}: {item}")
