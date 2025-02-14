@@ -107,7 +107,7 @@ descriptor_dict["path"] = generated_path
 descriptor_dict["supported_version"] = generated_supported_version
 
 # check if any other parameters had requested overrides
-if cao.override_enabled:
+if cao.overrides_enabled:
     # check if we want another name - make supported stellaris version available
     # useful for say gigastructures' mod naming convention
     if cao.descriptor_override_name is not None:
