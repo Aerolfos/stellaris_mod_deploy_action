@@ -62,7 +62,8 @@ def parse_descriptor_to_dict(descriptor_file_path: Path, debug_level: int=0) -> 
     Parses will skip empty lines and comments, indicated with #. This includes empty lines in multi-line blocks.
     """
     if debug_level >= 2:
-        print("Parsing descriptor style file")
+        print("- Parsing descriptor style file -")
+        print(f"Path: {descriptor_file_path}")
     descriptor_dict = {}
     line_container = []
     multiline_flag = False
