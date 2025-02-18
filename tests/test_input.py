@@ -1,4 +1,5 @@
-import sys, os
+import os
+import sys
 import random
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -34,13 +35,13 @@ def test_parse_descriptor_to_dict():
     }
 
     # test reading an override file
-    test_override = "fixtures/test_OVERRIDE.txt"
+    test_override = "fixtures/OVERRIDE.txt"
     expected_test_override_result = {
         'name_override': 'Display name {stellaris_version}', 
         'remote_file_id_override': '314159265', 
-        'Test': 'Test',
-        'singleline_list': [' test1 ' , 'test2', 'test3'],
-        'multiline_test': ['test1', 'test2', 'test3', 'test4', 'test5'],
+        'Test_override': 'Test',
+        'singleline_list_override': [' test1 ' , 'test2', 'test3'],
+        'multiline_test_override': ['test1', 'test2', 'test3', 'test4', 'test5'],
         'extra_loc_files_to_update': ["localisation/english/test_general_l_english.yml", "localisation/english/test_event_l_english.yml"],
         'version_loc_key':'test_mod_version',
     }
@@ -54,7 +55,7 @@ def test_parse_descriptor_to_dict():
         result = im.parse_descriptor_to_dict(test_path, debug_level=0)
 
         for file_key, test_key in zip(result.keys(), expected_result.keys()):
-            assert file_key == test_key, f"Mistmatching extracted key vs test key: {file_key} =/= {test_key}"
+            assert file_key == test_key, f"Mismatching extracted key vs test key: {file_key} =/= {test_key}"
             assert result[file_key] == result[test_key], f"Mismatching extracted value vs test value: {result[file_key]} =/= {result[test_key]}"
 
         error_msg = f"Failed to match descriptor {test_path} to test \nOutput dict was: \n{result} \nShould have been: \n{expected_result}"

@@ -6,10 +6,10 @@ name_override="Display name {stellaris_version}"
 # test comment (this is not actually supported by paradox, but override does support it)
 remote_file_id_override="314159265"
 
-Test = "Test"
+Test_override = "Test"
 
-singleline_list = {" test1 " "test2" "test3" } 
-multiline_test = {"test1"
+singleline_list_override = {" test1 " "test2" "test3" } 
+multiline_test_override = {"test1"
 	"test2"
 	"test3"
 	"test4"

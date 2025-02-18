@@ -172,7 +172,7 @@ new_template_insert_version = f"\\g<1>\\g<2>{supported_stellaris_version_display
 # user specified to use changelog
 if args.useChangelog:
     if not cao.changelog_file_path.exists():
-        raise ValueError(f"Requested adding changelog to release notes, but no file {cao.changelog_file_name} was provided in repository")
+        raise FileNotFoundError(f"Requested adding changelog to release notes, but no file {cao.changelog_file_name} was provided in repository")
 
     # handle link
     github_release_link = cao.github_release_link_pattern.format(args.repoGithubpath, github_release_tag)
