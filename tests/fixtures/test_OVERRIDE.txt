@@ -1,0 +1,21 @@
+# this file is "mean", and is formatted incorrectly
+# compared to what a proper paradox descriptor should be
+# but the extended parser should handle it
+
+name_override="Display name {stellaris_version}"
+# test comment (this is not actually supported by paradox, but override does support it)
+remote_file_id_override="314159265"
+
+Test = "Test"
+
+singleline_list = {" test1 " "test2" "test3" } 
+multiline_test = {"test1"
+	"test2"
+	"test3"
+	"test4"
+	"test5"} 
+extra_loc_files_to_update={
+	"localisation/english/test_general_l_english.yml"
+	"localisation/english/test_event_l_english.yml"
+}
+version_loc_key="test_mod_version"

@@ -71,63 +71,118 @@ def parse_descriptor_to_dict(descriptor_file_path: Path, debug_level: int=0) -> 
         for line in descriptor_object:
             # debug prints
             if debug_level >= 2:
-                print(f"Current line: {line}")
+                print() # implicit newline
+                if multiline_flag:
+                    print("Multiline parsing enabled")
+                print(f"Current line: {line.rstrip("\n")}")
             
             # skip empty lines and # comments
             if not line or line.isspace():
+                if debug_level >= 2:
+                    print("Skipping blank line")
                 continue
             # strip any spaces or tabs before any comment
             # the simple descriptor format does NOT support inline comments, hence ignoring # not at beginning
             if line.lstrip().startswith("#"):
+                if debug_level >= 2:
+                    print("Line is comment, skipping")
                 continue
             # check for normal parsing
             if not multiline_flag:
                 if "=" in line:
                     # strip line for trailing spaces and turn line into list with key and value
                     line = line.rstrip().split("=")
-                    line[1] = line[1].strip("\"")
+                    line[0] = line[0].strip()
+                    line[1] = line[1].strip().strip("\"")
 
-                    if not "{" in line[1]:
+                    if debug_level >= 2:
+                        print(f"Split line list: {line}")
+
+                    if not line[1].lstrip().startswith("{"):
                         descriptor_dict[line[0]] = line[1]
+                        
+                        if debug_level >= 2:
+                            print("Saving line:")
+                            print(f"'{line[0]}' : '{line[1]}'")
+                    
                     # the multiline blocks like tags are a problem, so parse those
-                    elif "{" in line[1]:
-                        if not "}" in line:
+                    elif line[1].lstrip().startswith("{"):
+                        if not "}" in line[1]:
+                            
+                            if debug_level >= 2:
+                                print("Started multiline")
+                            
                             multiline_key = line[0]
                             multiline_flag = True
                             # check for anything after the brace - you shouldn't do this but you never know...
                             index_brace = line[1].find("{")
                             if not (line[1].endswith("{") or line[1].endswith(" ")):
                                 # save anything after the brace unless the brace is last character (string was stripped already)
-                                line_container.append(line[1][index_brace+1:])
+                                extra_item = line[1][index_brace+1:].lstrip("\"")
+                                line_container.append(extra_item)
+
+                                if debug_level >= 2:
+                                    print(f"Found item after '{{', was: '{extra_item}'")
                             continue #  goes to next line
                         else:
                             # line is like 
                             # tags = { "tag1" "tag2" "tag3" "tag4" "tag5"}
+                            if debug_level >= 2:
+                                print("Single line listlike")
+
                             multiline_key = line[0]
                             index_lbrace = line[1].find("{")
                             index_rbrace = line[1].find("}")
                             contents = line[1][index_lbrace+1:index_rbrace].strip()
                             line_container = contents.split("\" \"")
                             line_container = [word.strip("\"") for word in line_container]
+
+                            if debug_level >= 2:
+                                print("Contents:", line_container)
+                            
                             descriptor_dict[multiline_key] = line_container
+                            if debug_level >= 2:
+                                print("Saving line:")
+                                print(f"'{multiline_key}' : '{line_container}'")
+
+                            # clear list of saved tags
+                            line_container = []
                     
             # alternate flow
             elif multiline_flag:
                 if not "}" in line:
-                    line_container.append(line.strip().strip("\""))
-                if "}" in line:
+                    line_item = line.strip().strip("\"")
+                    line_container.append(line_item)
+
+                    if debug_level >= 2:
+                        print(f"Found item: '{line_item}'")
+
+                if "}" in line: 
+                    if debug_level >= 2:
+                        print("Last line in multiline found")
+
                     line = line.lstrip().strip("\"")
                     # check for anything before the brace - you shouldn't do this but you never know...
                     index_brace = line.find("}")
                     if not (line.startswith("}") or line.startswith(" ")):
-                        # save anything before the brace unless it's last character (string was stripped already)
-                        line_container.append(line[:index_brace])
+                        # save anything before the brace unless it's last character
+                        # make sure the quote markers are gone from item
+                        extra_item = line[:index_brace].rstrip("\"")
+                        if debug_level >= 2:
+                            print(f"Found item after '}}', was: '{extra_item}'")
+
+                        line_container.append(extra_item)
                     
                     # end multiline
                     descriptor_dict[multiline_key] = line_container
+                    if debug_level >= 2:
+                        print("Saving line:")
+                        print(f"'{multiline_key}' : '{line_container}'")
+
+                    # clean up
                     multiline_flag = False
-                    line_container = [] # clean up container
-                    continue #  goes to next line
+                    line_container = []
+                    continue # keep parsing next line
 
     if debug_level >= 2:
         print("Finished parsing")
@@ -159,11 +214,13 @@ def create_descriptor_file(descriptor_dict: dict, descriptor_file_path: Path) ->
 def mod_version_to_dict(
         input_mod_version: str,
         use_format_check: bool = True,
-        possible_version_types: list = ["Major", "Minor", "Patch"]
+        possible_version_types: list = ["Major", "Minor", "Patch"],
+        regex_version_pattern = None,
     ) -> tuple[dict, bool, bool]:
     """Take a string with a version of the form "v1.2.3" and return a dict with the version components
 
     Uses a regex pattern to make sure the format is correct - can be optionally skipped
+    Has a default pattern but can be overriden
 
     Possible versions list must be in the same order as the version is structured
     """
@@ -171,9 +228,13 @@ def mod_version_to_dict(
     using_v_with_space_prefix = False
 
     if use_format_check:
-        # matches format "1.2.3" or alternatively "v1.2.3", * wildcards allowed
-        regex_version_pattern = r"^v?\s?(?:(?:\d{1,3}|\*)\.){2}(?:\d{1,3}|\*)" # yeah regex be like that
+        if regex_version_pattern is None:
+            # matches format "1.2.3" or alternatively "v1.2.3", * wildcards allowed
+            regex_version_pattern = r"^v?\s?(?:(?:\d{1,9}|\*)\.){2}(?:\d{1,9}|\*)" # yeah regex be like that
+        
         if not re.search(regex_version_pattern, input_mod_version, re.IGNORECASE):
+            if re.search(r"\d{10}", input_mod_version, re.IGNORECASE):
+                raise ValueError(f"Maximum number of digits (9) for a version number was exceeded. Why have you done this?")
             raise ValueError(f"Version format should be of type \"v1.2.3\", got {input_mod_version}")
 
     semantic_version_list = input_mod_version.split(".")
@@ -193,7 +254,8 @@ def increment_mod_version(
         input_mod_version: str,
         patch_type: str, 
         use_format_check: bool = True,
-        possible_version_types: list = ["Major", "Minor", "Patch"]
+        possible_version_types: list = ["Major", "Minor", "Patch"],
+        regex_version_pattern = None,
     ) -> tuple[dict, str]:
     """Take a version of the form "v1.2.3" and increment according to patch type
 
@@ -202,7 +264,7 @@ def increment_mod_version(
     Possible versions list must be in the same order as the version is structured
     """
     # break down with helper function
-    current_semantic_versions, using_v_prefix, using_v_with_space_prefix = mod_version_to_dict(input_mod_version, use_format_check, possible_version_types)
+    current_semantic_versions, using_v_prefix, using_v_with_space_prefix = mod_version_to_dict(input_mod_version, use_format_check=use_format_check, possible_version_types=possible_version_types, regex_version_pattern=regex_version_pattern)
 
     # check what versions follow from the currently selected version by slicing
     subsequent_versions = possible_version_types[possible_version_types.index(patch_type)+1:]

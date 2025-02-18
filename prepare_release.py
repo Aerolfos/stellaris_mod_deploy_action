@@ -46,7 +46,7 @@ if cao.debug_level >= 2:
 ## Mod version
 # takes the mod version str and increments the selected bit according to semantic versioning
 # also returns a dict with the split up semantic pieces (usually major version, minor version, and patch version)
-current_semantic_versions, updated_mod_version = increment_mod_version(descriptor_dict["version"], args.versionType, possible_version_types=cao.possible_version_types)
+current_semantic_versions, updated_mod_version = increment_mod_version(descriptor_dict["version"], args.versionType, possible_version_types=cao.possible_version_types, regex_version_pattern=cao.regex_version_pattern)
 
 # and we make a version suitable for a github release tag - this should be v1.2.3
 # user provided/paradox mod versioning supports a space (v 1.2.3) or completely omitting the v
@@ -63,17 +63,18 @@ if cao.debug_level >= 2:
     print(f"Github release tag to use: {github_release_tag}")
 
 ## Supported Stellaris version
-# for display in descriptions, change any asterisks to x
+# version for display in descriptions, change any asterisks to x
 # and remove the initial v too (matter of preference tbh)
 supported_stellaris_version_display = args.versionStellaris.replace("*", "x")
 supported_stellaris_version_display = supported_stellaris_version_display.replace("v", "")
 # NOTE: does not support custom display rules
 
-# for use in a mod name, like `Mod Name (4.0)`, Gigastructures does this
-# rely on default values for function, Stellaris version format is fixed beyond the user
+# version for use in a mod name, like `Mod Name (4.0)`, Gigastructures does this
+# extract the semantic version info from Stellaris version, relying on function defaults
+# since Stellaris version format is fixed beyond the user
 # catch errors and return a more helpful message
 try:
-    current_semantic_versions, using_v_prefix, using_v_with_space_prefix = mod_version_to_dict(args.versionStellaris)
+    current_semantic_versions, using_v_prefix, using_v_with_space_prefix = mod_version_to_dict(args.versionStellaris, use_format_check=True, possible_version_types=["Major", "Minor", "Patch"])
 except ValueError:
     raise ValueError(f"Input Stellaris version must be formatted correctly, should be of type \"v1.2.3\", got {args.versionStellaris}")
 stellaris_major_minor_version = f"{current_semantic_versions['Major']}.{current_semantic_versions['Minor']}"

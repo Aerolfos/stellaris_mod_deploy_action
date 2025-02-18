@@ -60,7 +60,7 @@ class OverrideClass():
 
 ### Settings ###
 # debug level 0 prints nothing, 1 inputs and paths, 2 prints information about parsing and processing
-debug_level = 2
+debug_level = 1
 # 0, 1, or 2
 
 # whether to add a new WIP entry to changelogs for filling in
@@ -68,8 +68,9 @@ default_add_changelog_WIP_entry = True
 
 ### Constants ###
 # constants have implications on infrastructure outside the python files
-## Semantic versioning (please don't override this)
+## Semantic versioning (please don't override this without good reason)
 default_possible_version_types = ["Major", "Minor", "Patch"]
+default_regex_version_pattern = r"^v?\s?(?:(?:\d{1,9}|\*)\.){2}(?:\d{1,9}|\*)"
 
 ## Environment variable names (passed to github action environment)
 github_env_modreleasetag_name = "MOD_RELEASE_TAG"
@@ -147,6 +148,7 @@ overrides_enabled = Overrides.overrides_enabled
 ## Setting overrides
 add_changelog_WIP_entry = Overrides.get_parameter("add_changelog_WIP_entry", default_add_changelog_WIP_entry)
 possible_version_types = Overrides.get_parameter("possible_version_types", default_possible_version_types)
+regex_version_pattern = Overrides.get_parameter("regex_version_pattern", default_regex_version_pattern)
 
 ## Path overrides
 descriptor_file_name = Overrides.get_parameter("descriptor_file_name", default_descriptor_file_name)
