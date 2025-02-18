@@ -79,7 +79,7 @@ except ValueError:
     raise ValueError(f"Input Stellaris version must be formatted correctly, should be of type \"v1.2.3\", got {args.versionStellaris}")
 stellaris_major_minor_version = f"{current_semantic_versions['Major']}.{current_semantic_versions['Minor']}"
 supported_stellaris_version_in_name = f"({stellaris_major_minor_version})" # put in parenthesis
-supported_stellaris_version_in_name = supported_stellaris_version_display.replace("v", "") # just in case
+supported_stellaris_version_in_name = supported_stellaris_version_in_name.replace("v", "") # just in case
 
 if cao.debug_level >= 2:
     print(f"Input supported Stellaris version: {args.versionStellaris}")
