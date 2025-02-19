@@ -257,7 +257,8 @@ def increment_mod_version(
         possible_version_types: list = ["Major", "Minor", "Patch"],
         regex_version_pattern = None,
     ) -> tuple[dict, str]:
-    """Take a version of the form "v1.2.3" and increment according to patch type
+    """
+    Take a version of the form "v1.2.3" and increment according to patch type
 
     Uses a regex pattern to make sure the format is correct - can be optionally skipped
 

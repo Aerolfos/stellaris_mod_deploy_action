@@ -157,7 +157,7 @@ if cao.loc_files_list:
         
         # change mod version in a loc file for access in-game
         # inserts requested specific key into a generic search pattern for loc files
-        version_loc_key_pattern = cao.loc_key_pattern.fo*rmat(cao.version_loc_key)
+        version_loc_key_pattern = cao.loc_key_pattern.format(cao.version_loc_key)
         # uses regex groups in `version_loc_key_pattern`
         new_version_loc_key = f"\\g<1>{updated_mod_version}\\g<2>"
 

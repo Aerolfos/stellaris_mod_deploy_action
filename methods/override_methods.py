@@ -4,10 +4,12 @@ from pathlib import Path
 
 from methods.input_methods import parse_descriptor_to_dict
 
-class OverrideClass():
+
+class OverrideClass:
     """
     Class to set up and support user overriding parameters/filenames/search patterns, etc.
     """
+
     def __init__(self, mod_github_folder_path: Path, debug_level: int=0):
         """
         Fetch all user-specified overrides from a file `OVERRIDE.txt`
@@ -36,10 +38,9 @@ class OverrideClass():
             else:
                 print("No overrides")
 
-    def get_parameter(self, parameter_name: str, parameter_default: str):
+    def get_parameter(self, parameter_name: str, parameter_default: str) -> str:
         """
-        Check if parameter has an override and return,
-        otherwise return specified fallback value
+        Check if parameter has an override and return, otherwise return specified fallback value
 
         skip entirely if no overrides
         """

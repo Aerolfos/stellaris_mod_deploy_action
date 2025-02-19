@@ -25,7 +25,7 @@ def test_override_class():
     }
     
     Overrides = om.OverrideClass(test_override, debug_level=0)
-    assert Overrides.overrides_enabled == True
+    assert Overrides.overrides_enabled is True
 
     result = Overrides.override_dict
     for file_key, test_key in zip(result.keys(), expected_test_override_result.keys()):
@@ -53,7 +53,7 @@ def test_override_class():
     # test a nonexistent file, should skip gracefully
     test_override2 = Path("fixtures/None/")
     Overrides2 = om.OverrideClass(test_override2, debug_level=0)
-    assert Overrides2.overrides_enabled == False
+    assert Overrides2.overrides_enabled is False
 
     descriptor_override_name = Overrides2.get_parameter("name", None)
     assert descriptor_override_name is None

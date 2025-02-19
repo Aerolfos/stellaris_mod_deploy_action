@@ -3,7 +3,7 @@ import os
 import sys
 from pathlib import Path
 
-from methods.input_methods import str2bool, get_env_variable, parse_descriptor_to_dict
+from methods.input_methods import get_env_variable, parse_descriptor_to_dict, str2bool
 from methods.override_methods import OverrideClass
 
 ### Settings ###
