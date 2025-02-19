@@ -1,31 +1,16 @@
 import os
 import random
 import sys
+from pathlib import Path
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-# sys.path.append('../methods')
-# sys.path.insert(0, os.path.dirname(__file__))
+import pytest
 
-try:
-    import input_methods as im
-except ModuleNotFoundError:
-    import methods.input_methods as im
+import methods.input_methods as im
 
 
-def test_str2bool() -> None:
-    for v in ("yes", "true", "t", "y", "1", "YES", "Yes", "True", "TRUE"):
-        assert im.str2bool(v) is True
-
-    for v in ("no", "false", "f", "n", "0", "NO", "No", "False", "FALSE"):
-        assert im.str2bool(v) is False
-
-    return None
-
-
-def test_parse_descriptor_to_dict() -> None:
-    # test reading a descriptor file
-    test_descriptor = "fixtures/test_descriptor.mod"
-    expected_test_descriptor_result = {
+@pytest.fixture
+def expected_test_descriptor_dict() -> dict[str,str]:
+    return {
         "name": "test name",
         "version": "v0.2.3",
         "tags": ["Test1", "Test2", "Test3"],
@@ -35,9 +20,9 @@ def test_parse_descriptor_to_dict() -> None:
         "remote_file_id": "11111",
     }
 
-    # test reading an override file
-    test_override = "fixtures/OVERRIDE.txt"
-    expected_test_override_result = {
+@pytest.fixture
+def expected_test_override_result() -> dict[str,str]:
+    return {
         "name_override": "Display name {stellaris_version}",
         "remote_file_id_override": "314159265",
         "Test_override": "Test",
@@ -50,8 +35,25 @@ def test_parse_descriptor_to_dict() -> None:
         "version_loc_key": "test_mod_version",
     }
 
+
+def test_str2bool() -> None:
+    for v in ("yes", "true", "t", "y", "1", "YES", "Yes", "True", "TRUE"):
+        assert im.str2bool(v) is True
+
+    for v in ("no", "false", "f", "n", "0", "NO", "No", "False", "FALSE"):
+        assert im.str2bool(v) is False
+
+    return None
+
+def test_parse_descriptor_to_dict(expected_test_descriptor_dict: dict, expected_test_override_result: dict) -> None:
+    # test reading a descriptor file
+    test_descriptor = "fixtures/test_descriptor.mod"
+
+    # test reading an override file
+    test_override = "fixtures/OVERRIDE.txt"
+
     test_descriptors = {
-        test_descriptor: expected_test_descriptor_result,
+        test_descriptor: expected_test_descriptor_dict,
         test_override: expected_test_override_result,
     }
 
@@ -75,7 +77,7 @@ def test_create_descriptor_file() -> None:
     return None
 
 
-def test_mod_version_to_dict():
+def test_mod_version_to_dict() -> None:
     random_1 = random.randint(0, 99999)
     random_2 = random.randint(0, 99999)
     random_3 = random.randint(0, 99999)
@@ -132,18 +134,3 @@ def test_search_and_replace_in_file() -> None:
 def generate_with_template_file() -> None:
     return None
 
-
-if __name__ == "__main__":
-    test_str2bool()
-
-    test_parse_descriptor_to_dict()
-
-    test_create_descriptor_file()
-
-    test_mod_version_to_dict()
-
-    test_increment_mod_version()
-
-    test_search_and_replace_in_file()
-
-    generate_with_template_file()

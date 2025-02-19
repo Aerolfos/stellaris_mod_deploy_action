@@ -1,0 +1,46 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "Stellaris-Mod-Deploy-Action"
+dynamic = ["version"]
+requires-python = ">= 3.12"
+license = "GPL-3.0-or-later"
+
+dependencies = [
+    pytest ">= 8.3",
+]
+
+[tool.ruff]
+line-length = 120
+indent-width = 4
+
+target-version = "py312"
+
+select = ["ALL", "D101", "RET502"]
+ignore = [
+    "ERA001",
+    "D1",
+    "TD002",
+    "TD003",
+    "PLR1711",
+    "D415",
+    "D400",
+    "D212",
+    "T2",
+    "D401",
+    "RET5",
+    "S101",
+    "FA100",
+    "FA102",
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
