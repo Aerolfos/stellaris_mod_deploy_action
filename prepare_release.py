@@ -5,7 +5,16 @@ import re
 from pathlib import Path
 
 import constants_and_overrides as cao
-from methods.input_methods import str2bool, get_env_variable, parse_descriptor_to_dict, mod_version_to_dict, increment_mod_version, search_and_replace_in_file, create_descriptor_file, generate_with_template_file
+from methods.input_methods import (
+    create_descriptor_file,
+    generate_with_template_file,
+    get_env_variable,
+    increment_mod_version,
+    mod_version_to_dict,
+    parse_descriptor_to_dict,
+    search_and_replace_in_file,
+    str2bool,
+)
 
 ### Command line inputs ###
 # the user shouldn't even see these, they're for the github action to call

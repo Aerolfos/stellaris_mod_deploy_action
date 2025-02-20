@@ -1,39 +1,9 @@
-import os
 import random
-import sys
 from pathlib import Path
 
 import pytest
 
 import methods.input_methods as im
-
-
-@pytest.fixture
-def expected_test_descriptor_dict() -> dict[str,str]:
-    return {
-        "name": "test name",
-        "version": "v0.2.3",
-        "tags": ["Test1", "Test2", "Test3"],
-        "picture": "thumbnail.png",
-        "supported_version": "v0.1.*",
-        "path": "mod/test/test",
-        "remote_file_id": "11111",
-    }
-
-@pytest.fixture
-def expected_test_override_result() -> dict[str,str]:
-    return {
-        "name_override": "Display name {stellaris_version}",
-        "remote_file_id_override": "314159265",
-        "Test_override": "Test",
-        "singleline_list_override": [" test1 ", "test2", "test3"],
-        "multiline_test_override": ["test1", "test2", "test3", "test4", "test5"],
-        "extra_loc_files_to_update": [
-            "localisation/english/test_general_l_english.yml",
-            "localisation/english/test_event_l_english.yml",
-        ],
-        "version_loc_key": "test_mod_version",
-    }
 
 
 def test_str2bool() -> None:
@@ -45,26 +15,25 @@ def test_str2bool() -> None:
 
     return None
 
-def test_parse_descriptor_to_dict(expected_test_descriptor_dict: dict, expected_test_override_result: dict) -> None:
-    # test reading a descriptor file
-    test_descriptor = "fixtures/test_descriptor.mod"
-
-    # test reading an override file
-    test_override = "fixtures/OVERRIDE.txt"
-
+def test_parse_descriptor_to_dict(
+        descriptor_test_file_path: Path, expected_test_descriptor_dict: dict,
+        override_test_file_path: Path, expected_test_override_dict: dict,
+    ) -> None:
     test_descriptors = {
-        test_descriptor: expected_test_descriptor_dict,
-        test_override: expected_test_override_result,
+        # test reading a descriptor file
+        descriptor_test_file_path: expected_test_descriptor_dict,
+        # test reading an override file
+        override_test_file_path: expected_test_override_dict,
     }
 
     for test_path, expected_result in test_descriptors.items():
         result = im.parse_descriptor_to_dict(test_path, debug_level=0)
 
-        for file_key, test_key in zip(result.keys(), expected_result.keys()):
-            assert file_key == test_key, f"Mismatching extracted key vs test key: {file_key} =/= {test_key}"
-            assert result[file_key] == result[test_key], (
-                f"Mismatching extracted value vs test value: {result[file_key]} =/= {result[test_key]}"
-            )
+        for file_key, test_key in zip(result.keys(), expected_result.keys(), strict=True):
+            error_msg = f"Mismatching extracted key vs test key: {file_key} =/= {test_key}"
+            assert file_key == test_key, error_msg
+            error_msg = f"Mismatching extracted value vs test value: {result[file_key]} =/= {result[test_key]}"
+            assert result[file_key] == result[test_key], error_msg
 
         error_msg = f"Failed to match descriptor {test_path} to test \nOutput dict was: \n{result} \
             \nShould have been: \n{expected_result}"

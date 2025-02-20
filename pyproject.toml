@@ -10,7 +10,7 @@ dependencies = [
 ]
 
 [tool.ruff]
-line-length = 120
+line-length = 122
 indent-width = 4
 
 target-version = "py313"

@@ -1,4 +1,7 @@
 {
+    "ruff.configuration": "pyproject.toml",
+    "ruff.configurationPreference": "filesystemFirst",
+
     "python.testing.pytestArgs": [
         "tests"
     ],
