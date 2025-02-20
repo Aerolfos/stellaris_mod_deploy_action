@@ -1,39 +1,38 @@
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
-
 [project]
 name = "Stellaris-Mod-Deploy-Action"
 dynamic = ["version"]
 requires-python = ">= 3.12"
 license = "GPL-3.0-or-later"
+readme = "README.md"
 
 dependencies = [
-    pytest ">= 8.3",
+    "pytest >= 8.3",
 ]
 
 [tool.ruff]
 line-length = 120
 indent-width = 4
 
-target-version = "py312"
+target-version = "py313"
 
+[tool.ruff.lint]
 select = ["ALL", "D101", "RET502"]
 ignore = [
     "ERA001",
     "D1",
+    "D212",
+    "D400",
+    "D401",
+    "D415",
+    "T2",
     "TD002",
     "TD003",
-    "PLR1711",
-    "D415",
-    "D400",
-    "D212",
-    "T2",
-    "D401",
     "RET5",
     "S101",
     "FA100",
     "FA102",
+    "S311",
+    "PLR1711",
 ]
 
 [tool.ruff.lint.pydocstyle]
@@ -44,3 +43,8 @@ quote-style = "double"
 indent-style = "space"
 skip-magic-trailing-comma = false
 line-ending = "auto"
+
+[tool.pytest.ini_options]
+testpaths = [
+    "tests",
+]
