@@ -110,7 +110,7 @@ if cao.debug_level in ["INFO", "DEBUG"]:
 print("Testing login")
 command = ["steamcmd", "+login", f'"{steam_username}"', "+quit"]
 try:
-    output = subprocess.run(command, check=True, capture_output=True)
+    output = subprocess.run(command, check=True, capture_output=True, shell=True)
     print(output)
 except subprocess.CalledProcessError as err:
     print(err)
