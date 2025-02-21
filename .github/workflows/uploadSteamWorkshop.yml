@@ -54,10 +54,12 @@ jobs:
         repository: aerolfos/stellaris_mod_deploy_action
         # actions/checkout does not allow cloning to a folder above the default working folder, so to separate from mod files place in this folder
         path: stellaris_mod_deploy_action
-        # avoid needlessly cloning the graphic assets, want root folder with script files and extra scripts in methods though
+        # avoid needlessly cloning the graphic assets (and tests)
+        # want scripts and templates
         # (root folder files are always cloned)
         sparse-checkout: |
           methods
+          templates
     
     - name: Set up Python 3.12
       uses: actions/setup-python@v5
