@@ -109,8 +109,13 @@ if cao.debug_level in ["INFO", "DEBUG"]:
 
 print("Testing login")
 command = ["steamcmd", "+login", f'"{steam_username}"', "+quit"]
-output = subprocess.run(command, check=True, capture_output=True)
-print(output)
+try:
+    output = subprocess.run(command, check=True, capture_output=True)
+    print(output)
+except subprocess.CalledProcessError as err:
+    print(err)
+    print(output)
+
 
 # upload the item
 print("deliberate halt")
