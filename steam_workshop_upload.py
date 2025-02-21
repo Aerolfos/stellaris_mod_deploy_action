@@ -108,15 +108,9 @@ if cao.debug_level in ["INFO", "DEBUG"]:
     print("Steam/config contents:", os.listdir(steam_home_dir_path / "config"))
 
 print("Testing login")
-command = f'steamcmd +login "{steam_username}" +quit'
-if run_command(command):
-    print("Successful login")
-else:
-    print("FAILED login")
-    subprocess.run(args=["ls", "-alh"], check=False)
-    subprocess.run(f"ls -alh {cao.mod_files_folder_path} || true", check=False)
-    subprocess.run(f"ls -Ralph {steam_home_dir_path / 'logs'}", check=False)
-    sys.exit(1)
+command = ["steamcmd", "+login", f'"{steam_username}"', "+quit"]
+output = subprocess.run(command, check=True, capture_output=True)
+print(output)
 
 # upload the item
 print("deliberate halt")
@@ -131,7 +125,7 @@ else:
     print("Errors during upload")
     subprocess.run(["ls", "-alh"], check=False)
     #subprocess.run(f"ls -alh {root_path} || true", check=False)
-    subprocess.run(f"ls -Ralph {steam_home_dir_path / 'logs'}", check=False)
+    subprocess.run(["ls", "-Ralph", f"{steam_home_dir_path / 'logs'}"], check=False)
 
     log_dir_path = steam_home_dir_path / "logs"
     if log_dir_path.is_dir():
