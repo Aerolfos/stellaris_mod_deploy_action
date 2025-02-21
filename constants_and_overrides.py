@@ -5,9 +5,8 @@ from methods.input_methods import get_env_variable
 from methods.override_methods import OverrideClass
 
 ### Settings ###
-# debug level 0 prints nothing, 1 inputs and paths, 2 prints information about parsing and processing
-debug_level = 2
-# 0, 1, or 2
+# debug level "SILENT" prints nothing, "INFO" inputs and paths, "DEBUG" prints information about parsing and processing
+debug_level = "INFO"  # "SILENT", "INFO", or "DEBUG"
 
 # whether to add a new WIP entry to changelogs for filling in
 default_add_changelog_WIP_entry = True  # noqa: N816, WIP should be capitalized
@@ -103,7 +102,8 @@ descriptor_file_name = Overrides.get_parameter("descriptor_file_name", default_d
 # note, descriptor is with mod files, not in higher level repository
 descriptor_file_path = mod_files_folder_path / descriptor_file_name
 workshop_description_file_name = Overrides.get_parameter(
-    "workshop_description_file_name", default_workshop_description_file_name,
+    "workshop_description_file_name",
+    default_workshop_description_file_name,
 )
 workshop_description_file_path = mod_github_folder_path / workshop_description_file_name
 readme_file_name = Overrides.get_parameter("readme_file_name", default_readme_file_name)
@@ -113,7 +113,8 @@ changelog_file_path = mod_github_folder_path / changelog_file_name
 
 # temp files used by script, kept out of mod files repository so as to not be committed
 generated_release_notes_filename = Overrides.get_parameter(
-    "generated_release_notes_filename", default_generated_release_notes_filename,
+    "generated_release_notes_filename",
+    default_generated_release_notes_filename,
 )
 generated_release_notes_file_path = Path.cwd() / generated_release_notes_filename
 manifest_file_name = Overrides.get_parameter("manifest_file_name", default_manifest_file_name)
@@ -121,7 +122,8 @@ manifest_file_path = Path.cwd() / manifest_file_name
 
 # template files
 release_note_template_filename = Overrides.get_parameter(
-    "release_note_template_filename", default_release_note_template_filename,
+    "release_note_template_filename",
+    default_release_note_template_filename,
 )
 release_note_template_overriden = Overrides.overriden_params["release_note_template_filename"]
 # default template file is generic and comes from the deploy repo
@@ -133,7 +135,8 @@ else:
 
 # no changelog version
 release_note_template_no_changelog_filename = Overrides.get_parameter(
-    "release_note_template_no_changelog_filename", default_release_note_template_no_changelog_filename,
+    "release_note_template_no_changelog_filename",
+    default_release_note_template_no_changelog_filename,
 )
 release_note_template_no_changelog_overriden = Overrides.overriden_params["release_note_template_no_changelog_filename"]
 # same as above
@@ -155,16 +158,19 @@ descriptor_override_remote_file_id = Overrides.get_parameter("remote_file_id", N
 ## Search pattern overrides
 loc_key_pattern = Overrides.get_parameter("loc_key_pattern", default_loc_key_pattern)
 workshop_desc_version_pattern = Overrides.get_parameter(
-    "workshop_desc_version_pattern", default_workshop_desc_version_pattern,
+    "workshop_desc_version_pattern",
+    default_workshop_desc_version_pattern,
 )
 readme_version_pattern = Overrides.get_parameter("readme_version_pattern", default_readme_version_pattern)
 github_release_link_pattern = Overrides.get_parameter(
-    "github_release_link_pattern", default_github_release_link_pattern,
+    "github_release_link_pattern",
+    default_github_release_link_pattern,
 )
 changelog_search_pattern = Overrides.get_parameter("changelog_search_pattern", default_changelog_search_pattern)
 template_search_pattern = Overrides.get_parameter("template_search_pattern", default_template_search_pattern)
 template_insert_version_pattern = Overrides.get_parameter(
-    "template_insert_version_pattern", default_template_insert_version_pattern,
+    "template_insert_version_pattern",
+    default_template_insert_version_pattern,
 )
 
 ## Custom logic for handling overriding of loc keys, potentially from multiple files
@@ -174,9 +180,7 @@ if not Overrides.overrides_enabled:
 else:
     try:
         loc_files_list = Overrides.override_dict["extra_loc_files_to_update"]  # list of files
-        version_loc_key = Overrides.override_dict[
-            "version_loc_key"
-        ]  # loc key to look for, inserted in generic search pattern
+        version_loc_key = Overrides.override_dict["version_loc_key"]  # loc key to look for, inserted in generic search pattern
     except KeyError:
         loc_files_list = []
         version_loc_key = None

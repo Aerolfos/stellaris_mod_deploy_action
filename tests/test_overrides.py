@@ -1,6 +1,3 @@
-import os
-import random
-import sys
 from pathlib import Path
 
 import methods.override_methods as om
@@ -45,7 +42,3 @@ def test_override_class(override_test_folder_path: Path, expected_test_override_
     assert descriptor_override_name is None
 
     return None
-
-
-if __name__ == "__main__":
-    test_override_class()

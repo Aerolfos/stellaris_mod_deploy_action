@@ -1,19 +1,13 @@
-import os
-import sys
 from pathlib import Path
 
 from methods.input_methods import parse_descriptor_to_dict
 
 
 class OverrideClass:
-    """
-    Class to set up and support user overriding parameters/filenames/search patterns, etc.
-    """
+    """Class to set up and support user overriding parameters/filenames/search patterns, etc."""
 
-    def __init__(self, mod_github_folder_path: Path, debug_level: int=0):
-        """
-        Fetch all user-specified overrides from a file `OVERRIDE.txt`
-        """
+    def __init__(self, mod_github_folder_path: Path, debug_level: int = 0) -> None:
+        """Fetch all user-specified overrides from a file `OVERRIDE.txt`"""
         # file for potential overrides
         # makes no sense to change name, filename MUST be this
         override_file_name = "OVERRIDE.txt"
@@ -29,7 +23,7 @@ class OverrideClass:
 
         self.overriden_params = {}
 
-        if debug_level >= 2:
+        if debug_level == "DEBUG":
             print("- Overrides: -")
             print(f"Override setting: {self.overrides_enabled}")
             if self.overrides_enabled:

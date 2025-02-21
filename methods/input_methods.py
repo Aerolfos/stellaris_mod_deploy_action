@@ -3,7 +3,6 @@ import os
 import re
 import subprocess
 from pathlib import Path
-from typing import Optional, Union
 
 
 def str2bool(v: str) -> bool:
@@ -37,21 +36,22 @@ def str2bool(v: str) -> bool:
     elif v.lower() in ("no", "false", "f", "n", "0"):
         return False
     else:
-        raise argparse.ArgumentTypeError("Boolean value expected.")
+        msg = "Boolean value expected."
+        raise argparse.ArgumentTypeError(msg)
 
 
-def get_env_variable(env_var_name: str, default: str = None, debug_level: int = 1):
+def get_env_variable(env_var_name: str, default: str | None = None, debug_level: int = 1) -> str:
     """Simple getenv wrapper with debug print"""
     env_var = os.getenv(env_var_name, default)
-    if debug_level >= 1:
+    if debug_level in ["INFO", "DEBUG"]:
         print(f"{env_var_name}={env_var}")
     return env_var
 
 
-def run_command(command) -> Optional[bool]:
+def run_command(command: str) -> bool | None:
     """Helper function to run shell commands, wrapped for error handling"""
     try:
-        subprocess.run(command, shell=True, check=True)
+        subprocess.run(command, check=True)
         return True
     except subprocess.CalledProcessError as err:
         print(err)
@@ -70,7 +70,7 @@ def parse_descriptor_to_dict(descriptor_file_path: Path, debug_level: int = 0) -
     Parser will skip empty lines and comments, indicated with #. This includes empty lines in multi-line blocks.'
     In-line comments are NOT supported.
     """
-    if debug_level >= 2:
+    if debug_level == "DEBUG":
         print("- Parsing descriptor style file -")
         print(f"Path: {descriptor_file_path}")
     descriptor_dict = {}
@@ -79,7 +79,7 @@ def parse_descriptor_to_dict(descriptor_file_path: Path, debug_level: int = 0) -
     with Path.open(descriptor_file_path, encoding="utf-8") as descriptor_object:
         for line in descriptor_object:
             # debug prints
-            if debug_level >= 2:
+            if debug_level == "DEBUG":
                 print()  # implicit newline
                 if multiline_flag:
                     print("Multiline parsing enabled")
@@ -87,13 +87,13 @@ def parse_descriptor_to_dict(descriptor_file_path: Path, debug_level: int = 0) -
 
             # skip empty lines and # comments
             if not line or line.isspace():
-                if debug_level >= 2:
+                if debug_level == "DEBUG":
                     print("Skipping blank line")
                 continue
             # strip any spaces or tabs before any comment
             # the simple descriptor format does NOT support inline comments, hence ignoring # not at beginning
             if line.lstrip().startswith("#"):
-                if debug_level >= 2:
+                if debug_level == "DEBUG":
                     print("Line is comment, skipping")
                 continue
             # check for normal parsing
@@ -104,20 +104,20 @@ def parse_descriptor_to_dict(descriptor_file_path: Path, debug_level: int = 0) -
                     line[0] = line[0].strip()
                     line[1] = line[1].strip().strip('"')
 
-                    if debug_level >= 2:
+                    if debug_level == "DEBUG":
                         print(f"Split line list: {line}")
 
                     if not line[1].lstrip().startswith("{"):
                         descriptor_dict[line[0]] = line[1]
 
-                        if debug_level >= 2:
+                        if debug_level == "DEBUG":
                             print("Saving line:")
                             print(f"'{line[0]}' : '{line[1]}'")
 
                     # the multiline blocks like tags are a problem, so parse those
                     elif line[1].lstrip().startswith("{"):
                         if "}" not in line[1]:
-                            if debug_level >= 2:
+                            if debug_level == "DEBUG":
                                 print("Started multiline")
 
                             multiline_key = line[0]
@@ -129,13 +129,13 @@ def parse_descriptor_to_dict(descriptor_file_path: Path, debug_level: int = 0) -
                                 extra_item = line[1][index_brace + 1 :].lstrip('"')
                                 line_container.append(extra_item)
 
-                                if debug_level >= 2:
+                                if debug_level == "DEBUG":
                                     print(f"Found item after '{{', was: '{extra_item}'")
                             continue  #  goes to next line
                         else:
                             # line is like
                             # tags = { "tag1" "tag2" "tag3" "tag4" "tag5"}
-                            if debug_level >= 2:
+                            if debug_level == "DEBUG":
                                 print("Single line listlike")
 
                             multiline_key = line[0]
@@ -145,11 +145,11 @@ def parse_descriptor_to_dict(descriptor_file_path: Path, debug_level: int = 0) -
                             line_container = contents.split('" "')
                             line_container = [word.strip('"') for word in line_container]
 
-                            if debug_level >= 2:
+                            if debug_level == "DEBUG":
                                 print("Contents:", line_container)
 
                             descriptor_dict[multiline_key] = line_container
-                            if debug_level >= 2:
+                            if debug_level == "DEBUG":
                                 print("Saving line:")
                                 print(f"'{multiline_key}' : '{line_container}'")
 
@@ -162,11 +162,11 @@ def parse_descriptor_to_dict(descriptor_file_path: Path, debug_level: int = 0) -
                     line_item = line.strip().strip('"')
                     line_container.append(line_item)
 
-                    if debug_level >= 2:
+                    if debug_level == "DEBUG":
                         print(f"Found item: '{line_item}'")
 
                 if "}" in line:
-                    if debug_level >= 2:
+                    if debug_level == "DEBUG":
                         print("Last line in multiline found")
 
                     line = line.lstrip().strip('"')
@@ -176,14 +176,14 @@ def parse_descriptor_to_dict(descriptor_file_path: Path, debug_level: int = 0) -
                         # save anything before the brace unless it's last character
                         # make sure the quote markers are gone from item
                         extra_item = line[:index_brace].rstrip('"')
-                        if debug_level >= 2:
+                        if debug_level == "DEBUG":
                             print(f"Found item after '}}', was: '{extra_item}'")
 
                         line_container.append(extra_item)
 
                     # end multiline
                     descriptor_dict[multiline_key] = line_container
-                    if debug_level >= 2:
+                    if debug_level == "DEBUG":
                         print("Saving line:")
                         print(f"'{multiline_key}' : '{line_container}'")
 
@@ -192,7 +192,7 @@ def parse_descriptor_to_dict(descriptor_file_path: Path, debug_level: int = 0) -
                     line_container = []
                     continue  # keep parsing next line
 
-    if debug_level >= 2:
+    if debug_level == "DEBUG":
         print("Finished parsing")
         print(f"result = {descriptor_dict}")
 
@@ -201,7 +201,7 @@ def parse_descriptor_to_dict(descriptor_file_path: Path, debug_level: int = 0) -
 
 def create_descriptor_file(descriptor_dict: dict, descriptor_file_path: Path) -> None:
     """Creates a paradox descriptor.mod file from a dictionary"""
-    with open(descriptor_file_path, "w", encoding="utf-8") as descriptor_object:
+    with Path.open(descriptor_file_path, "w", encoding="utf-8") as descriptor_object:
         # dict order being insertion order is guaranteed in newer python versions so file structure should be preserved
         for key, item in descriptor_dict.items():
             # construct line - in case of list we need to write it out tabbed and encased in {}
@@ -222,9 +222,10 @@ def create_descriptor_file(descriptor_dict: dict, descriptor_file_path: Path) ->
 
 def mod_version_to_dict(
     input_mod_version: str,
+    *,
     use_format_check: bool = True,
-    possible_version_types: list = ["Major", "Minor", "Patch"],
-    regex_version_pattern=None,
+    possible_version_types: list = ("Major", "Minor", "Patch"),
+    regex_version_pattern: str | None = None,
 ) -> tuple[dict, bool, bool]:
     """
     Take a string with a version of the form "v1.2.3" and return a dict with the version components
@@ -244,10 +245,10 @@ def mod_version_to_dict(
 
         if not re.search(regex_version_pattern, input_mod_version, re.IGNORECASE):
             if re.search(r"\d{10}", input_mod_version, re.IGNORECASE):
-                raise ValueError(
-                    "Maximum number of digits (9) for a version number was exceeded. Why have you done this?"
-                )
-            raise ValueError(f'Version format should be of type "v1.2.3", got {input_mod_version}')
+                msg = "Maximum number of digits (9) for a version number was exceeded. Why have you done this?"
+                raise ValueError(msg)
+            msg = f'Version format should be of type "v1.2.3", got "{input_mod_version}"'
+            raise ValueError(msg)
 
     semantic_version_list = input_mod_version.split(".")
     # save the v and potential space for later
@@ -258,7 +259,7 @@ def mod_version_to_dict(
             semantic_version_list[0] = semantic_version_list[0].lstrip(" ")
             using_v_with_space_prefix = True
 
-    current_semantic_versions = dict(zip(possible_version_types, semantic_version_list))
+    current_semantic_versions = dict(zip(possible_version_types, semantic_version_list, strict=True))
 
     return current_semantic_versions, using_v_prefix, using_v_with_space_prefix
 
@@ -268,8 +269,8 @@ def increment_mod_version(
     patch_type: str,
     *,
     use_format_check: bool = True,
-    possible_version_types: list | None = None,
-    regex_version_pattern: str | None=None,
+    possible_version_types: list = ("Major", "Minor", "Patch"),
+    regex_version_pattern: str | None = None,
 ) -> tuple[dict, str]:
     """
     Take a version of the form "v1.2.3" and increment according to patch type
@@ -278,8 +279,6 @@ def increment_mod_version(
 
     Possible versions list must be in the same order as the version is structured
     """
-    if possible_version_types is None:
-        possible_version_types = ["Major", "Minor", "Patch"]
     # break down with helper function
     current_semantic_versions, using_v_prefix, using_v_with_space_prefix = mod_version_to_dict(
         input_mod_version,
@@ -310,8 +309,12 @@ def increment_mod_version(
 
 
 def search_and_replace_in_file(
-    file_path: Path, pattern: Union[str, list], replacestr: Union[str, list], return_old_str: bool = False
-) -> Union[str, tuple[str, str]]:
+    file_path: Path,
+    pattern: str | list,
+    replacestr: str | list,
+    *,
+    return_old_str: bool = False,
+) -> str | tuple[str, str]:
     """
     Opens a file and replaces a part of it via regex
 
@@ -322,14 +325,14 @@ def search_and_replace_in_file(
     Returns the new file string in case info from file is useful - option to also get old string
     """
     # read into holder string for searching
-    file_handle = open(file_path)
+    file_handle = Path.open(file_path)
     file_string = file_handle.read()
     file_handle.close()
     original_file_string = file_string
 
     if isinstance(pattern, list):
         if isinstance(replacestr, list):
-            for selected_pattern, selected_replacementstr in zip(pattern, replacestr):
+            for selected_pattern, selected_replacementstr in zip(pattern, replacestr, strict=False):
                 file_string = re.sub(
                     selected_pattern,
                     selected_replacementstr,
@@ -339,19 +342,19 @@ def search_and_replace_in_file(
         else:
             # reuse the same pattern multiple times
             for selected_pattern in pattern:
-                file_string = re.sub(
-                    selected_pattern, replacestr, file_string, flags=re.IGNORECASE | re.MULTILINE | re.DOTALL
-                )
+                file_string = re.sub(selected_pattern, replacestr, file_string, flags=re.IGNORECASE | re.MULTILINE | re.DOTALL)
     elif isinstance(pattern, str):
         if isinstance(replacestr, str):
             file_string = re.sub(pattern, replacestr, file_string, flags=re.IGNORECASE | re.MULTILINE | re.DOTALL)
         else:
-            raise TypeError("Passed only one pattern but multiple replacement strings, types must match")
+            msg = "Passed only one pattern but multiple replacement strings, types must match"
+            raise TypeError(msg)
     else:
-        raise TypeError(f"Input search pattern must be a single str or a list of str, got {type(pattern)}")
+        msg = f"Input search pattern must be a single str or a list of str, got {type(pattern)}"
+        raise TypeError(msg)
 
     # w overwrites file
-    file_handle = open(file_path, "w")
+    file_handle = Path.open(file_path, "w")
     file_handle.write(file_string)
     file_handle.close()
 
@@ -364,9 +367,10 @@ def search_and_replace_in_file(
 def generate_with_template_file(
     template_file_path: Path,
     generated_file_path: Path,
-    pattern: Union[str, list],
-    replacestr: Union[str, list],
-    skip_regex_replace=False,
+    pattern: str | list,
+    replacestr: str | list,
+    *,
+    skip_regex_replace: bool = False,
 ) -> str:
     """
     Uses a template file to generate a new file with part of it replaced via regex
@@ -380,7 +384,7 @@ def generate_with_template_file(
     Returns the file string in case info from file is useful
     """
     # read template into holder string
-    file_handle = open(template_file_path)
+    file_handle = Path.open(template_file_path)
     file_string = file_handle.read()
     file_handle.close()
 
@@ -388,7 +392,7 @@ def generate_with_template_file(
         # fill in to template via regex search
         if isinstance(pattern, list):
             if isinstance(replacestr, list):
-                for selected_pattern, selected_replacementstr in zip(pattern, replacestr):
+                for selected_pattern, selected_replacementstr in zip(pattern, replacestr, strict=False):
                     file_string = re.sub(
                         selected_pattern,
                         selected_replacementstr,
@@ -399,18 +403,20 @@ def generate_with_template_file(
                 # reuse the same pattern multiple times
                 for selected_pattern in pattern:
                     file_string = re.sub(
-                        selected_pattern, replacestr, file_string, flags=re.IGNORECASE | re.MULTILINE | re.DOTALL
+                        selected_pattern, replacestr, file_string, flags=re.IGNORECASE | re.MULTILINE | re.DOTALL,
                     )
         elif isinstance(pattern, str):
             if isinstance(replacestr, str):
                 file_string = re.sub(pattern, replacestr, file_string, flags=re.IGNORECASE | re.MULTILINE | re.DOTALL)
             else:
-                raise TypeError("Passed only one pattern but multiple replacement strings, types must match")
+                msg = "Passed only one pattern but multiple replacement strings, types must match"
+                raise TypeError(msg)
         else:
-            raise TypeError(f"Input search pattern must be a single str or a list of str, got {type(pattern)}")
+            msg = f"Input search pattern must be a single str or a list of str, got {type(pattern)}"
+            raise TypeError(msg)
 
     # w writes new file
-    file_handle = open(generated_file_path, "w")
+    file_handle = Path.open(generated_file_path, "w")
     file_handle.write(file_string)
     file_handle.close()
 

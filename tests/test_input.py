@@ -15,10 +15,13 @@ def test_str2bool() -> None:
 
     return None
 
+
 def test_parse_descriptor_to_dict(
-        descriptor_test_file_path: Path, expected_test_descriptor_dict: dict,
-        override_test_file_path: Path, expected_test_override_dict: dict,
-    ) -> None:
+    descriptor_test_file_path: Path,
+    expected_test_descriptor_dict: dict,
+    override_test_file_path: Path,
+    expected_test_override_dict: dict,
+) -> None:
     test_descriptors = {
         # test reading a descriptor file
         descriptor_test_file_path: expected_test_descriptor_dict,
@@ -102,4 +105,3 @@ def test_search_and_replace_in_file() -> None:
 
 def generate_with_template_file() -> None:
     return None
-

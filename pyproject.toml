@@ -10,7 +10,7 @@ dependencies = [
 ]
 
 [tool.ruff]
-line-length = 122
+line-length = 128
 indent-width = 4
 
 target-version = "py313"
@@ -32,7 +32,11 @@ ignore = [
     "FA100",
     "FA102",
     "S311",
+    "C901",
     "PLR1711",
+    "PLR0912",
+    "PLR0915",
+    "PLW2901",
 ]
 
 [tool.ruff.lint.pydocstyle]

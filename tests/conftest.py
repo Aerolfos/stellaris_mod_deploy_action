@@ -7,16 +7,19 @@ import pytest
 def override_test_folder_path() -> Path:
     return Path("tests/fixtures/")
 
+
 @pytest.fixture
 def override_test_file_path() -> Path:
     return Path("tests/fixtures/OVERRIDE.txt")
+
 
 @pytest.fixture
 def descriptor_test_file_path() -> Path:
     return Path("tests/fixtures/test_descriptor.mod")
 
+
 @pytest.fixture
-def expected_test_descriptor_dict() -> dict[str,str]:
+def expected_test_descriptor_dict() -> dict[str, str]:
     return {
         "name": "test name",
         "version": "v0.2.3",
@@ -27,8 +30,9 @@ def expected_test_descriptor_dict() -> dict[str,str]:
         "remote_file_id": "11111",
     }
 
+
 @pytest.fixture
-def expected_test_override_dict() -> dict[str,str]:
+def expected_test_override_dict() -> dict[str, str]:
     return {
         "name_override": "Display name {stellaris_version}",
         "remote_file_id_override": "314159265",
