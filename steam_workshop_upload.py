@@ -19,7 +19,6 @@ from methods.input_methods import (
     get_env_variable,
     increment_mod_version,
     parse_descriptor_to_dict,
-    run_command,
     search_and_replace_in_file,
     str2bool,
 )
