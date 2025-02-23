@@ -9,21 +9,16 @@ account will be used with steamcmd
 import base64
 import os
 import subprocess
-import sys
 from pathlib import Path
 
 import constants_and_overrides as cao
 from methods.input_methods import (
-    create_descriptor_file,
-    generate_with_template_file,
     get_env_variable,
-    increment_mod_version,
     parse_descriptor_to_dict,
-    search_and_replace_in_file,
     str2bool,
 )
 
-timeout_time = 60  # s
+timeout_time = 60 # s
 
 ### Environment variables, paths ###
 # secrets
@@ -34,7 +29,7 @@ app_id = get_env_variable("appID", None, debug_level=cao.debug_level)
 input_stellaris_version = get_env_variable("versionStellaris", None, debug_level=cao.debug_level)
 use_changelog = str2bool(get_env_variable("useChangelog", "false", debug_level=cao.debug_level))
 
-item_id = get_env_variable("itemID", None, debug_level=cao.debug_level)  # TODO: change flow
+# TODO: change flow
 change_note = "TEST deployment from Github"
 
 # dependent on docker container image used to set up steamcmd
@@ -60,6 +55,38 @@ if not config_vdf_contents:
     msg = "Config VDF input file is missing or incomplete, must have configured account to upload with"
     raise ValueError(msg)
 
+### Processing ###
+# find information from mod files
+descriptor_dict = parse_descriptor_to_dict(cao.descriptor_file_path)
+
+if cao.debug_level == "DEBUG":
+    print("- Extracted descriptor dictionary: -")
+    for key, item in descriptor_dict.items():
+        print(f"{key}: {item}")
+
+try:
+    item_id = descriptor_dict["remote_file_id"]
+except KeyError as err:
+    msg = "Published file ID is missing or incomplete, must use an already published workshop object with ID in descriptor"
+    raise ValueError(msg) from err
+
+try:
+    mod_title = descriptor_dict["name"]
+except KeyError as err:
+    msg = "Mod name is missing or incomplete, must have name in descriptor"
+    raise ValueError(msg) from err
+
+if not cao.workshop_description_file_path.exists():
+    msg = f"File with workshop description '{cao.workshop_description_file_name}' is missing, \
+    must have one for workshop upload feature"
+    raise ValueError(msg)
+file_handle = Path.open(cao.workshop_description_file_path)
+workshop_description_file_string = file_handle.read()
+workshop_description_file_string = workshop_description_file_string.replace('"', '\"')  # noqa: Q004 deliberately escaping quotes
+file_handle.close()
+
+# TODO: actual change note
+
 ### Metadata ###
 # make manifest file with metadata
 manifest_content = f""""workshopitem"
@@ -67,7 +94,9 @@ manifest_content = f""""workshopitem"
     "appid" "{app_id}"
     "publishedfileid" "{item_id}"
     "contentfolder" "{cao.mod_files_folder_path}"
-    "previewfile" "{cao.mod_files_folder_path}/thumbnail.png"
+    "previewfile" "{cao.mod_files_folder_path / "thumbnail.png"}"
+    "title" "{mod_title}"
+    "description" "{workshop_description_file_string}"
     "changenote" "{change_note}"
 }}
 """
@@ -80,7 +109,7 @@ manifest_content = f""""workshopitem"
     "contentfolder"        "C:\\Users\\...\\mod_name"
     "previewfile"        "C:\\Users\\...\\mod_name\\thumbnail.png"
     "visibility"        "2"
-    "title"        "Mod uploaded using SteamCmd"
+    "title"        "Example mod uploaded using SteamCmd"
     "description"        "New description."
     "changenote"        "Initial Release."
 }
@@ -159,15 +188,12 @@ print("Testing login")
 login_command = f'steamcmd +login "{steam_username}" +quit'
 retcode = steamcmd_run(login_command, timeout_time)
 
-print("deliberate halt, TODO upload")
-sys.exit(0)
-
 ### Upload item ###
 upload_command = f'steamcmd +login "{steam_username}" +workshop_build_item "{cao.manifest_file_path}" +quit'
 retcode = steamcmd_run(upload_command, timeout_time)
 
 # Output the manifest path
 # TODO: use github upload artifact to upload the manifest file for inspection
-github_output = os.getenv("GITHUB_OUTPUT", "")
+github_output = os.getenv("GITHUB_OUTPUT", None)
 with Path.open(github_output, "a") as gh_output_file:
     gh_output_file.write(f"manifest={cao.manifest_file_path}\n")
