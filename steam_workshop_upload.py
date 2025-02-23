@@ -24,6 +24,8 @@ from methods.input_methods import (
     str2bool,
 )
 
+timeout_time = 60  # s
+
 ### Environment variables, paths ###
 # secrets
 steam_username = get_env_variable("steam_username", None, debug_level=cao.debug_level)
@@ -38,7 +40,9 @@ change_note = "TEST deployment from Github"
 
 # dependent on docker container image used to set up steamcmd
 home_dir_path: Path = Path(get_env_variable("HOME", "/home", debug_level=cao.debug_level)).resolve()
-steam_home_dir_path: Path = Path(get_env_variable("STEAM_HOME", home_dir_path / ".local/share/Steam", debug_level=cao.debug_level))
+steam_home_dir_path: Path = Path(
+    get_env_variable("STEAM_HOME", home_dir_path / ".local/share/Steam", debug_level=cao.debug_level),
+)
 
 ### Errors ###
 if not app_id:
@@ -74,10 +78,10 @@ manifest_content = f""""workshopitem"
 "workshopitem"
 {
     "appid"        "281990"
-    "contentfolder"        "C:\\Users\\...\\my_awesome_mod"
-    "previewfile"        "C:\\Users\\...\\my_awesome_mod\\thumbnail.png"
+    "contentfolder"        "C:\\Users\\...\\mod_name"
+    "previewfile"        "C:\\Users\\...\\mod_name\\thumbnail.png"
     "visibility"        "2"
-    "title"        "My awesome mod uploaded using SteamCmd"
+    "title"        "Mod uploaded using SteamCmd"
     "description"        "New description."
     "changenote"        "Initial Release."
 }
@@ -96,6 +100,7 @@ if cao.debug_level in ["INFO", "DEBUG"]:
     print(manifest_content)
 
 ### Login ###
+# write the login cache file to make login work
 (steam_home_dir_path / "config").mkdir(exist_ok=True)
 decoded_config_vdf = base64.b64decode(config_vdf_contents)
 config_file_path = steam_home_dir_path / "config" / "config.vdf"
@@ -107,40 +112,60 @@ if cao.debug_level in ["INFO", "DEBUG"]:
     print(f"{config_file_path=}")
     print("Steam/config contents:", os.listdir(steam_home_dir_path / "config"))
 
+
+def steamcmd_run(command: str, timeout_time: int = 60) -> int:
+    """
+    Function to run steamcmd
+
+    Only exists to avoid having to retype error handling twice. That's it.
+    """
+    try:
+        output = subprocess.run(args=command, shell=True, check=True, timeout=timeout_time)
+        print(output)
+
+    except subprocess.TimeoutExpired as err:
+        print(f"Error: {err}")
+        print("Cached credentials likely invalid, in which case steamcmd falls back to interactive mode, breaking control flow")
+        print(output)
+        msg = "Timed out, cached credentials likely invalid, this makes steamcmd fall back to interactive mode\
+              and break control flow"
+        raise subprocess.CalledProcessError(msg) from err
+
+    except subprocess.CalledProcessError as err:
+        # In case of error, output logs
+        print("Errors during upload:")
+        print(err)
+
+        log_dir_path = steam_home_dir_path / "logs"
+        log_command = ["ls", "-Ralph", log_dir_path]
+        output = subprocess.run(args=log_command, check=False)
+        print(output)
+
+        if log_dir_path.is_dir():
+            for log_filename in os.listdir(log_dir_path):
+                log_file_path = log_dir_path / log_filename
+                with Path.open(log_file_path) as f:
+                    print(f"######## {log_filename}")
+                    print(f.read())
+
+        msg = "Stemcmd failed during upload"
+        raise subprocess.CalledProcessError(msg) from err
+
+    # no raised errors
+    else:
+        return output.returncode
+
+
 print("Testing login")
-command = ["steamcmd", "+login", f'"{steam_username}"', "+quit"]
-try:
-    output = subprocess.run(command, check=True, capture_output=True, shell=True)
-    print(output)
-except subprocess.CalledProcessError as err:
-    print(err)
-    print(output)
+login_command = f'steamcmd +login "{steam_username}" +quit'
+retcode = steamcmd_run(login_command, timeout_time)
 
-
-# upload the item
-print("deliberate halt")
+print("deliberate halt, TODO upload")
 sys.exit(0)
 
 ### Upload item ###
 upload_command = f'steamcmd +login "{steam_username}" +workshop_build_item "{cao.manifest_file_path}" +quit'
-if run_command(upload_command):
-    print("Successful upload")
-else:
-    # In case of error, output logs
-    print("Errors during upload")
-    subprocess.run(["ls", "-alh"], check=False)
-    #subprocess.run(f"ls -alh {root_path} || true", check=False)
-    subprocess.run(["ls", "-Ralph", f"{steam_home_dir_path / 'logs'}"], check=False)
-
-    log_dir_path = steam_home_dir_path / "logs"
-    if log_dir_path.is_dir():
-        for log_filename in os.listdir(log_dir_path):
-            log_file_path = log_dir_path / log_filename
-            with Path.open(log_file_path) as f:
-                print(f"######## {log_filename}")
-                print(f.read())
-
-    sys.exit(1)
+retcode = steamcmd_run(upload_command, timeout_time)
 
 # Output the manifest path
 # TODO: use github upload artifact to upload the manifest file for inspection

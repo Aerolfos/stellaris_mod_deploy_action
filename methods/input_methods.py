@@ -48,16 +48,6 @@ def get_env_variable(env_var_name: str, default: str | None = None, debug_level:
     return env_var
 
 
-def run_command(command: str) -> bool | None:
-    """Helper function to run shell commands, wrapped for error handling"""
-    try:
-        subprocess.run(command, check=True)
-        return True
-    except subprocess.CalledProcessError as err:
-        print(err)
-        return False
-
-
 def parse_descriptor_to_dict(descriptor_file_path: Path, debug_level: int = 0) -> dict:
     """
     Creates a dict of entries from a paradox descriptor.mod file
@@ -403,7 +393,10 @@ def generate_with_template_file(
                 # reuse the same pattern multiple times
                 for selected_pattern in pattern:
                     file_string = re.sub(
-                        selected_pattern, replacestr, file_string, flags=re.IGNORECASE | re.MULTILINE | re.DOTALL,
+                        selected_pattern,
+                        replacestr,
+                        file_string,
+                        flags=re.IGNORECASE | re.MULTILINE | re.DOTALL,
                     )
         elif isinstance(pattern, str):
             if isinstance(replacestr, str):
