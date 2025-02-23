@@ -42,7 +42,7 @@ permissions:
 
 jobs:
   use_updateStellarisMod_workflow:
-    uses: aerolfos/stellaris_mod_deploy_action/.github/workflows/updateStellarisMod.yml@main
+    uses: aerolfos/stellaris_mod_deploy_action/.github/workflows/reusable_workflows/updateStellarisMod.yml@main
     with:
       versionType: ${{ inputs.versionType }}
       versionStellaris: ${{ inputs.versionStellaris }}
