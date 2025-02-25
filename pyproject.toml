@@ -37,6 +37,7 @@ ignore = [
     "PLR0912",
     "PLR0915",
     "PLW2901",
+    "PIE790",
 ]
 
 [tool.ruff.lint.pydocstyle]

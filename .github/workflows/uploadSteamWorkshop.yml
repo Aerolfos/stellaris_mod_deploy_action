@@ -86,3 +86,9 @@ jobs:
       working-directory: stellaris_mod_deploy_action
       run: |
         python steam_workshop_upload.py
+    - name: Upload result manifest file
+      id: steam_workshop_upload_step_manifest_archive
+      uses: actions/upload-artifact@v4
+      with:
+          name: output-manifest-file
+          path: ${{ steps.steam_workshop_upload_step_python.outputs.manifest_path }}

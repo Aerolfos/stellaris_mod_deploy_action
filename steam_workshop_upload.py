@@ -29,9 +29,6 @@ app_id = get_env_variable("appID", None, debug_level=cao.debug_level)
 input_stellaris_version = get_env_variable("versionStellaris", None, debug_level=cao.debug_level)
 use_changelog = str2bool(get_env_variable("useChangelog", "false", debug_level=cao.debug_level))
 
-# TODO: change flow
-change_note = "TEST deployment from Github"
-
 # dependent on docker container image used to set up steamcmd
 home_dir_path: Path = Path(get_env_variable("HOME", "/home", debug_level=cao.debug_level)).resolve()
 steam_home_dir_path: Path = Path(
@@ -86,6 +83,18 @@ workshop_description_file_string = workshop_description_file_string.replace('"',
 file_handle.close()
 
 # TODO: actual change note
+# user specified to use changelog
+if use_changelog:
+    if not cao.changelog_file_path.exists():
+        msg = f"Requested adding changelog to release notes, but no file {cao.changelog_file_name} was provided in repository"
+        raise FileNotFoundError(msg)
+
+    pass
+
+else:
+    change_note = "TEST deployment from Github"
+
+# TODO: steam templates?
 
 ### Metadata ###
 # make manifest file with metadata
@@ -193,7 +202,7 @@ upload_command = f'steamcmd +login "{steam_username}" +workshop_build_item "{cao
 retcode = steamcmd_run(upload_command, timeout_time)
 
 # Output the manifest path
-# TODO: use github upload artifact to upload the manifest file for inspection
-github_output = os.getenv("GITHUB_OUTPUT", None)
+# uses github upload artifact to upload the manifest file for inspection
+github_output = get_env_variable("GITHUB_OUTPUT", None, debug_level=cao.debug_level)
 with Path.open(github_output, "a") as gh_output_file:
-    gh_output_file.write(f"manifest={cao.manifest_file_path}\n")
+    gh_output_file.write(f"manifest_path={cao.manifest_file_path}\n")
