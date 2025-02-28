@@ -142,7 +142,7 @@ if use_changelog:
         change_note_file_string,
         flags=re.IGNORECASE | re.MULTILINE | re.DOTALL,
     ):
-        change_note_entry = match
+        change_note_entry = match.group(0)
     else:
         msg = f"No changelog entry found for the version {mod_version} in '{cao.changelog_file_name}'"
         raise ValueError(msg)
