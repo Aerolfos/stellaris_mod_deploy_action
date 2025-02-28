@@ -8,17 +8,19 @@ account will be used with steamcmd
 ### Imports ###
 import base64
 import os
+import re
 import subprocess
 from pathlib import Path
 
 import constants_and_overrides as cao
 from methods.input_methods import (
     get_env_variable,
+    mod_version_to_dict,
     parse_descriptor_to_dict,
     str2bool,
 )
 
-timeout_time = 60 # s
+timeout_time = 60  # s
 
 ### Environment variables, paths ###
 # secrets
@@ -28,6 +30,7 @@ config_vdf_contents = get_env_variable("configVdf", None, debug_level=cao.debug_
 app_id = get_env_variable("appID", None, debug_level=cao.debug_level)
 input_stellaris_version = get_env_variable("versionStellaris", None, debug_level=cao.debug_level)
 use_changelog = str2bool(get_env_variable("useChangelog", "false", debug_level=cao.debug_level))
+repo_github_path = get_env_variable("repoGithubpath", None, debug_level=cao.debug_level)
 
 # dependent on docker container image used to set up steamcmd
 home_dir_path: Path = Path(get_env_variable("HOME", "/home", debug_level=cao.debug_level)).resolve()
@@ -51,6 +54,10 @@ if not steam_username:
 if not config_vdf_contents:
     msg = "Config VDF input file is missing or incomplete, must have configured account to upload with"
     raise ValueError(msg)
+if not repo_github_path:
+    msg = "Missing Github repository identifier, the last part of link `https://github.com/UserName/RepositoryName`. \
+        Need this to construct links."
+    raise ValueError(msg)
 
 ### Processing ###
 # find information from mod files
@@ -73,28 +80,99 @@ except KeyError as err:
     msg = "Mod name is missing or incomplete, must have name in descriptor"
     raise ValueError(msg) from err
 
+# versioning
+try:
+    mod_version = descriptor_dict["version"]
+except KeyError as err:
+    msg = "Mod version is missing or incomplete, must have version in descriptor for this tool"
+    raise ValueError(msg) from err
+try:
+    stellaris_version = descriptor_dict["supported_version"]
+except KeyError as err:
+    msg = "Supported Stellaris version is missing or incomplete, must have supported version in descriptor\
+        \nPDX tools should have caught this; how did you even upload this mod in the first place?"
+    raise ValueError(msg) from err
+
+# break down into dict with the mod versions
+current_semantic_mod_version, using_v_prefix, using_v_with_space_prefix = mod_version_to_dict(
+    mod_version,
+    use_format_check=False,
+    possible_version_types=cao.possible_version_types,
+    regex_version_pattern=cao.regex_version_pattern,
+)
+
+# and we make a version suitable for a github release tag - this should be v1.2.3
+# user provided/paradox mod versioning supports a space (v 1.2.3) or completely omitting the v
+# this is not valid for github so need to re-make a github tag style version
+github_release_tag = "v" + ".".join(current_semantic_mod_version.values())
+
+# version for display in descriptions, change any asterisks to x
+# and remove the initial v too (matter of preference)
+supported_stellaris_version_display = descriptor_dict["supported_version"].replace("*", "x")
+supported_stellaris_version_display = supported_stellaris_version_display.replace("v", "")
+
+# the link for the earlier generated github release
+github_release_link = cao.github_release_link_pattern.format(repo_github_path, github_release_tag)
+
+# fetch workshop description
 if not cao.workshop_description_file_path.exists():
     msg = f"File with workshop description '{cao.workshop_description_file_name}' is missing, \
     must have one for workshop upload feature"
     raise ValueError(msg)
-file_handle = Path.open(cao.workshop_description_file_path)
-workshop_description_file_string = file_handle.read()
-workshop_description_file_string = workshop_description_file_string.replace('"', '\"')  # noqa: Q004 deliberately escaping quotes
-file_handle.close()
+workshop_description_file_object = Path.open(cao.workshop_description_file_path)
+workshop_description_file_string = workshop_description_file_object.read()
+workshop_description_file_string = workshop_description_file_string.replace('"', '\\"')  # deliberately escaping quotes
+workshop_description_file_object.close()
 
-# TODO: actual change note
-# user specified to use changelog
+# (optional) fetch change note
 if use_changelog:
     if not cao.changelog_file_path.exists():
-        msg = f"Requested adding changelog to release notes, but no file {cao.changelog_file_name} was provided in repository"
+        msg = f"Requested adding changelog to release notes, but no file '{cao.changelog_file_name}' was provided in repository"
         raise FileNotFoundError(msg)
 
-    pass
+    change_note_file_object = Path.open(cao.changelog_file_path)
+    change_note_file_string = change_note_file_object.read()
+    change_note_file_object.close()
+
+    # insert reference to current mod version
+    versioned_changelog_entry_search_pattern = cao.versioned_changelog_entry_search_pattern.format(mod_version)
+    # find the corresponding entry
+    if match := re.search(
+        versioned_changelog_entry_search_pattern,
+        change_note_file_string,
+        flags=re.IGNORECASE | re.MULTILINE | re.DOTALL,
+    ):
+        change_note_entry = match
+    else:
+        msg = f"No changelog entry found for the version {mod_version} in '{cao.changelog_file_name}'"
+        raise ValueError(msg)
+
+    workshop_change_note_template_file_object = Path.open(cao.workshop_change_note_template_file_path)
+    workshop_change_note_template_string = workshop_change_note_template_file_object.read()
+    workshop_change_note_template_file_object.close()
+
+    workshop_change_note_template_string = workshop_change_note_template_string.format(
+        release_url=github_release_link,
+        mod_version=mod_version,
+        stellaris_version=stellaris_version,
+    )
+
+    # finally make the full change note to be passed to workshop
+    # by replacing the placeholder bit in the template
+    # with the extracted change note entry via the provided search pattern
+    change_note = re.sub(
+        cao.workshop_template_search_pattern,
+        change_note_entry,
+        workshop_change_note_template_string,
+        flags=re.IGNORECASE | re.MULTILINE | re.DOTALL,
+    )
 
 else:
-    change_note = "TEST deployment from Github"
+    change_note = f"""[h2][url={github_release_link}]ModName: [b]{mod_version}[/b][/url][/h2]
+    Supports Stellaris version: [b]{stellaris_version}[/b]
 
-# TODO: steam templates?
+    Automatically deployed from Github
+    """
 
 ### Metadata ###
 # make manifest file with metadata

@@ -82,7 +82,7 @@ if cao.debug_level == "DEBUG":
 # and remove the initial v too (matter of preference tbh)
 supported_stellaris_version_display = args.versionStellaris.replace("*", "x")
 supported_stellaris_version_display = supported_stellaris_version_display.replace("v", "")
-# NOTE: does not support custom display rules
+# NOTE: does not support custom display rules (yet?)
 
 # version for use in a mod name, like `Mod Name (4.0)`, Gigastructures does this
 # extract the semantic version info from Stellaris version, relying on function defaults

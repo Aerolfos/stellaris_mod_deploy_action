@@ -80,9 +80,7 @@ jobs:
         versionStellaris: ${{ inputs.versionStellaris }}
         useChangelog: ${{ inputs.useChangelog }}
         modFolderName: ${{ github.event.repository.name }}
-        #itemId: ${{ inputs.publishedFileId }}
-        #rootPath: ${{ inputs.path }}
-        #changeNote: ${{ inputs.changeNote }}
+        repoGithubpath: ${{ github.repository }}
       working-directory: stellaris_mod_deploy_action
       run: |
         python steam_workshop_upload.py

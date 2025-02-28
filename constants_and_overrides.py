@@ -52,6 +52,7 @@ mod_files_folder_path = mod_github_folder_path / mod_folder_name
 ## Filenames
 default_release_note_template_filename = "release_note_template.md"
 default_release_note_template_no_changelog_filename = "release_note_template_no_changelog.md"
+default_workshop_change_note_template_filename = "workshop_change_note_template.md"
 
 ## Regex search patterns
 # loc_something:0 "something"
@@ -80,13 +81,37 @@ default_github_release_link_pattern = r"https://github.com/{}/releases/tag/{}"
 ---
 
 [Older versions]
-
 """
 default_changelog_search_pattern = r"(^---\n)(##\s)(.+?\s`)WIP(`)(:\n)(.*?)(^---$)"
 # regex r"(^---\n)(## .+?\s`.{1,13}`:\n)(.*?)(^---$)" matches arbitrary version numbers
 default_template_search_pattern = r"(^---\n)(\nChanges\n\n)(^---$)"
 default_template_insert_version_pattern = r"(##\s)(Supports Stellaris version:\s\`).+?(\`)"
 
+# for pushing to workshop, changelog file has been changed by github release script
+# now the full changelog will be (placeholder may not be present depending on settings):
+"""
+# Changes for [ModName](https://steamcommunity.com/sharedfiles/filedetails/?id=mod_workshop_id)
+
+---
+## ModName `WIP`:
+- Newest changes
+---
+
+---
+## [ModName `v1.2.3`](https://github.com/UserName/mod_name/releases/tag/v1.2.3):
+- Latest
+- Change
+- Entries
+---
+
+[Even older versions]
+"""
+# this pattern will search the arbitrary, already linked entries, and extract changes for one specific mod version
+# note the {}, for use with .format to insert a version number to search for
+# just paste this in regex101.com don't try to understand the regex directly
+default_versioned_changelog_entry_search_pattern = r"(^---\n)(##\s)(\[.+?\s`){}(`)(\]\(.+?\))(:\n)(.*?)(^---$)"
+# for replacing what is inside the horizontal rules in the workshop changenote template
+default_workshop_template_search_pattern = r"(^\[hr\]\[/hr\]\n)(.+?\n)(^\[hr\]\[/hr\]$)"
 
 ### Overrides ###
 Overrides = OverrideClass(mod_github_folder_path, debug_level=debug_level)
@@ -145,6 +170,17 @@ if not release_note_template_no_changelog_overriden:
 else:
     release_note_template_no_changelog_file_path = mod_github_folder_path / release_note_template_no_changelog_filename
 
+# workshop change note, same as above
+workshop_change_note_template_filename = Overrides.get_parameter(
+    "workshop_change_note_template_filename",
+    default_workshop_change_note_template_filename,
+)
+workshop_change_note_template_overriden = Overrides.overriden_params["workshop_change_note_template_filename"]
+if not workshop_change_note_template_overriden:
+    workshop_change_note_template_file_path = Path.cwd() / "templates/" / workshop_change_note_template_filename
+else:
+    workshop_change_note_template_file_path = mod_github_folder_path / workshop_change_note_template_filename
+
 ## Descriptor overrides
 # can supply overrides to the parsed descriptor from the mod github
 descriptor_override_name = Overrides.get_parameter("name", None)
@@ -171,6 +207,15 @@ template_search_pattern = Overrides.get_parameter("template_search_pattern", def
 template_insert_version_pattern = Overrides.get_parameter(
     "template_insert_version_pattern",
     default_template_insert_version_pattern,
+)
+
+versioned_changelog_entry_search_pattern = Overrides.get_parameter(
+    "versioned_changelog_entry_search_pattern",
+    default_versioned_changelog_entry_search_pattern,
+)
+workshop_template_search_pattern = Overrides.get_parameter(
+    "workshop_template_search_pattern",
+    default_workshop_template_search_pattern,
 )
 
 ## Custom logic for handling overriding of loc keys, potentially from multiple files
