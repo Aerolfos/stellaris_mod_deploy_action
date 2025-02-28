@@ -6,9 +6,9 @@
 <!---[![Discord](https://img.shields.io/discord/739835273969664050?style=flat&label=Discord&logo=discord&logoColor=white&color=7289DA)](https://discord.com/invite/xUrG9wh)--->
 
 
-This is a custom tool to aid in updating Stellaris mods. It only makes sense to use this tool if you structure mods similarly, see below under usage.
+This is a custom tool to aid in updating Stellaris mods. It only makes sense to use this tool if you structure mods similarly, see below under setup.
 
-This tool uses the [Github action](https://github.com/features/actions) functionality to trigger a Python script which bumps version numbers and supported Stellaris version, and also creates a Github release for the mod.
+This tool uses the [Github actions](https://github.com/features/actions) functionality to trigger a Python script which bumps version numbers and supported Stellaris version, and then creates a Github release for the mod.
 
 Also integrates [TTFTCUTS' localisation processing action](https://github.com/TTFTCUTS/Stellaris-Loc-Action) as an optional step that can be triggered, which will propagate loc entries from English to other languages before generating a release.
 
@@ -35,7 +35,7 @@ https://github.com/Aerolfos/dubstep_launchers/blob/main/dubstep_launchers/descri
 
 https://github.com/Aerolfos/stellaris_mod_deploy_action/wiki/Expected-mod-structure
 
-## In practice
+## Setup
 https://github.com/Aerolfos/stellaris_mod_deploy_action/blob/main/.github/workflows/example.yml
 
 `.../Paradox Interactive/Stellaris/mod/mod_name`
