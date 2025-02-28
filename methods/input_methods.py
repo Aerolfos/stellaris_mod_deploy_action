@@ -1,7 +1,6 @@
 import argparse
 import os
 import re
-import subprocess
 from pathlib import Path
 
 
@@ -414,3 +413,123 @@ def generate_with_template_file(
     file_handle.close()
 
     return file_string
+
+def replace_markdown_list_with_bbcode(match: re.Match) -> str:
+    """Helper for `convert_markdown_lists_to_bbcode` to go into `re.sub`"""
+    items = match.group(1).strip().split("\n")
+    # item.split[] is to preserve whitespace to the left of list item
+    bbcode_items = [f'{item.split("- ")[0]}[*] {item.split("- ")[1].rstrip()}' for item in items if item.strip()]
+    return "[list]\n" + "\n".join(bbcode_items) + "\n[/list]"
+
+def convert_markdown_lists_to_bbcode(text: str) -> str:
+    """
+    Convert all lists in a passed markdown string to steam bbcode lists
+
+    NOTE: collapses nested lists, full nested list support would require a full parser
+    """
+    # regex to capture a full markdown list
+    markdown_list_pattern = re.compile(r"^[\t ]*((?:^|\n)[\t ]*- .*(?:\n[\t ]*- .*)*)", re.MULTILINE)
+    # NOTE: does not make separate lists depending on indentation
+
+    # use helper method to replace markdown lists with BBCode lists
+    converted_text = markdown_list_pattern.sub(replace_markdown_list_with_bbcode, text)
+    return converted_text
+
+def replace_with_steam_formatting(markdown_string: str) -> str:
+    """
+    Very basic format conversion, NOT a proper parser and will not work for arbitrary markdown
+
+    Consider using a proper full parser instead, or keep changelogs very simple and regular
+
+    Turns something like:
+
+    (markdown)
+    ```
+    ---
+    ## [TEST MOD `v0.0.34`](https://github.com/Aerolfos/automated_deploy_test/releases/tag/v0.0.34):
+    Fixes
+    - Item 1, contains [link](https://example.com)
+    - Item 2, contains **bold text**
+    - Item 3, contains *italic text*
+    - Item 4, contains ~~strikethrough text~~
+    - Item 5, contains `code text`
+    - Item 6, contains __underline text__
+    - Item 7:
+        ```
+        multiline
+        code
+        block
+        ```
+    - Item 8
+    Misc.
+    - Item 1
+    - Item 2
+    - Item 3
+        - Item 31
+        - Item 32
+    - Item-4
+    ---
+    ```
+
+    into:
+
+    (steam bbcode)
+    ```
+    [hr][/hr]
+    Fixes
+    [list]
+    [*] Item 1, contains [url=https://example.com]link[/url]
+    [*] Item 2, contains [b]bold text[/b]
+    [*] Item 3, contains [i]italic text[/i]
+    [*] Item 4, contains [strike]strikethrough text[/strike]
+    [*] Item 5, contains [b][noparse]code text[/noparse][/b]
+    [*] Item 6, contains [u]underline text[/u]
+    [*] Item 7:
+    [/list]
+        [code]
+        multiline
+        code
+        block
+        [/code]
+    [list]
+    [*] Item 8
+    [/list]
+    Misc.
+    [list]
+    [*] Item 1
+    [*] Item 2
+    [*] Item 3
+        [*] Item 31
+        [*] Item 32
+    [*] Item-4
+    [/list]
+    [hr][/hr]
+    ```
+    """
+    # initiate
+    steamed_string = markdown_string
+
+    # simple tag replacements
+    replacement_dict = {
+        r"^[\t ]*---" : "[hr][/hr]", # horizontal rule
+        r"^[\t ]*## .*?:\n" : "", # empty the header line with modname and mod link, we have this already from template
+        r"\[([^\[]+?)\]\((.+?)\)" : "[url=\\g<2>]\\g<1>[/url]", # links
+        r"(?<!\*)(\*\*)(?!\*)(.+?)(?<!\*)(\*\*)(?!\*)" : "[b]\\g<2>[/b]", # bold
+        r"(?<!\*)(\*)(?!\*)(.+?)(?<!\*)(\*)(?!\*)" : "[i]\\g<2>[/i]", # italic
+        r"~~(.+?)~~" : "[strike]\\g<1>[/strike]", # strikethrough
+        r"`([^`\n]+?)`" : "[b][noparse]\\g<1>[/noparse][/b]", # code
+        r"__(.+?)__" : "[u]\\g<1>[/u]", # underline
+        r"```(.+?)```" : "[code]\\g<1>[/code]", # code block
+    }
+    for selected_pattern, selected_replacementstr in replacement_dict.items():
+        steamed_string = re.sub(
+            selected_pattern,
+            selected_replacementstr,
+            steamed_string,
+            flags=re.IGNORECASE | re.MULTILINE | re.DOTALL,
+        )
+
+    # lists
+    steamed_string = convert_markdown_lists_to_bbcode(steamed_string)
+
+    return steamed_string

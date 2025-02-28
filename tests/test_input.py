@@ -90,7 +90,8 @@ def test_mod_version_to_dict() -> None:
 
     for v_string, output_dict in test_versions.items():
         result = im.mod_version_to_dict(v_string, use_format_check=True)
-        assert result == output_dict, f"Failed to match {v_string} to {output_dict}, output was {result}"
+        error_msg = f"Failed to match {v_string} to {output_dict}, output was {result}"
+        assert result == output_dict, error_msg
 
     return None
 
@@ -104,4 +105,27 @@ def test_search_and_replace_in_file() -> None:
 
 
 def generate_with_template_file() -> None:
+    return None
+
+
+def test_convert_markdown_lists_to_bbcode(input_markdown_lists: str, expected_bbcode_converted_lists: str) -> None:
+    output_str = im.convert_markdown_lists_to_bbcode(input_markdown_lists)
+    error_msg = f"Conversion of input markdown lists does not match expected steam bbcode lists output\
+        \nExpected output: \n{expected_bbcode_converted_lists}\
+        \nActual output: \n{output_str}"
+    assert output_str == expected_bbcode_converted_lists, error_msg
+
+    return None
+
+
+def test_replace_with_steam_formatting(
+    input_markdown_to_steam_conversion: str,
+    expected_markdown_to_steam_conversion: str,
+) -> None:
+    output_str = im.replace_with_steam_formatting(input_markdown_to_steam_conversion)
+    error_msg = f"Conversion of input markdown formatting does not match expected steam bbcode output\
+        \nExpected output: \n{expected_markdown_to_steam_conversion}\
+        \nActual output: \n{output_str}"
+    assert output_str == expected_markdown_to_steam_conversion, error_msg
+
     return None

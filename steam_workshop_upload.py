@@ -17,6 +17,7 @@ from methods.input_methods import (
     get_env_variable,
     mod_version_to_dict,
     parse_descriptor_to_dict,
+    replace_with_steam_formatting,
     str2bool,
 )
 
@@ -146,6 +147,8 @@ if use_changelog:
     else:
         msg = f"No changelog entry found for the version {mod_version} in '{cao.changelog_file_name}'"
         raise ValueError(msg)
+
+    change_note_entry = replace_with_steam_formatting(change_note_entry)
 
     workshop_change_note_template_file_object = Path.open(cao.workshop_change_note_template_file_path)
     workshop_change_note_template_string = workshop_change_note_template_file_object.read()
