@@ -109,7 +109,7 @@ github_release_tag = "v" + ".".join(current_semantic_mod_version.values())
 
 # version for display in descriptions, change any asterisks to x
 # and remove the initial v too (matter of preference)
-supported_stellaris_version_display = descriptor_dict["supported_version"].replace("*", "x")
+supported_stellaris_version_display = stellaris_version.replace("*", "x")
 supported_stellaris_version_display = supported_stellaris_version_display.replace("v", "")
 
 # the link for the earlier generated github release
@@ -158,7 +158,7 @@ if use_changelog:
         release_url=github_release_link,
         mod_title=mod_title,
         mod_version=mod_version,
-        stellaris_version=stellaris_version,
+        stellaris_version=supported_stellaris_version_display,
     )
 
     # finally make the full change note to be passed to workshop
@@ -173,7 +173,7 @@ if use_changelog:
 
 else:
     change_note = f"""[h2][url={github_release_link}]{mod_title}: [b]{mod_version}[/b][/url][/h2]
-    Supports Stellaris version: [b]{stellaris_version}[/b]
+    Supports Stellaris version: [b]{supported_stellaris_version_display}[/b]
 
     Automatically deployed from Github
     """
