@@ -1,4 +1,6 @@
 ### Imports ###
+import json
+from os import name
 from pathlib import Path
 
 from methods.input_methods import get_env_variable
@@ -35,9 +37,14 @@ default_manifest_file_name = "manifest.vdf"
 
 ## Paths
 mod_folder_name = get_env_variable("modFolderName", None, debug_level=debug_level)
+# bypass if file ran directly as a standalone
+if __name__ == "__main__":
+    mod_folder_name = "Placeholder"
+
 if not mod_folder_name:
     msg = "Mod folder name is missing or incomplete, must set an env variable with calling Github repo name"
     raise ValueError(msg)
+
 mod_repo_name = mod_folder_name  # NOTE part of expected `modname/modname/common` structure
 
 # cwd is set to where the python file is,
@@ -46,6 +53,11 @@ mod_github_folder_path = (Path.cwd() / f"../{mod_folder_name}").resolve()
 # and the folder with the actual game mod files (nested one down from github)
 mod_files_folder_path = mod_github_folder_path / mod_folder_name
 
+# file to output the current set of overrideable parameters for convenience
+# NOTE: files for the tool repo don't get committed during a workflow run
+# (not that external parties running the tool would be allowed to)
+# so this file is generated when manually running this script from the dev side
+overrideable_parameters_file_path = Path.cwd() / ".github/" / "overrideable_parameters.json"
 
 ### Defaults ###
 # merely convenient defaults for python script, can be changed
@@ -53,6 +65,9 @@ mod_files_folder_path = mod_github_folder_path / mod_folder_name
 default_release_note_template_filename = "release_note_template.md"
 default_release_note_template_no_changelog_filename = "release_note_template_no_changelog.md"
 default_workshop_change_note_template_filename = "workshop_change_note_template.md"
+
+# file for giving (potential) extra information to web tools
+default_webhook_json_file_path = mod_github_folder_path / ".github/" / "supported_stellaris_version.json"
 
 ## Regex search patterns
 # loc_something:0 "something"
@@ -135,6 +150,8 @@ readme_file_name = Overrides.get_parameter("readme_file_name", default_readme_fi
 readme_file_path = mod_github_folder_path / readme_file_name
 changelog_file_name = Overrides.get_parameter("changelog_file_name", default_changelog_file_name)
 changelog_file_path = mod_github_folder_path / changelog_file_name
+
+webhook_json_file_path = Overrides.get_parameter("webhook_json_file_path", default_webhook_json_file_path)
 
 # temp files used by script, kept out of mod files repository so as to not be committed
 generated_release_notes_filename = Overrides.get_parameter(
@@ -229,3 +246,10 @@ else:
     except KeyError:
         loc_files_list = []
         version_loc_key = None
+
+if __name__ == "__main__":
+    # save a json with the list of parameters this script supports for overrides
+    params_dict = {"overrideable_parameter_names" : [param+"_override" for param in Overrides.overriden_params]}
+    params_dict["special_params"] = ["extra_loc_files_to_update", "version_loc_key"]
+    with Path.open(overrideable_parameters_file_path, "w") as params_json_file_object:
+        json.dump(params_dict, params_json_file_object, indent=4)

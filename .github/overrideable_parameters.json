@@ -1,0 +1,37 @@
+{
+    "overrideable_parameter_names": [
+        "add_changelog_WIP_entry_override",
+        "possible_version_types_override",
+        "regex_version_pattern_override",
+        "descriptor_file_name_override",
+        "workshop_description_file_name_override",
+        "readme_file_name_override",
+        "changelog_file_name_override",
+        "webhook_json_file_path_override",
+        "generated_release_notes_filename_override",
+        "manifest_file_name_override",
+        "release_note_template_filename_override",
+        "release_note_template_no_changelog_filename_override",
+        "workshop_change_note_template_filename_override",
+        "name_override",
+        "version_override",
+        "tags_override",
+        "picture_override",
+        "supported_version_override",
+        "path_override",
+        "remote_file_id_override",
+        "loc_key_pattern_override",
+        "workshop_desc_version_pattern_override",
+        "readme_version_pattern_override",
+        "github_release_link_pattern_override",
+        "changelog_search_pattern_override",
+        "template_search_pattern_override",
+        "template_insert_version_pattern_override",
+        "versioned_changelog_entry_search_pattern_override",
+        "workshop_template_search_pattern_override"
+    ],
+    "special_params": [
+        "extra_loc_files_to_update",
+        "version_loc_key"
+    ]
+}

@@ -1,5 +1,6 @@
 ### Imports ###
 import argparse
+import json
 import re
 from pathlib import Path
 
@@ -274,6 +275,11 @@ env_file_path = get_env_variable("GITHUB_ENV", None, debug_level=cao.debug_level
 # save path of generated changelog file
 with Path.open(env_file_path, "a") as envfile:  # type: ignore - false error from parsing a str filename which works fine when the file exists in the actual github env
     print(f"{cao.github_env_releasenotesfile_name}={cao.generated_release_notes_file_path}", file=envfile)
+
+# save a json with the stellaris version for automated parsing by web tools/hooks
+webhook_dict = {"supported_stellaris_version": args.versionStellaris}
+with Path.open(cao.webhook_json_file_path, "w") as webhook_json_file_object:
+    json.dump(webhook_dict, webhook_json_file_object)
 
 # create title from mod name + the release tag - used for commit message and release title
 release_title = f"{descriptor_dict['name']} {github_release_tag}"
