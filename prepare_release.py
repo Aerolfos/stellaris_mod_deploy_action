@@ -283,12 +283,20 @@ with Path.open(cao.webhook_json_file_path, "w") as webhook_json_file_object:
 
 # output if the `localisation` and `localisation/replace` folders exist
 # just to avoid crashing later
+# github uses different true and false from what python does, explicitly output strings
 localisation_path = cao.mod_files_folder_path / "localisation/"
+loc_folder_exists = "true" if localisation_path.is_dir() else "false"
 loc_replace_path = cao.mod_files_folder_path / "localisation/replace/"
+loc_replace_folder_exists = "true" if loc_replace_path.is_dir() else "false"
+
 github_output = get_env_variable("GITHUB_OUTPUT", None, debug_level=cao.debug_level)
 with Path.open(github_output, "a") as gh_output_file:
-    gh_output_file.write(f"loc_folder_exists={localisation_path.is_dir()}\n")
-    gh_output_file.write(f"loc_replace_folder_exists={loc_replace_path.is_dir()}\n")
+    gh_output_file.write(f"loc_folder_exists={loc_folder_exists}\n")
+    gh_output_file.write(f"loc_replace_folder_exists={loc_replace_folder_exists}\n")
+
+if cao.debug_level in ["INFO", "DEBUG"]:
+    print("- Output being passed to github: -")
+    print(f"{(Path.open(github_output, "r")).read()}")
 
 # create title from mod name + the release tag - used for commit message and release title
 release_title = f"{descriptor_dict['name']} {github_release_tag}"
