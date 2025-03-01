@@ -1,4 +1,4 @@
-[h2][url={release_url}]ModName: [b]{mod_version}[/b][/url][/h2]
+[h2][url={release_url}]{mod_title}: [b]{mod_version}[/b][/url][/h2]
 Supports Stellaris version: [b]{stellaris_version}[/b]
 
 [h3]Changes:[/h3]

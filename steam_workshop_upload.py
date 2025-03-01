@@ -156,6 +156,7 @@ if use_changelog:
 
     workshop_change_note_template_string = workshop_change_note_template_string.format(
         release_url=github_release_link,
+        mod_title=mod_title,
         mod_version=mod_version,
         stellaris_version=stellaris_version,
     )
