@@ -171,7 +171,7 @@ if use_changelog:
     )
 
 else:
-    change_note = f"""[h2][url={github_release_link}]ModName: [b]{mod_version}[/b][/url][/h2]
+    change_note = f"""[h2][url={github_release_link}]{mod_title}: [b]{mod_version}[/b][/url][/h2]
     Supports Stellaris version: [b]{stellaris_version}[/b]
 
     Automatically deployed from Github
