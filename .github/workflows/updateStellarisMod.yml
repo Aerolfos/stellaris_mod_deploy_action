@@ -73,10 +73,21 @@ jobs:
       working-directory: stellaris_mod_deploy_action
       run: python prepare_release.py "${{ inputs.versionType }}" "${{ inputs.versionStellaris }}" "${{ inputs.useChangelog }}" "${{ github.event.repository.name }}" "${{ github.repository }}"
       shell: bash
-
+      
+      # To use loc action, need to check for folder existence (or it will crash)
+    - name: Check if loc replace folder exists
+      id: ttftcuts_check_folder_loc
+      run: |
+        if [ -d "${{ github.event.repository.name }}/${{ github.event.repository.name }}/localisation/replace" ]; then
+          echo "Found /localisation/replace folder"
+          echo "::set-output name=loc_folder_exists::true"
+        else
+          echo "Missing /localisation/replace folder"
+          echo "::set-output name=loc_folder_exists::false"
+        fi
     - name: Optionally propagate new entries from one source language to target languages via TTFTCUTS' loc action
       id: ttftcuts_update_loc
-      if: ${{ inputs.updateLoc }}
+      if: ${{ inputs.updateLoc && steps.ttftcuts_check_folder_loc.outputs.loc_folder_exists }}
       uses: TTFTCUTS/Stellaris-Loc-Action@main
       with:
         # nesting is necessary
