@@ -77,7 +77,7 @@ jobs:
     # To use loc action, need to check for folder existence (or it will crash)
     - name: Optionally propagate new entries from one source language to target languages via TTFTCUTS' loc action
       id: ttftcuts_update_loc
-      if: ${{ inputs.updateLoc && steps.main_prepare_release_python.outputs.loc_folder_exists }}
+      if: ${{ (inputs.updateLoc) && (steps.main_prepare_release_python.outputs.loc_folder_exists == 'true') }}
       uses: TTFTCUTS/Stellaris-Loc-Action@main
       with:
         # nesting is necessary
@@ -86,7 +86,7 @@ jobs:
         output-languages: braz_por, french, german, polish, russian, simp_chinese, spanish
     - name: Same as above but for /localisation/replace
       id: ttftcuts_update_loc_replace
-      if: ${{ inputs.updateLoc && steps.main_prepare_release_python.outputs.loc_replace_folder_exists }}
+      if: ${{ (inputs.updateLoc) && (steps.main_prepare_release_python.outputs.loc_replace_folder_exists == 'true') }}
       uses: TTFTCUTS/Stellaris-Loc-Action@main
       with:
         path: ${{ github.event.repository.name }}/${{ github.event.repository.name }}/localisation/replace
