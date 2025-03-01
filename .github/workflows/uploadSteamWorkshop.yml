@@ -47,6 +47,8 @@ jobs:
         # actions/checkout does not allow cloning to a folder above the default working folder, so to separate from tools place in this folder
         # the path names become very long but needs tools to fix before change
         path: ${{ github.event.repository.name }}
+        # ensure latest version of repository is used (we pushed to it since workflow triggered)
+        ref: ${{ github.ref.name }}
     
     - name: Checkout tools repo
       uses: actions/checkout@v4
