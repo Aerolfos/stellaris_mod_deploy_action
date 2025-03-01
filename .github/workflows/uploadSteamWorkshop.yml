@@ -48,7 +48,7 @@ jobs:
         # the path names become very long but needs tools to fix before change
         path: ${{ github.event.repository.name }}
         # ensure latest version of repository is used (we pushed to it since workflow triggered)
-        ref: ${{ github.ref.name }}
+        ref: ${{ github.ref }}
     
     - name: Checkout tools repo
       uses: actions/checkout@v4
