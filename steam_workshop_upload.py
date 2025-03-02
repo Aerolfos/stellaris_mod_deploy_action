@@ -43,8 +43,9 @@ steam_home_dir_path: Path = Path(
 if not app_id:
     msg = "Steam app ID is missing or incomplete, must have a game to upload mod for"
     raise ValueError(msg)
-# if not item_id:
-#    raise ValueError("Published file ID is missing or incomplete, must have an already uploaded workshop object")
+if not input_stellaris_version:
+    msg = "Supported Stellaris version is missing or incomplete, must specify version to support"
+    raise ValueError(msg)
 if not cao.mod_folder_name:
     msg = "Mod folder name is missing or incomplete, it should be Github repo name, how did you manage that?"
     raise ValueError(msg)
@@ -109,7 +110,7 @@ github_release_tag = "v" + ".".join(current_semantic_mod_version.values())
 
 # version for display in descriptions, change any asterisks to x
 # and remove the initial v too (matter of preference)
-supported_stellaris_version_display = stellaris_version.replace("*", "x")
+supported_stellaris_version_display = input_stellaris_version.replace("*", "x")
 supported_stellaris_version_display = supported_stellaris_version_display.replace("v", "")
 
 # the link for the earlier generated github release
