@@ -47,7 +47,7 @@ def get_env_variable(env_var_name: str, default: str | None = None, debug_level:
     return env_var
 
 
-def parse_descriptor_to_dict(descriptor_file_path: Path, debug_level: int = 0) -> dict[str, str]:
+def parse_descriptor_to_dict(descriptor_file_path: Path, debug_level: str = "SILENT") -> dict[str, str]:
     """
     Creates a dict of entries from a paradox descriptor.mod file
 
@@ -57,7 +57,22 @@ def parse_descriptor_to_dict(descriptor_file_path: Path, debug_level: int = 0) -
     like supporting {} blocks for later formatting in Python
 
     Parser will skip empty lines and comments, indicated with #. This includes empty lines in multi-line blocks.'
-    In-line comments are NOT supported.
+    In-line comments are NOT supported (Stellaris does not support this either).
+
+    Parameters
+    ----------
+    descriptor_file_path : Path
+        Input `pathlib.Path` object pointing to a `descriptor.mod` style file, which will be parsed
+
+    debug_level : str
+        One of "SILENT", "INFO", or "DEBUG", for enabling print statements during parsing
+
+    Returns
+    -------
+    descriptor_dict : dict[str: str]
+        A Python-appropriate representation of the key-value content that was in the descriptor file.
+        See tests for examples, like `expected_test_descriptor_dict` in `conftest.py`.
+
     """
     if debug_level == "DEBUG":
         print("- Parsing descriptor style file -")
@@ -189,7 +204,11 @@ def parse_descriptor_to_dict(descriptor_file_path: Path, debug_level: int = 0) -
 
 
 def create_descriptor_file(descriptor_dict: dict, descriptor_file_path: Path) -> None:
-    """Creates a paradox descriptor.mod file from a dictionary"""
+    """
+    Creates a paradox `descriptor.mod` file from a dictionary
+
+    Very simplistic and rigid file writing, on purpose. Paradox tools are very particular about reading descriptors.
+    """
     with Path.open(descriptor_file_path, "w", encoding="utf-8") as descriptor_object:
         # dict order being insertion order is guaranteed in newer python versions so file structure should be preserved
         for key, item in descriptor_dict.items():
@@ -217,12 +236,42 @@ def mod_version_to_dict(
     regex_version_pattern: str | None = None,
 ) -> tuple[dict, bool, bool]:
     """
-    Take a string with a version of the form "v1.2.3" and return a dict with the version components
+    Take a string with a version of the form `(v)1.2.3` and return a dict with the version components
 
-    Uses a regex pattern to make sure the format is correct - can be optionally skipped
-    Has a default pattern but can be overriden
+    Uses a regex pattern to make sure input version format is correct - this can optionally be skipped.
+    Supplied with a default pattern looking for `(v)1.2.3`, can be supplied a different regex pattern.
+    Default pattern allows for up to 9 digits per semantic version.
 
-    Possible versions list must be in the same order as the version is structured
+    Possible versions list must be in the same order as the input version is structured.
+
+    NOTE: Does not have generic prefix/suffix support, just specialized for `v` prefix
+
+    Arguments
+    ---------
+    input_mod_version : str
+        A version number in a str
+    use_format_check : bool, optional
+        Check if version format is correct, defaults to True
+    possible_version_types : listlike, optional
+        List indicating what each part of a semantic version represents, by default ("Major", "Minor", "Patch")
+    regex_version_pattern : str, optional
+        Regex pattern to check version format, defaults to looking for `(v)1.2.3`.
+        Maximum number of allowed digits per semantic version with this pattern is 9.
+
+    Returns
+    -------
+    current_semantic_versions : dict[version type: version]
+        A dict with the broken-down semantic version components
+    using_v_prefix : bool
+        Useful to reconstruct version later. True if version was of style `v1.2.3` with a v
+    using_v_with_space_prefix: bool
+        Useful to reconstruct version later. True if version was of style `v 1.2.3` with space
+
+    Raises
+    ------
+    ValueError
+        Format check failed, including going over the maximum number of digits for a version number (9)
+
     """
     using_v_prefix = False
     using_v_with_space_prefix = False
@@ -231,13 +280,15 @@ def mod_version_to_dict(
         if regex_version_pattern is None:
             # matches format "1.2.3" or alternatively "v1.2.3", * wildcards allowed
             regex_version_pattern = r"^v?\s?(?:(?:\d{1,9}|\*)\.){2}(?:\d{1,9}|\*)"  # yeah regex be like that
+            max_digit_search = re.compile(r"\d{10,}", re.IGNORECASE)
 
         if not re.search(regex_version_pattern, input_mod_version, re.IGNORECASE):
-            if re.search(r"\d{10}", input_mod_version, re.IGNORECASE):
+            if re.search(max_digit_search, input_mod_version):
                 msg = "Maximum number of digits (9) for a version number was exceeded. Why have you done this?"
                 raise ValueError(msg)
-            msg = f'Version format should be of type "v1.2.3", got "{input_mod_version}"'
-            raise ValueError(msg)
+            else:
+                msg = f"Version format should be of type `v1.2.3`, got `{input_mod_version}`"
+                raise ValueError(msg)
 
     semantic_version_list = input_mod_version.split(".")
     # save the v and potential space for later

@@ -1,6 +1,7 @@
+import argparse
 import random
+import re
 from pathlib import Path
-from unittest.mock import patch
 
 import pytest
 
@@ -14,6 +15,9 @@ def test_str2bool(input_truey_strings: tuple[str], input_falsey_strings: tuple[s
     for v in input_falsey_strings:
         assert im.str2bool(v) is False
 
+    with pytest.raises(argparse.ArgumentTypeError):
+        im.str2bool("Some random string with actual content")
+
     return None
 
 
@@ -23,6 +27,7 @@ def test_parse_descriptor_to_dict(
     override_test_file_path: Path,
     expected_test_override_dict: dict,
 ) -> None:
+    """Test reading from a fixture"""
     test_descriptors = {
         # test reading a descriptor file
         descriptor_test_file_path: expected_test_descriptor_dict,
@@ -47,13 +52,14 @@ def test_parse_descriptor_to_dict(
 
 
 def test_create_descriptor_file() -> None:
+    # TODO: This will probably need pytests file writing systems which are more complicated
     return None
 
 
 def test_mod_version_to_dict() -> None:
-    random_1 = random.randint(0, 99999)
-    random_2 = random.randint(0, 99999)
-    random_3 = random.randint(0, 99999)
+    random_1 = random.randint(0, 99998)
+    random_2 = random.randint(0, 99998)
+    random_3 = random.randint(0, 99998)
 
     # test input string as key vs expected output as value
     # output is a tuple of (current_semantic_versions, using_v_prefix, using_v_with_space_prefix)
@@ -79,28 +85,41 @@ def test_mod_version_to_dict() -> None:
         "v*.*.*": ({"Major": "*", "Minor": "*", "Patch": "*"}, True, False),
         "1.*.*": ({"Major": "1", "Minor": "*", "Patch": "*"}, False, False),
     }
-    test_versions_fail = {
-        # 1 over the max number of digits to match
-        "v9999999999.9999999999.9999999999": None,
-        "vqawj.dawok.dwajc": ({"Major": "vqawj", "Minor": "dawok", "Patch": "dwajc"}, True, False),
-        "1234": {},
-        "klakwlk": {},
-    }
-
-    # TODO: test to check assertion works by raising error on invalid version string
 
     for v_string, output_dict in test_versions.items():
         result = im.mod_version_to_dict(v_string, use_format_check=True)
         error_msg = f"Failed to match {v_string} to {output_dict}, output was {result}"
         assert result == output_dict, error_msg
 
+    # test errors correctly raised on invalid version strings
+    test_versions_fail_length = [
+        # 1 over the max number of digits to match
+        "v9999999999.9999999999.9999999999",
+    ]
+    for v_string in test_versions_fail_length:
+        err_msg_length = re.escape("Maximum number of digits (9) for a version number was exceeded.")
+        with pytest.raises(ValueError, match=err_msg_length) as excinfo:
+            result = im.mod_version_to_dict(v_string, use_format_check=True)
+
+    test_versions_fail_format = [
+        "vqawj.dawok.dwajc",
+        "1234",
+        "klakwlk",
+    ]
+    for v_string in test_versions_fail_format:
+        err_msg_format = f"Version format should be of type `v1.2.3`, got `{v_string}`"
+        with pytest.raises(ValueError, match=err_msg_format) as excinfo:
+            result = im.mod_version_to_dict(v_string, use_format_check=True)
+
+        assert err_msg_format in str(excinfo.value)
+
     return None
 
 
 def test_increment_mod_version() -> None:
-    random_1 = random.randint(0, 99999)
-    random_2 = random.randint(0, 99999)
-    random_3 = random.randint(0, 99999)
+    random_1 = random.randint(0, 99998)
+    random_2 = random.randint(0, 99998)
+    random_3 = random.randint(0, 99998)
 
     increment_list = ["increment_major", "increment_minor", "increment_patch"]
     possible_version_types = ("Major", "Minor", "Patch")
