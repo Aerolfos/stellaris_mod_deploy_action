@@ -219,14 +219,19 @@ if args.useChangelog:
     # this replaces the WIP on the latest change entry in the original changelog file from the mod repo
     # and also turns it into a link that will lead to the release we will be creating
     original_changelog_file_string, new_changelog_file_string = search_and_replace_in_file(
-        cao.changelog_file_path, cao.changelog_search_pattern, changelog_replace, return_old_str=True,
+        cao.changelog_file_path,
+        cao.changelog_search_pattern,
+        changelog_replace,
+        return_old_str=True,
     )
 
     # fill in template to make a file to bundle as release notes
     # grab the changelog entry from the original file, change the WIP to version number, then fill in template
     # note use of extracted changelog string, the source file has been updated already
     if match := re.search(
-        cao.changelog_search_pattern, original_changelog_file_string, flags=re.IGNORECASE | re.MULTILINE | re.DOTALL,
+        cao.changelog_search_pattern,
+        original_changelog_file_string,
+        flags=re.IGNORECASE | re.MULTILINE | re.DOTALL,
     ):
         # fills in string with groups retrieved from regex search, in order
         release_changelog_entry = f"{match[1]}{match[2]}{match[3]}{updated_mod_version}{match[4]}{match[5]}{match[6]}{match[7]}"
@@ -296,7 +301,7 @@ with Path.open(github_output, "a") as gh_output_file:
 
 if cao.debug_level in ["INFO", "DEBUG"]:
     print("- Output being passed to github: -")
-    print(f"{(Path.open(github_output, "r")).read()}")
+    print(f"{(Path.open(github_output, 'r')).read()}")
 
 # create title from mod name + the release tag - used for commit message and release title
 release_title = f"{descriptor_dict['name']} {github_release_tag}"
