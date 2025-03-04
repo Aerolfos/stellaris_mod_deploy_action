@@ -47,7 +47,7 @@ def get_env_variable(env_var_name: str, default: str | None = None, debug_level:
     return env_var
 
 
-def parse_descriptor_to_dict(descriptor_file_path: Path, debug_level: int = 0) -> dict:
+def parse_descriptor_to_dict(descriptor_file_path: Path, debug_level: int = 0) -> dict[str, str]:
     """
     Creates a dict of entries from a paradox descriptor.mod file
 
@@ -258,7 +258,7 @@ def increment_mod_version(
     patch_type: str,
     *,
     use_format_check: bool = True,
-    possible_version_types: list = ("Major", "Minor", "Patch"),
+    possible_version_types: list | tuple = ("Major", "Minor", "Patch"),
     regex_version_pattern: str | None = None,
 ) -> tuple[dict, str]:
     """
@@ -267,6 +267,8 @@ def increment_mod_version(
     Uses a regex pattern to make sure the format is correct - can be optionally skipped
 
     Possible versions list must be in the same order as the version is structured
+
+    Returns dict current_semantic_versions, str updated_mod_version (concatenated from dict)
     """
     # break down with helper function
     current_semantic_versions, using_v_prefix, using_v_with_space_prefix = mod_version_to_dict(
@@ -276,6 +278,9 @@ def increment_mod_version(
         regex_version_pattern=regex_version_pattern,
     )
 
+    if patch_type not in possible_version_types:
+        msg = f"Input patch type '{patch_type}' is not a possible version type, must be one of {possible_version_types}"
+        raise ValueError(msg)
     # check what versions follow from the currently selected version by slicing
     subsequent_versions = possible_version_types[possible_version_types.index(patch_type) + 1 :]
     # these should be zeroed if we're updating a higher version
@@ -414,12 +419,14 @@ def generate_with_template_file(
 
     return file_string
 
+
 def replace_markdown_list_with_bbcode(match: re.Match) -> str:
     """Helper for `convert_markdown_lists_to_bbcode` to go into `re.sub`"""
     items = match.group(1).strip().split("\n")
     # item.split[] is to preserve whitespace to the left of list item
-    bbcode_items = [f'{item.split("- ")[0]}[*] {item.split("- ")[1].rstrip()}' for item in items if item.strip()]
+    bbcode_items = [f"{item.split('- ')[0]}[*] {item.split('- ')[1].rstrip()}" for item in items if item.strip()]
     return "[list]\n" + "\n".join(bbcode_items) + "\n[/list]"
+
 
 def convert_markdown_lists_to_bbcode(text: str) -> str:
     """
@@ -434,6 +441,7 @@ def convert_markdown_lists_to_bbcode(text: str) -> str:
     # use helper method to replace markdown lists with BBCode lists
     converted_text = markdown_list_pattern.sub(replace_markdown_list_with_bbcode, text)
     return converted_text
+
 
 def replace_with_steam_formatting(markdown_string: str) -> str:
     """
@@ -511,15 +519,15 @@ def replace_with_steam_formatting(markdown_string: str) -> str:
 
     # simple tag replacements
     replacement_dict = {
-        r"^[\t ]*---" : "[hr][/hr]", # horizontal rule
-        r"^[\t ]*## .*?:\n" : "", # empty the header line with modname and mod link, we have this already from template
-        r"\[([^\[]+?)\]\((.+?)\)" : "[url=\\g<2>]\\g<1>[/url]", # links
-        r"(?<!\*)(\*\*)(?!\*)(.+?)(?<!\*)(\*\*)(?!\*)" : "[b]\\g<2>[/b]", # bold
-        r"(?<!\*)(\*)(?!\*)(.+?)(?<!\*)(\*)(?!\*)" : "[i]\\g<2>[/i]", # italic
-        r"~~(.+?)~~" : "[strike]\\g<1>[/strike]", # strikethrough
-        r"`([^`\n]+?)`" : "[b][noparse]\\g<1>[/noparse][/b]", # code
-        r"__(.+?)__" : "[u]\\g<1>[/u]", # underline
-        r"```(.+?)```" : "[code]\\g<1>[/code]", # code block
+        r"^[\t ]*---": "[hr][/hr]",  # horizontal rule
+        r"^[\t ]*## .*?:\n": "",  # empty the header line with modname and mod link, we have this already from template
+        r"\[([^\[]+?)\]\((.+?)\)": "[url=\\g<2>]\\g<1>[/url]",  # links
+        r"(?<!\*)(\*\*)(?!\*)(.+?)(?<!\*)(\*\*)(?!\*)": "[b]\\g<2>[/b]",  # bold
+        r"(?<!\*)(\*)(?!\*)(.+?)(?<!\*)(\*)(?!\*)": "[i]\\g<2>[/i]",  # italic
+        r"~~(.+?)~~": "[strike]\\g<1>[/strike]",  # strikethrough
+        r"`([^`\n]+?)`": "[b][noparse]\\g<1>[/noparse][/b]",  # code
+        r"__(.+?)__": "[u]\\g<1>[/u]",  # underline
+        r"```(.+?)```": "[code]\\g<1>[/code]",  # code block
     }
     for selected_pattern, selected_replacementstr in replacement_dict.items():
         steamed_string = re.sub(

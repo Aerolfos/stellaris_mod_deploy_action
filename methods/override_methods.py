@@ -16,12 +16,21 @@ class OverrideClass:
 
         # if there are overrides, we parse them - use same structure as a paradox descriptor because we have the parser already
         self.overrides_enabled: bool = False
-        self.override_dict: dict = {}
+        """Class instance top-level setting, whether overrides were found"""
+
+        self.override_dict: dict[str, str] = {}
+        """Output dict from the overrides parsing, contains all current override values for this class instance"""
+
         if override_file_path.exists():
             self.overrides_enabled = True
-            self.override_dict: dict = parse_descriptor_to_dict(override_file_path, debug_level=debug_level)
+            self.override_dict: dict[str, str] = parse_descriptor_to_dict(override_file_path, debug_level=debug_level)
 
-        self.overriden_params = {}
+        self.overriden_params: dict[str, bool] = {}
+        """
+        Book-keeping dict of parameter names and whether they were overriden or not.
+
+        This will correspond to all overrides that were tried *outside* of the class by surrounding script.
+        """
 
         if debug_level == "DEBUG":
             print("- Overrides: -")

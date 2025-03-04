@@ -1,16 +1,17 @@
 import random
 from pathlib import Path
+from unittest.mock import patch
 
 import pytest
 
 import methods.input_methods as im
 
 
-def test_str2bool() -> None:
-    for v in ("yes", "true", "t", "y", "1", "YES", "Yes", "True", "TRUE"):
+def test_str2bool(input_truey_strings: tuple[str], input_falsey_strings: tuple[str]) -> None:
+    for v in input_truey_strings:
         assert im.str2bool(v) is True
 
-    for v in ("no", "false", "f", "n", "0", "NO", "No", "False", "FALSE"):
+    for v in input_falsey_strings:
         assert im.str2bool(v) is False
 
     return None
@@ -35,8 +36,8 @@ def test_parse_descriptor_to_dict(
         for file_key, test_key in zip(result.keys(), expected_result.keys(), strict=True):
             error_msg = f"Mismatching extracted key vs test key: {file_key} =/= {test_key}"
             assert file_key == test_key, error_msg
-            error_msg = f"Mismatching extracted value vs test value: {result[file_key]} =/= {result[test_key]}"
-            assert result[file_key] == result[test_key], error_msg
+            error_msg = f"Mismatching extracted value vs test value: {result[file_key]} =/= {expected_result[test_key]}"
+            assert result[file_key] == expected_result[test_key], error_msg
 
         error_msg = f"Failed to match descriptor {test_path} to test \nOutput dict was: \n{result} \
             \nShould have been: \n{expected_result}"
@@ -97,14 +98,131 @@ def test_mod_version_to_dict() -> None:
 
 
 def test_increment_mod_version() -> None:
+    random_1 = random.randint(0, 99999)
+    random_2 = random.randint(0, 99999)
+    random_3 = random.randint(0, 99999)
+
+    increment_list = ["increment_major", "increment_minor", "increment_patch"]
+    possible_version_types = ("Major", "Minor", "Patch")
+
+    test_increment_versions = {
+        "v1.2.3": {
+            "increment_major": ({"Major": "2", "Minor": "0", "Patch": "0"}, "v2.0.0"),
+            "increment_minor": ({"Major": "1", "Minor": "3", "Patch": "0"}, "v1.3.0"),
+            "increment_patch": ({"Major": "1", "Minor": "2", "Patch": "4"}, "v1.2.4"),
+        },
+        "1.2.3": {
+            "increment_major": ({"Major": "2", "Minor": "0", "Patch": "0"}, "2.0.0"),
+            "increment_minor": ({"Major": "1", "Minor": "3", "Patch": "0"}, "1.3.0"),
+            "increment_patch": ({"Major": "1", "Minor": "2", "Patch": "4"}, "1.2.4"),
+        },
+        "v 1.2.3": {
+            "increment_major": ({"Major": "2", "Minor": "0", "Patch": "0"}, "v 2.0.0"),
+            "increment_minor": ({"Major": "1", "Minor": "3", "Patch": "0"}, "v 1.3.0"),
+            "increment_patch": ({"Major": "1", "Minor": "2", "Patch": "4"}, "v 1.2.4"),
+        },
+        "v12039.23929.20392": {
+            "increment_major": ({"Major": "12040", "Minor": "0", "Patch": "0"}, "v12040.0.0"),
+            "increment_minor": ({"Major": "12039", "Minor": "23930", "Patch": "0"}, "v12039.23930.0"),
+            "increment_patch": ({"Major": "12039", "Minor": "23929", "Patch": "20393"}, "v12039.23929.20393"),
+        },
+        f"{random_1}.{random_2}.{random_3}": {
+            "increment_major": (
+                {"Major": f"{random_1 + 1}", "Minor": f"{0}", "Patch": f"{0}"},
+                f"{random_1 + 1}.{0}.{0}",
+            ),
+            "increment_minor": (
+                {"Major": f"{random_1}", "Minor": f"{random_2 + 1}", "Patch": f"{0}"},
+                f"{random_1}.{random_2 + 1}.{0}",
+            ),
+            "increment_patch": (
+                {"Major": f"{random_1}", "Minor": f"{random_2}", "Patch": f"{random_3 + 1}"},
+                f"{random_1}.{random_2}.{random_3 + 1}",
+            ),
+        },
+        # maximum of 9 digits, this is the highest version number allowed
+        "v999999999.999999999.999999999": {
+            "increment_major": (
+                {"Major": "1000000000", "Minor": "0", "Patch": "0"},
+                "v1000000000.0.0",
+            ),
+            "increment_minor": (
+                {"Major": "999999999", "Minor": "1000000000", "Patch": "0"},
+                "v999999999.1000000000.0",
+            ),
+            "increment_patch": (
+                {"Major": "999999999", "Minor": "999999999", "Patch": "1000000000"},
+                "v999999999.999999999.1000000000",
+            ),
+        },
+        "3.14.*": {
+            "increment_major": ({"Major": "4", "Minor": "0", "Patch": "*"}, "4.0.*"),
+            "increment_minor": ({"Major": "3", "Minor": "15", "Patch": "*"}, "3.15.*"),
+            "increment_patch": ({"Major": "3", "Minor": "14", "Patch": "*"}, "3.14.*"),
+        },
+        "v3.14.*": {
+            "increment_major": ({"Major": "4", "Minor": "0", "Patch": "*"}, "v4.0.*"),
+            "increment_minor": ({"Major": "3", "Minor": "15", "Patch": "*"}, "v3.15.*"),
+            "increment_patch": ({"Major": "3", "Minor": "14", "Patch": "*"}, "v3.14.*"),
+        },
+        "*.*.*": {
+            "increment_major": ({"Major": "*", "Minor": "*", "Patch": "*"}, "*.*.*"),
+            "increment_minor": ({"Major": "*", "Minor": "*", "Patch": "*"}, "*.*.*"),
+            "increment_patch": ({"Major": "*", "Minor": "*", "Patch": "*"}, "*.*.*"),
+        },
+        "v*.*.*": {
+            "increment_major": ({"Major": "*", "Minor": "*", "Patch": "*"}, "v*.*.*"),
+            "increment_minor": ({"Major": "*", "Minor": "*", "Patch": "*"}, "v*.*.*"),
+            "increment_patch": ({"Major": "*", "Minor": "*", "Patch": "*"}, "v*.*.*"),
+        },
+        "1.*.*": {
+            "increment_major": ({"Major": "2", "Minor": "*", "Patch": "*"}, "2.*.*"),
+            "increment_minor": ({"Major": "1", "Minor": "*", "Patch": "*"}, "1.*.*"),
+            "increment_patch": ({"Major": "1", "Minor": "*", "Patch": "*"}, "1.*.*"),
+        },
+    }
+
+    # match a result dict for all possible patch types for each given input string
+    for v_string, output_dict in test_increment_versions.items():
+        for increment_key, curr_patch_type in zip(increment_list, possible_version_types, strict=True):
+            result = im.increment_mod_version(v_string, patch_type=curr_patch_type, use_format_check=True)
+            current_expected_output = output_dict[increment_key]
+            error_msg = f"Improper version increment result for key='{v_string}'\
+                \nExpected:      {current_expected_output}\
+                \nActual result: {result}"
+            assert result == current_expected_output, error_msg
+
+    # check with different versioning systems
+    increment_list = ["increment_major", "increment_build"]
+    possible_version_types = ("Major", "Build")
+    test_increment_versions = {
+        "v1.120": {
+            "increment_major": ({"Major": "2", "Build": "0"}, "v2.0"),
+            "increment_build": ({"Major": "1", "Build": "121"}, "v1.121"),
+        },
+    }
+
+    for v_string, output_dict in test_increment_versions.items():
+        for increment_key, curr_patch_type in zip(increment_list, possible_version_types, strict=True):
+            result = im.increment_mod_version(
+                v_string, patch_type=curr_patch_type, use_format_check=False, possible_version_types=possible_version_types
+            )
+            current_expected_output = output_dict[increment_key]
+            error_msg = f"Improper version increment result for key='{v_string}'\
+                \nExpected:      {current_expected_output}\
+                \nActual result: {result}"
+            assert result == current_expected_output, error_msg
+
     return None
 
 
 def test_search_and_replace_in_file() -> None:
+    # TODO: implement
     return None
 
 
 def generate_with_template_file() -> None:
+    # TODO: implement
     return None
 
 

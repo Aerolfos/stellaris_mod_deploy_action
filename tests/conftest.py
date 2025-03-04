@@ -4,6 +4,16 @@ import pytest
 
 
 @pytest.fixture
+def input_truey_strings() -> tuple[str]:
+    return ("yes", "true", "t", "y", "1", "YES", "Yes", "True", "TRUE")
+
+
+@pytest.fixture
+def input_falsey_strings() -> tuple[str]:
+    return ("no", "false", "f", "n", "0", "NO", "No", "False", "FALSE")
+
+
+@pytest.fixture
 def override_test_folder_path() -> Path:
     return Path("tests/fixtures/")
 
@@ -44,6 +54,20 @@ def expected_test_override_dict() -> dict[str, str]:
             "localisation/english/test_event_l_english.yml",
         ],
         "version_loc_key": "test_mod_version",
+    }
+
+
+@pytest.fixture
+def expected_test_overriden_params_dict() -> dict[str, bool]:
+    return {
+        "name": True,
+        "version": False,
+        "singleline_list": True,
+        "multiline_test": True,
+        "picture": False,
+        "supported_version": False,
+        "path": False,
+        "remote_file_id": True,
     }
 
 
