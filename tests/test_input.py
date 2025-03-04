@@ -224,7 +224,7 @@ def test_increment_mod_version() -> None:
     for v_string, output_dict in test_increment_versions.items():
         for increment_key, curr_patch_type in zip(increment_list, possible_version_types, strict=True):
             result = im.increment_mod_version(
-                v_string, patch_type=curr_patch_type, use_format_check=False, possible_version_types=possible_version_types
+                v_string, patch_type=curr_patch_type, use_format_check=False, possible_version_types=possible_version_types,
             )
             current_expected_output = output_dict[increment_key]
             error_msg = f"Improper version increment result for key='{v_string}'\
