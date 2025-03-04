@@ -7,6 +7,7 @@ readme = "README.md"
 
 dependencies = [
     "pytest >= 8.3",
+    "ruff >= 0.9.9"
 ]
 
 [tool.ruff]
