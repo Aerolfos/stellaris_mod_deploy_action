@@ -120,7 +120,7 @@ jobs:
       run: |
         sed -i 's|path="mod/${{ github.event.repository.name }}/${{ github.event.repository.name }}"|path="mod/${{ github.event.repository.name }}"|' "${{ github.event.repository.name }}/$MOD_DESCRIPTOR_FILE"
         cp ${{ github.event.repository.name }}/$MOD_DESCRIPTOR_FILE ${{ github.event.repository.name }}.mod
-        zip -r ${MOD_RELEASE_ZIP_FILE} ${{ github.event.repository.name }} ${{ github.event.repository.name }}.mod
+        zip -r ${MOD_RELEASE_ZIPFILE_NAME} ${{ github.event.repository.name }} ${{ github.event.repository.name }}.mod
       shell: bash
 
     - name: Create a release object, attach zip of mod files + descriptor
@@ -129,7 +129,6 @@ jobs:
       env:
         GH_TOKEN: ${{ github.token }}
       run: |
-        gh release create $MOD_RELEASE_TAG $MOD_RELEASE_ZIP_FILE --title "$MOD_RELEASE_TITLE" --notes-file $MOD_RELEASENOTES_FILE
+        gh release create $MOD_RELEASE_TAG $MOD_RELEASE_ZIPFILE_NAME --title "$MOD_RELEASE_TITLE" --notes-file $MOD_RELEASENOTES_FILE
       shell: bash
-
 

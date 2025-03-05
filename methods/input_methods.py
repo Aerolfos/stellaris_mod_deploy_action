@@ -1,6 +1,9 @@
+"""Functions for handling various user input"""
+
 import argparse
 import os
 import re
+import zipfile
 from pathlib import Path
 
 
@@ -469,6 +472,20 @@ def generate_with_template_file(
     file_handle.close()
 
     return file_string
+
+
+def zip_folder(folder_to_zip: Path | str, filename: Path | str) -> None:
+    """
+    Zip the provided directory without navigating to that directory using `pathlib` module
+
+    Adapted from: https://stackoverflow.com/a/68817065
+    """
+    # Convert to Path object
+    folder_to_zip = Path(folder_to_zip)
+
+    with zipfile.ZipFile(filename, "w", zipfile.ZIP_DEFLATED) as zip_file:
+        for entry in folder_to_zip.rglob("*"):
+            zip_file.write(entry, entry.relative_to(folder_to_zip))
 
 
 def replace_markdown_list_with_bbcode(match: re.Match) -> str:

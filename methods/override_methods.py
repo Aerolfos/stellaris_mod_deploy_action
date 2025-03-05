@@ -1,3 +1,9 @@
+"""
+Support for override functionality in script
+
+Used for example to allow user to override what is written to `descriptor.mod` file or override regex search patterns
+"""
+
 from pathlib import Path
 
 from methods.input_methods import parse_descriptor_to_dict

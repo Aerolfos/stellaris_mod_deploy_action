@@ -23,7 +23,7 @@ github_env_modreleasetag_name = "MOD_RELEASE_TAG"
 github_env_releasetitle_name = "MOD_RELEASE_TITLE"
 github_env_releasenotesfile_name = "MOD_RELEASENOTES_FILE"
 github_env_descriptorfile_name = "MOD_DESCRIPTOR_FILE"
-github_env_releasezipfile_name = "MOD_RELEASE_ZIP_FILE"
+github_env_releasezipfile_name = "MOD_RELEASE_ZIPFILE_NAME"
 
 ## Constant filenames
 # technically overrideable, though it will break compatibility with other tools like the launcher, github, steamcmd etc.
