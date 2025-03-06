@@ -6,13 +6,34 @@
 <!---[![Discord](https://img.shields.io/discord/739835273969664050?style=flat&label=Discord&logo=discord&logoColor=white&color=7289DA)](https://discord.com/invite/xUrG9wh)--->
 
 
-This is a custom tool to aid in updating Stellaris mods. It only makes sense to use this tool if you structure mods similarly, see below under setup.
+This is a custom tool to aid in updating Stellaris mods. It only makes sense to use this tool if you structure mods similarly, see below under setup. 
 
-This tool uses the [Github actions](https://github.com/features/actions) functionality to trigger a Python script which bumps version numbers and supported Stellaris version, and then creates a Github release for the mod.
+Target audience is developers familiar with GitHub already, who want to use GitHub both for version control and to make their mods more accessible to the open source community.
+
+This tool uses the [GitHub actions](https://github.com/features/actions) functionality to trigger a Python script which bumps version numbers, changes supported Stellaris version in various places, and then creates a Github release for the mod.
 
 Also integrates [TTFTCUTS' localisation processing action](https://github.com/TTFTCUTS/Stellaris-Loc-Action) as an optional step that can be triggered, which will propagate loc entries from English to other languages before generating a release.
 
+Basically, this tool deals with parity issues by consolidating input needed for a mod update to a single place. Thus it automates away having to fill in metadata in a bunch of different places, one of which will inevitably be forgotten. [Here's an example of changes made by the script for a mod update]().
+
 ## Usage
+After setup, in the Github repository for a mod with an update to be released, go to the actions tab in the UI. Trigger the workflow, filling in the necessary inputs.
+
+![action run button UI](https://github.com/user-attachments/assets/da909f08-7a52-4e7f-b7f8-eb74b546b80c)
+
+![workflow dispatch trigger UI](https://github.com/user-attachments/assets/61fe3527-5eca-4160-9520-1383b2203a6e)
+
+![actions name in UI](https://github.com/user-attachments/assets/c96d32a7-12ef-4b92-b212-9167a3ba0361)
+
+![github actions button UI position](https://github.com/user-attachments/assets/55c539cf-c86b-4a5f-aabf-1b1f675c5425)
+
+If using the changelog feature, do not forget to double check that your changelog file (default, `CHANGELOG.md`) has the appropriate entries for the update (I like to write these as I'm working on an update, both as a todo-list and a reminder of what I finished already). The most recent changelog entries should be under `WIP` (insert picture here).
+
+The workflow will take a few seconds to start (reload the actions page to see it), and then finish within a minute or less. Once a workflow shows success in the UI, there should be a new commit to the repository (`example`), and a new release (`example`).
+
+Remember to pull these changes to your local repository, and then upload the mod to the steam workshop.
+
+
 WIP: How to use and structure mod setup
 
 https://github.com/Aerolfos/stellaris_mod_deploy_action/wiki/Mod-file-locations
@@ -44,8 +65,6 @@ https://docs.github.com/en/actions/about-github-actions/understanding-github-act
 
 ![action run button UI](https://github.com/user-attachments/assets/da909f08-7a52-4e7f-b7f8-eb74b546b80c)
 
-![action run button UI](https://github.com/user-attachments/assets/da909f08-7a52-4e7f-b7f8-eb74b546b80c)
-
 `version="v1.2.0"`
 
 `supported_version="v3.*.*"`
@@ -56,11 +75,6 @@ https://github.com/Aerolfos/stellaris_mod_deploy_action/wiki/Tool-setup
 
 https://github.com/Aerolfos/dubstep_launchers/blob/main/CHANGELOG.md
 
-![workflow dispatch trigger UI](https://github.com/user-attachments/assets/61fe3527-5eca-4160-9520-1383b2203a6e)
-
-![actions name in UI](https://github.com/user-attachments/assets/c96d32a7-12ef-4b92-b212-9167a3ba0361)
-
-![github actions button UI position](https://github.com/user-attachments/assets/55c539cf-c86b-4a5f-aabf-1b1f675c5425)
 
 
 
