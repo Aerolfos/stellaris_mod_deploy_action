@@ -14,22 +14,26 @@ This tool uses the [GitHub actions](https://github.com/features/actions) functio
 
 Also integrates [TTFTCUTS' localisation processing action](https://github.com/TTFTCUTS/Stellaris-Loc-Action) as an optional step that can be triggered, which will propagate loc entries from English to other languages before generating a release.
 
-Basically, this tool deals with parity issues by consolidating input needed for a mod update to a single place. Thus it automates away having to fill in metadata in a bunch of different places, one of which will inevitably be forgotten. [Here's an example of changes made by the script for a mod update]().
+Basically, this tool deals with parity issues by consolidating input needed for a mod update to a single place. Thus it automates away having to fill in metadata in a bunch of different places, one of which will inevitably be forgotten. [Here's an example of changes made by the script for a mod update](https://github.com/Aerolfos/dubstep_launchers/commit/848613fd8d76b55532b5087a33e3b9dfb22106e6).
 
 ## Usage
-After setup, in the Github repository for a mod with an update to be released, go to the actions tab in the UI. Trigger the workflow, filling in the necessary inputs.
-
-![action run button UI](https://github.com/user-attachments/assets/da909f08-7a52-4e7f-b7f8-eb74b546b80c)
-
-![workflow dispatch trigger UI](https://github.com/user-attachments/assets/61fe3527-5eca-4160-9520-1383b2203a6e)
-
-![actions name in UI](https://github.com/user-attachments/assets/c96d32a7-12ef-4b92-b212-9167a3ba0361)
+After setup, in the Github repository for a mod with an update to be released, go to the actions tab in the UI.
 
 ![github actions button UI position](https://github.com/user-attachments/assets/55c539cf-c86b-4a5f-aabf-1b1f675c5425)
 
+Select the correct workflow in the left sidebar, by default it should be called `Deploy Stellaris mod update`.
+
+![actions name in UI](https://github.com/user-attachments/assets/c96d32a7-12ef-4b92-b212-9167a3ba0361)
+
+Trigger the workflow from the button, and fill in the necessary inputs in the dropdown.
+
+![workflow dispatch trigger UI](https://github.com/user-attachments/assets/61fe3527-5eca-4160-9520-1383b2203a6e)
+
+![action run button UI](https://github.com/user-attachments/assets/da909f08-7a52-4e7f-b7f8-eb74b546b80c)
+
 If using the changelog feature, do not forget to double check that your changelog file (default, `CHANGELOG.md`) has the appropriate entries for the update (I like to write these as I'm working on an update, both as a todo-list and a reminder of what I finished already). The most recent changelog entries should be under `WIP` (insert picture here).
 
-The workflow will take a few seconds to start (reload the actions page to see it), and then finish within a minute or less. Once a workflow shows success in the UI, there should be a new commit to the repository (`example`), and a new release (`example`).
+The workflow will take a few seconds to start (reload the actions page to see it), and then finish within a minute or less. Once a workflow shows success in the UI, there should be a new commit to the repository ([example](https://github.com/Aerolfos/dubstep_launchers/commit/848613fd8d76b55532b5087a33e3b9dfb22106e6)), and a new release ([example](https://github.com/Aerolfos/dubstep_launchers/releases/tag/v1.2.1)).
 
 Remember to pull these changes to your local repository, and then upload the mod to the steam workshop.
 
