@@ -40,6 +40,10 @@ def expected_test_descriptor_dict() -> dict[str, str]:
         "remote_file_id": "11111",
     }
 
+@pytest.fixture
+def input_test_descriptor_dict(expected_test_descriptor_dict: dict[str, str]) -> dict[str, str]:
+    return expected_test_descriptor_dict
+
 
 @pytest.fixture
 def expected_test_override_dict() -> dict[str, str]:

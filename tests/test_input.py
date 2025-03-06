@@ -23,9 +23,9 @@ def test_str2bool(input_truey_strings: tuple[str], input_falsey_strings: tuple[s
 
 def test_parse_descriptor_to_dict(
     descriptor_test_file_path: Path,
-    expected_test_descriptor_dict: dict,
+    expected_test_descriptor_dict: dict[str, str],
     override_test_file_path: Path,
-    expected_test_override_dict: dict,
+    expected_test_override_dict: dict[str, str],
 ) -> None:
     """Test reading from a fixture"""
     test_descriptors = {
@@ -51,8 +51,16 @@ def test_parse_descriptor_to_dict(
     return None
 
 
-def test_create_descriptor_file() -> None:
-    # TODO: This will probably need pytests file writing systems which are more complicated
+def test_create_descriptor_file(
+    input_test_descriptor_dict: dict[str, str], tmp_path: Path, descriptor_test_file_path: Path,
+) -> None:
+    # since we previously tested if a file output matches a predefined dict,
+    # then it follows that writing the predefined dict to file via this method should match the test file
+    output_file_path = tmp_path / "output_descriptor.mod"
+    im.create_descriptor_file(input_test_descriptor_dict, output_file_path)
+
+    assert output_file_path.read_text() == descriptor_test_file_path.read_text()
+
     return None
 
 
@@ -224,7 +232,10 @@ def test_increment_mod_version() -> None:
     for v_string, output_dict in test_increment_versions.items():
         for increment_key, curr_patch_type in zip(increment_list, possible_version_types, strict=True):
             result = im.increment_mod_version(
-                v_string, patch_type=curr_patch_type, use_format_check=False, possible_version_types=possible_version_types,
+                v_string,
+                patch_type=curr_patch_type,
+                use_format_check=False,
+                possible_version_types=possible_version_types,
             )
             current_expected_output = output_dict[increment_key]
             error_msg = f"Improper version increment result for key='{v_string}'\
@@ -235,13 +246,19 @@ def test_increment_mod_version() -> None:
     return None
 
 
-def test_search_and_replace_in_file() -> None:
+def test_search_and_replace_in_file(tmp_path: Path) -> None:
     # TODO: implement
+    output_file_path = tmp_path / "test.txt"
+    output_file_path.write_text("test")
+    im.search_and_replace_in_file(output_file_path, "", "", return_old_str=True)
     return None
 
 
-def generate_with_template_file() -> None:
+def test_generate_with_template_file(tmp_path: Path) -> None:
     # TODO: implement
+    output_file_path = tmp_path / "test.txt"
+    output_file_path.write_text("test")
+    im.generate_with_template_file(output_file_path, output_file_path, "", "", skip_regex_replace=False)
     return None
 
 
