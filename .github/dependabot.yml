@@ -11,22 +11,22 @@ updates:
     schedule:
       interval: "monthly"
       time: "12:00"
-      # see: https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/optimizing-pr-creation-version-updates#example-3-individual-pull-requests-for-major-updates-and-grouped-for-minorpatch-updates
-      groups:
-        pip-version-bump:
-          applies-to: version-updates
-          patterns:
-            - "*"
-          update-types:
-            - "minor"
-            - "patch"
-        pip-security-bump:
-          applies-to: security-updates
-          patterns:
-            - "*"
-          update-types:
-            - "minor"
-            - "patch"
+    # see: https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/optimizing-pr-creation-version-updates#example-3-individual-pull-requests-for-major-updates-and-grouped-for-minorpatch-updates
+    groups:
+      pip-version-bump:
+        applies-to: version-updates
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+      pip-security-bump:
+        applies-to: security-updates
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
 
   # python
   - package-ecosystem: "uv"
@@ -34,21 +34,21 @@ updates:
     schedule:
       interval: "monthly"
       time: "12:00"
-      groups:
-        uv-version-bump:
-          applies-to: version-updates
-          patterns:
-            - "*"
-          update-types:
-            - "minor"
-            - "patch"
-        uv-security-bump:
-          applies-to: security-updates
-          patterns:
-            - "*"
-          update-types:
-            - "minor"
-            - "patch"
+    groups:
+      uv-version-bump:
+        applies-to: version-updates
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+      uv-security-bump:
+        applies-to: security-updates
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
   
   # actions
   - package-ecosystem: "github-actions"
