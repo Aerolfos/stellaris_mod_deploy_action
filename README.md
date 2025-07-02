@@ -106,3 +106,4 @@ This project is meant to support creating Stellaris mods, which are subject to t
 
 ## Contributions
 If you for some reason want to contribute, why not. Open a pull request.
+
