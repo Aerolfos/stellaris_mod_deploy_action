@@ -6,7 +6,7 @@
 <!---[![Discord](https://img.shields.io/discord/739835273969664050?style=flat&label=Discord&logo=discord&logoColor=white&color=7289DA)](https://discord.com/invite/xUrG9wh)--->
 
 
-This is a custom tool to aid in updating Stellaris mods. It only makes sense to use this tool if you structure mods similarly, see below under setup. 
+This is a custom tool to aid in updating Stellaris mods. It only makes sense to use this tool if you structure mods similarly, see below under setup.
 
 Target audience is developers familiar with GitHub already, who want to use GitHub both for version control and to make their mods more accessible to the open source community.
 
