@@ -59,10 +59,10 @@ jobs:
           methods
           templates
     
-    - name: Set up Python 3.12
+    - name: Set up Python latest
       uses: actions/setup-python@v5
       with:
-        python-version: "3.12"
+        python-version-file: "pyproject.toml"
     
     # action expects to be run from a directory that's alongside the relevant mod repo, see tools step above
     - name: Run supporting Python release script

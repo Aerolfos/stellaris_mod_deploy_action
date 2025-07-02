@@ -63,10 +63,10 @@ jobs:
           methods
           templates
     
-    - name: Set up Python 3.12
+    - name: Set up Python latest
       uses: actions/setup-python@v5
       with:
-        python-version: "3.12"
+        python-version-file: "pyproject.toml"
     
     # SteamCMD, see also https://developer.valvesoftware.com/wiki/SteamCMD
     - name: Check for SteamCMD updates
@@ -86,7 +86,8 @@ jobs:
       working-directory: stellaris_mod_deploy_action
       run: |
         python steam_workshop_upload.py
-    - name: Upload result manifest file
+
+    - name: Upload result manifest file as artifact
       id: steam_workshop_upload_step_manifest_archive
       uses: actions/upload-artifact@v4
       with:
