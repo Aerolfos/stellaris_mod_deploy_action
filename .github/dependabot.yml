@@ -7,6 +7,8 @@ version: 2
 updates:
   # python
   - package-ecosystem: "pip"
+    allow:
+      - dependency-type: "all"
     directory: "/"
     schedule:
       interval: "monthly"
@@ -30,6 +32,8 @@ updates:
 
   # python
   - package-ecosystem: "uv"
+    allow:
+      - dependency-type: "all"
     directory: "/"
     schedule:
       interval: "monthly"
@@ -52,6 +56,8 @@ updates:
   
   # actions
   - package-ecosystem: "github-actions"
+    allow:
+      - dependency-type: "all"
     directory: "/"
     schedule:
       interval: "monthly"
