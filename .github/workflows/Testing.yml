@@ -16,7 +16,6 @@ jobs:
       with:
         version: "latest"
         enable-cache: true
-        activate-environment: true
 
     - name: "Set up Python"
       uses: actions/setup-python@v5

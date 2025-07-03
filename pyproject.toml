@@ -55,6 +55,7 @@ ignore = [
     "PLR0915",
     "PLW2901",
     "PIE790",
+    "COM812", # covered by formatter
 ]
 
 [tool.ruff.lint.pydocstyle]
