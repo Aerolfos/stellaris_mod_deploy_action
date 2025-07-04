@@ -24,7 +24,8 @@ jobs:
         python-version-file: "pyproject.toml"
 
     - name: "Install dependencies via uv"
-      run: uv sync --all-extras --dev
+      #run: uv sync --all-extras --dev # needs dependabot support
+      run: uv sync --all-extras
 
     - name: "Automatically format files via ruff"
       uses: astral-sh/ruff-action@v3

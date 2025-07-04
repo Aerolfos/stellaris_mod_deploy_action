@@ -93,6 +93,14 @@ name = "stellaris-mod-deploy-action"
 version = "0.0.2"
 source = { virtual = "." }
 
+[package.optional-dependencies]
+dev = [
+    { name = "pytest" },
+]
+lint = [
+    { name = "ruff" },
+]
+
 [package.dev-dependencies]
 dev = [
     { name = "pytest" },
@@ -102,6 +110,11 @@ lint = [
 ]
 
 [package.metadata]
+requires-dist = [
+    { name = "pytest", marker = "extra == 'dev'", specifier = "~=8.4.0" },
+    { name = "ruff", marker = "extra == 'lint'", specifier = "~=0.12.0" },
+]
+provides-extras = ["dev", "lint"]
 
 [package.metadata.requires-dev]
 dev = [{ name = "pytest", specifier = "~=8.4.0" }]

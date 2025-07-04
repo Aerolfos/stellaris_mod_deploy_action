@@ -13,6 +13,16 @@ dependencies = [
     # no dependencies, only use std lib unless developing
 ]
 
+# dependency groups is uv-specific and not (yet) supported by dependabot so packages are not included in updates
+# support is "Soon(TM)"
+[project.optional-dependencies]
+dev = [
+    "pytest~=8.4.0",
+]
+lint = [
+    "ruff~=0.12.0",
+]
+
 [dependency-groups]
 dev = [
     "pytest~=8.4.0",
@@ -24,6 +34,7 @@ lint = [
 # uv
 [tool.uv]
 package = false
+default-groups = ["dev", "lint"]
 
 # ruff
 [tool.ruff]
