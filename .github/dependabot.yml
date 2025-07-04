@@ -12,7 +12,7 @@ updates:
     directory: "/"
     schedule:
       interval: "monthly"
-      time: "12:00"
+      time: "12:05"
     # see: https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/optimizing-pr-creation-version-updates#example-3-individual-pull-requests-for-major-updates-and-grouped-for-minorpatch-updates
     groups:
       pip-version-bump:
@@ -37,7 +37,7 @@ updates:
     directory: "/"
     schedule:
       interval: "monthly"
-      time: "12:00"
+      time: "12:05"
     groups:
       uv-version-bump:
         applies-to: version-updates
@@ -61,7 +61,7 @@ updates:
     directory: "/"
     schedule:
       interval: "monthly"
-      time: "12:00"
+      time: "12:05"
     groups:
       actions-version-bump:
         applies-to: version-updates
