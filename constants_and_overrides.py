@@ -248,7 +248,9 @@ else:
 
 if __name__ == "__main__":
     # save a json with the list of parameters this script supports for overrides
+    # useful for automated documentation
     params_dict = {"overrideable_parameter_names": [param + "_override" for param in Overrides.overriden_params]}
     params_dict["special_params"] = ["extra_loc_files_to_update", "version_loc_key"]
     with Path.open(overrideable_parameters_file_path, "w") as params_json_file_object:
         json.dump(params_dict, params_json_file_object, indent=4)
+    print(f"Wrote possible override parameters to file `{overrideable_parameters_file_path}`")

@@ -371,6 +371,18 @@ def search_and_replace_in_file(
     Can take in one pattern, or a list of them to go through and match
 
     Returns the new file string in case info from file is useful - option to also get old string
+
+    Returns
+    -------
+    if return_old_str = True:
+
+    (original_file_string, file_string) : tuple[str, str]
+        The retrieved unchanged str from the file, and the new str with replacements made
+
+    return_old_str = False:
+
+    file_string : str
+        The str that was written to file contents, has replacements made
     """
     # read into holder string for searching
     file_handle = Path.open(file_path)
@@ -429,7 +441,7 @@ def generate_with_template_file(
 
     If skip is enabled, skips the regex search - just pass empty strings for pattern and replacestr
 
-    Returns the file string in case info from file is useful
+    Returns the file string with replacements made in case info from file is useful
     """
     # read template into holder string
     file_handle = Path.open(template_file_path)
