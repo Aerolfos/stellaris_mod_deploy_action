@@ -255,13 +255,21 @@ def test_search_and_replace_in_file(tmp_path: Path, input_example_changelog_file
     output_file_path = tmp_path / "test.txt"
     output_file_path.write_text(input_example_changelog_file_str)
 
+    changelog_search_pattern = r"(^---\n)(##\s)(.+?\s`)WIP(`)(:\n)(.*?)(^---$)"
+
     updated_mod_version = "v1.2.3"
     github_release_link = f"https://github.com/test/releases/tag/{updated_mod_version}"
     changelog_replace = f"\\g<1>\\g<2>[\\g<3>{updated_mod_version}\\g<4>]({github_release_link})\\g<5>\\g<6>\\g<7>"
 
-    (retrieved_file_str, new_file_str) = im.search_and_replace_in_file(
-        output_file_path, "", changelog_replace, return_old_str=True
+    retrieved_file_str, new_file_str = im.search_and_replace_in_file(
+        output_file_path, changelog_search_pattern, changelog_replace, return_old_str=True
     )
+
+    error_msg = f"Did not succesfully return old string from file\
+                \nExpected:      {input_example_changelog_file_str}\
+                \nActual result: {retrieved_file_str}"
+    assert input_example_changelog_file_str == retrieved_file_str, error_msg
+
     return None
 
 
@@ -277,7 +285,9 @@ def test_generate_with_template_file(tmp_path: Path, input_example_changelog_fil
     new_version_line = f"\\g<1>{supported_stellaris_version_display}\\g<2>"
 
     # test skip
-    im.generate_with_template_file(output_file_path, output_file_path, "", "", skip_regex_replace=True)
+    im.generate_with_template_file(
+        output_file_path, output_file_path, default_regex_version_pattern, new_version_line, skip_regex_replace=True
+    )
     return None
 
 
