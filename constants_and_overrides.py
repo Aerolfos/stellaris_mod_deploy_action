@@ -7,7 +7,7 @@ from methods.override_methods import OverrideClass
 
 ### Settings ###
 # debug level "SILENT" prints nothing, "INFO" inputs and paths, "DEBUG" prints information about parsing and processing
-debug_level = "INFO"  # "SILENT", "INFO", or "DEBUG"
+debug_level: str = "INFO"  # "SILENT", "INFO", or "DEBUG"
 
 # whether to add a new WIP entry to changelogs for filling in
 default_add_changelog_WIP_entry = True  # noqa: N816, WIP should be capitalized
@@ -15,7 +15,7 @@ default_add_changelog_WIP_entry = True  # noqa: N816, WIP should be capitalized
 ### Constants ###
 # constants have implications on infrastructure outside the python files
 ## Semantic versioning (please don't override this without good reason)
-default_possible_version_types = ["Major", "Minor", "Patch"]
+default_possible_version_types: list[str] = ["Major", "Minor", "Patch"]
 default_regex_version_pattern = r"^v?\s?(?:(?:\d{1,9}|\*)\.){2}(?:\d{1,9}|\*)"
 
 ## Environment variable names (passed to github action environment)

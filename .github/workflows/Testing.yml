@@ -50,6 +50,10 @@ jobs:
       # Use always() to always run this step to publish test results when there are test failures
       if: ${{ always() }}
 
+    - name: "Type check with ty"
+      run: uv run ty check
+      shell: bash
+
     # this will generate a json file with parameters
     - name: "Run `constants_and_overrides.py` to document overrideable parameters"
       run: python constants_and_overrides.py

@@ -1,15 +1,15 @@
 from pathlib import Path
 
-import pytest
+import pytest  # ty: ignore ty tooltip fails on a dev dependency?
 
 
 @pytest.fixture
-def input_truey_strings() -> tuple[str]:
+def input_truey_strings() -> tuple:
     return ("yes", "true", "t", "y", "1", "YES", "Yes", "True", "TRUE")
 
 
 @pytest.fixture
-def input_falsey_strings() -> tuple[str]:
+def input_falsey_strings() -> tuple:
     return ("no", "false", "f", "n", "0", "NO", "No", "False", "FALSE")
 
 
@@ -39,6 +39,7 @@ def expected_test_descriptor_dict() -> dict[str, str]:
         "path": "mod/test/test",
         "remote_file_id": "11111",
     }
+
 
 @pytest.fixture
 def input_test_descriptor_dict(expected_test_descriptor_dict: dict[str, str]) -> dict[str, str]:
@@ -73,6 +74,21 @@ def expected_test_overriden_params_dict() -> dict[str, bool]:
         "path": False,
         "remote_file_id": True,
     }
+
+
+@pytest.fixture
+def input_example_changelog_file_str() -> str:
+    test_str = """
+---
+## ModName Version `WIP`:
+- Latest
+- Change
+- Entries
+---
+
+[Older versions]
+"""
+    return test_str
 
 
 @pytest.fixture

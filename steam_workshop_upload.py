@@ -7,7 +7,6 @@ account will be used with steamcmd
 
 ### Imports ###
 import base64
-import os
 import re
 import subprocess
 from pathlib import Path
@@ -34,10 +33,14 @@ use_changelog = str2bool(get_env_variable("useChangelog", "false", debug_level=c
 repo_github_path = get_env_variable("repoGithubpath", None, debug_level=cao.debug_level)
 
 # dependent on docker container image used to set up steamcmd
-home_dir_path: Path = Path(get_env_variable("HOME", "/home", debug_level=cao.debug_level)).resolve()
-steam_home_dir_path: Path = Path(
-    get_env_variable("STEAM_HOME", home_dir_path / ".local/share/Steam", debug_level=cao.debug_level),
-)
+home_dir_env_var = get_env_variable("HOME", "/home", debug_level=cao.debug_level)
+if home_dir_env_var is None:
+    msg = "HOME environment variable is missing - problem with docker image being used that should set this up"
+    raise ValueError(msg)
+home_dir_path: Path = Path(home_dir_env_var).resolve()
+
+steam_home_env_var = get_env_variable("STEAM_HOME", home_dir_path / ".local/share/Steam", debug_level=cao.debug_level)
+steam_home_dir_path: Path = Path(steam_home_env_var)
 
 ### Errors ###
 if not app_id:
@@ -211,10 +214,10 @@ with Path.open(cao.manifest_file_path, "w") as manifest_file_object:
     manifest_file_object.write(manifest_content)
 
 if cao.debug_level in ["INFO", "DEBUG"]:
-    print("Home contents:", os.listdir(home_dir_path))
-    print("Steam home contents:", os.listdir(steam_home_dir_path))
-    print(".steam/steam contents:", os.listdir(home_dir_path / ".steam/steam"))
-    print(".steam/root contents:", os.listdir(home_dir_path / ".steam/root"))
+    print("Home contents:", list(home_dir_path.iterdir()))
+    print("Steam home contents:", list(steam_home_dir_path.iterdir()))
+    print(".steam/steam contents:", list((home_dir_path / ".steam/steam").iterdir()))
+    print(".steam/root contents:", list((home_dir_path / ".steam/root").iterdir()))
 
     print("- Manifest: -")
     print(manifest_content)
@@ -230,7 +233,7 @@ config_file_path.chmod(0o777)
 
 if cao.debug_level in ["INFO", "DEBUG"]:
     print(f"{config_file_path=}")
-    print("Steam/config contents:", os.listdir(steam_home_dir_path / "config"))
+    print("Steam/config contents:", list((steam_home_dir_path / "config").iterdir()))
 
 
 def steamcmd_run(command: str, timeout_time: int = 60) -> int:
@@ -249,7 +252,7 @@ def steamcmd_run(command: str, timeout_time: int = 60) -> int:
         print(output)
         msg = "Timed out, cached credentials likely invalid, this makes steamcmd fall back to interactive mode\
               and break control flow"
-        raise subprocess.CalledProcessError(msg) from err
+        raise subprocess.CalledProcessError(returncode=2, cmd=command, output=msg, stderr=msg) from err
 
     except subprocess.CalledProcessError as err:
         # In case of error, output logs
@@ -262,14 +265,14 @@ def steamcmd_run(command: str, timeout_time: int = 60) -> int:
         print(output)
 
         if log_dir_path.is_dir():
-            for log_filename in os.listdir(log_dir_path):
+            for log_filename in log_dir_path.iterdir():
                 log_file_path = log_dir_path / log_filename
                 with Path.open(log_file_path) as f:
                     print(f"######## {log_filename}")
                     print(f.read())
 
         msg = "Stemcmd failed during upload"
-        raise subprocess.CalledProcessError(msg) from err
+        raise subprocess.CalledProcessError(returncode=3, cmd=command, output=msg, stderr=msg) from err
 
     # no raised errors
     else:

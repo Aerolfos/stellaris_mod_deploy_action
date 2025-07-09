@@ -7,7 +7,7 @@ import zipfile
 from pathlib import Path
 
 
-def str2bool(v: str) -> bool:
+def str2bool(v: str | None) -> bool:
     """
     Parses a string value for a true-like or false-like value to be turned into a `bool`
 
@@ -15,10 +15,12 @@ def str2bool(v: str) -> bool:
 
     Parameters
     ----------
-    v : str
+    v : str | None
         Input should be a bool-like string.
 
         Something like "yes", "true", "1", for True, or "no", "false", "0" for False.
+
+        Technically `None` is also accepted, as usual in Python `None` is falsy.
 
     Returns
     -------
@@ -33,6 +35,8 @@ def str2bool(v: str) -> bool:
     """
     if isinstance(v, bool):
         return v
+    if v is None:
+        return False
     if v.lower() in ("yes", "true", "t", "y", "1"):
         return True
     elif v.lower() in ("no", "false", "f", "n", "0"):
@@ -42,7 +46,7 @@ def str2bool(v: str) -> bool:
         raise argparse.ArgumentTypeError(msg)
 
 
-def get_env_variable(env_var_name: str, default: str | None = None, debug_level: int = 1) -> str:
+def get_env_variable(env_var_name: str, default: str | None = None, debug_level: str = "INFO") -> str | None:
     """Simple getenv wrapper with debug print"""
     env_var = os.getenv(env_var_name, default)
     if debug_level in ["INFO", "DEBUG"]:
@@ -235,7 +239,7 @@ def mod_version_to_dict(
     input_mod_version: str,
     *,
     use_format_check: bool = True,
-    possible_version_types: list = ("Major", "Minor", "Patch"),
+    possible_version_types: list[str] | tuple = ("Major", "Minor", "Patch"),
     regex_version_pattern: str | None = None,
 ) -> tuple[dict, bool, bool]:
     """
@@ -358,8 +362,8 @@ def increment_mod_version(
 
 def search_and_replace_in_file(
     file_path: Path,
-    pattern: str | list,
-    replacestr: str | list,
+    pattern: str | list[str],
+    replacestr: str | list[str],
     *,
     return_old_str: bool = False,
 ) -> str | tuple[str, str]:
@@ -386,26 +390,34 @@ def search_and_replace_in_file(
     """
     # read into holder string for searching
     file_handle = Path.open(file_path)
-    file_string = file_handle.read()
+    file_string: str = file_handle.read()
     file_handle.close()
     original_file_string = file_string
 
     if isinstance(pattern, list):
         if isinstance(replacestr, list):
             for selected_pattern, selected_replacementstr in zip(pattern, replacestr, strict=False):
-                file_string = re.sub(
+                file_string: str = re.sub(
                     selected_pattern,
                     selected_replacementstr,
                     file_string,
                     flags=re.IGNORECASE | re.MULTILINE | re.DOTALL,
                 )
-        else:
+        elif isinstance(replacestr, str):
             # reuse the same pattern multiple times
             for selected_pattern in pattern:
-                file_string = re.sub(selected_pattern, replacestr, file_string, flags=re.IGNORECASE | re.MULTILINE | re.DOTALL)
+                file_string: str = re.sub(
+                    selected_pattern,
+                    replacestr,
+                    file_string,
+                    flags=re.IGNORECASE | re.MULTILINE | re.DOTALL,
+                )
+        else:
+            msg = f"Incompatible `replacestr` type, expected str | list[str] but got {type(replacestr)}"
+            raise TypeError(msg)
     elif isinstance(pattern, str):
         if isinstance(replacestr, str):
-            file_string = re.sub(pattern, replacestr, file_string, flags=re.IGNORECASE | re.MULTILINE | re.DOTALL)
+            file_string: str = re.sub(pattern, replacestr, file_string, flags=re.IGNORECASE | re.MULTILINE | re.DOTALL)
         else:
             msg = "Passed only one pattern but multiple replacement strings, types must match"
             raise TypeError(msg)
@@ -459,7 +471,7 @@ def generate_with_template_file(
                         file_string,
                         flags=re.IGNORECASE | re.MULTILINE | re.DOTALL,
                     )
-            else:
+            elif isinstance(replacestr, str):
                 # reuse the same pattern multiple times
                 for selected_pattern in pattern:
                     file_string = re.sub(
@@ -468,11 +480,14 @@ def generate_with_template_file(
                         file_string,
                         flags=re.IGNORECASE | re.MULTILINE | re.DOTALL,
                     )
+            else:
+                msg = f"Incompatible `replacestr` type, expected str | list[str] but got {type(replacestr)}"
+                raise TypeError(msg)
         elif isinstance(pattern, str):
             if isinstance(replacestr, str):
                 file_string = re.sub(pattern, replacestr, file_string, flags=re.IGNORECASE | re.MULTILINE | re.DOTALL)
             else:
-                msg = "Passed only one pattern but multiple replacement strings, types must match"
+                msg: str = "Passed only one pattern but multiple replacement strings, types must match"
                 raise TypeError(msg)
         else:
             msg = f"Input search pattern must be a single str or a list of str, got {type(pattern)}"

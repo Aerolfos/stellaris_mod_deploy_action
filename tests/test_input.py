@@ -3,7 +3,7 @@ import random
 import re
 from pathlib import Path
 
-import pytest
+import pytest  # ty: ignore ty tooltip fails on a dev dependency?
 
 import methods.input_methods as im
 
@@ -14,6 +14,8 @@ def test_str2bool(input_truey_strings: tuple[str], input_falsey_strings: tuple[s
 
     for v in input_falsey_strings:
         assert im.str2bool(v) is False
+
+    assert im.str2bool(None) is False
 
     with pytest.raises(argparse.ArgumentTypeError):
         im.str2bool("Some random string with actual content")
@@ -36,7 +38,7 @@ def test_parse_descriptor_to_dict(
     }
 
     for test_path, expected_result in test_descriptors.items():
-        result = im.parse_descriptor_to_dict(test_path, debug_level=0)
+        result = im.parse_descriptor_to_dict(test_path, debug_level="INFO")
 
         for file_key, test_key in zip(result.keys(), expected_result.keys(), strict=True):
             error_msg = f"Mismatching extracted key vs test key: {file_key} =/= {test_key}"
@@ -52,7 +54,9 @@ def test_parse_descriptor_to_dict(
 
 
 def test_create_descriptor_file(
-    input_test_descriptor_dict: dict[str, str], tmp_path: Path, descriptor_test_file_path: Path,
+    input_test_descriptor_dict: dict[str, str],
+    tmp_path: Path,
+    descriptor_test_file_path: Path,
 ) -> None:
     # since we previously tested if a file output matches a predefined dict,
     # then it follows that writing the predefined dict to file via this method should match the test file
@@ -246,19 +250,34 @@ def test_increment_mod_version() -> None:
     return None
 
 
-def test_search_and_replace_in_file(tmp_path: Path) -> None:
+def test_search_and_replace_in_file(tmp_path: Path, input_example_changelog_file_str: str) -> None:
     # TODO: implement
     output_file_path = tmp_path / "test.txt"
-    output_file_path.write_text("test")
-    im.search_and_replace_in_file(output_file_path, "", "", return_old_str=True)
+    output_file_path.write_text(input_example_changelog_file_str)
+
+    updated_mod_version = "v1.2.3"
+    github_release_link = f"https://github.com/test/releases/tag/{updated_mod_version}"
+    changelog_replace = f"\\g<1>\\g<2>[\\g<3>{updated_mod_version}\\g<4>]({github_release_link})\\g<5>\\g<6>\\g<7>"
+
+    (retrieved_file_str, new_file_str) = im.search_and_replace_in_file(
+        output_file_path, "", changelog_replace, return_old_str=True
+    )
     return None
 
 
-def test_generate_with_template_file(tmp_path: Path) -> None:
+def test_generate_with_template_file(tmp_path: Path, input_example_changelog_file_str: str) -> None:
     # TODO: implement
     output_file_path = tmp_path / "test.txt"
-    output_file_path.write_text("test")
-    im.generate_with_template_file(output_file_path, output_file_path, "", "", skip_regex_replace=False)
+    output_file_path.write_text(input_example_changelog_file_str)
+
+    default_regex_version_pattern = r"^v?\s?(?:(?:\d{1,9}|\*)\.){2}(?:\d{1,9}|\*)"
+
+    # pattern
+    supported_stellaris_version_display = "3.14.x"
+    new_version_line = f"\\g<1>{supported_stellaris_version_display}\\g<2>"
+
+    # test skip
+    im.generate_with_template_file(output_file_path, output_file_path, "", "", skip_regex_replace=True)
     return None
 
 
