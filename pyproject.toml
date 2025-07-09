@@ -1,7 +1,7 @@
 [project]
 name = "Stellaris-Mod-Deploy-Action"
 version = "0.0.2"
-requires-python = ">= 3.13"
+requires-python = "== 3.13.*"
 license = "GPL-3.0-or-later"
 readme = "README.md"
 
@@ -17,20 +17,20 @@ dependencies = [
 # support is "Soon(TM)"
 [project.optional-dependencies]
 dev = [
-    "pytest~=8.4.0",
-    "ty~=0.0.1a14",
+    "pytest==8.4.*",
+    "ty==0.0.1a14",
 ]
 lint = [
-    "ruff~=0.12.0",
+    "ruff==0.12.*",
 ]
 
 [dependency-groups]
 dev = [
-    "pytest~=8.4.0",
-    "ty~=0.0.1a14",
+    "pytest==8.4.*",
+    "ty==0.0.1a14",
 ]
 lint = [
-    "ruff~=0.12.0",
+    "ruff==0.12.*",
 ]
 
 # uv

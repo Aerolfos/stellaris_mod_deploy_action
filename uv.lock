@@ -1,6 +1,6 @@
 version = 1
 revision = 2
-requires-python = ">=3.13"
+requires-python = "==3.13.*"
 
 [[package]]
 name = "colorama"
@@ -113,18 +113,18 @@ lint = [
 
 [package.metadata]
 requires-dist = [
-    { name = "pytest", marker = "extra == 'dev'", specifier = "~=8.4.0" },
-    { name = "ruff", marker = "extra == 'lint'", specifier = "~=0.12.0" },
-    { name = "ty", marker = "extra == 'dev'", specifier = "~=0.0.1a14" },
+    { name = "pytest", marker = "extra == 'dev'", specifier = "==8.4.*" },
+    { name = "ruff", marker = "extra == 'lint'", specifier = "==0.12.*" },
+    { name = "ty", marker = "extra == 'dev'", specifier = "==0.0.1a14" },
 ]
 provides-extras = ["dev", "lint"]
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "pytest", specifier = "~=8.4.0" },
-    { name = "ty", specifier = "~=0.0.1a14" },
+    { name = "pytest", specifier = "==8.4.*" },
+    { name = "ty", specifier = "==0.0.1a14" },
 ]
-lint = [{ name = "ruff", specifier = "~=0.12.0" }]
+lint = [{ name = "ruff", specifier = "==0.12.*" }]
 
 [[package]]
 name = "ty"
