@@ -92,6 +92,21 @@ def input_example_changelog_file_str() -> str:
 
 
 @pytest.fixture
+def expected_modified_changelog_file_str() -> str:
+    test_str = """
+---
+## [ModName Version `v1.2.3`](https://github.com/test/releases/tag/v1.2.3):
+- Latest
+- Change
+- Entries
+---
+
+[Older versions]
+"""
+    return test_str
+
+
+@pytest.fixture
 def input_markdown_lists() -> str:
     # (markdown)
     return """

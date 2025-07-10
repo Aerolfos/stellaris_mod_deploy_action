@@ -250,9 +250,11 @@ def test_increment_mod_version() -> None:
     return None
 
 
-def test_search_and_replace_in_file(tmp_path: Path, input_example_changelog_file_str: str) -> None:
+def test_search_and_replace_in_file(
+    tmp_path: Path, input_example_changelog_file_str: str, expected_modified_changelog_file_str: str
+) -> None:
     # TODO: implement
-    output_file_path = tmp_path / "test.txt"
+    output_file_path: Path = tmp_path / "test.txt"
     output_file_path.write_text(input_example_changelog_file_str)
 
     changelog_search_pattern = r"(^---\n)(##\s)(.+?\s`)WIP(`)(:\n)(.*?)(^---$)"
@@ -269,6 +271,18 @@ def test_search_and_replace_in_file(tmp_path: Path, input_example_changelog_file
                 \nExpected:      {input_example_changelog_file_str}\
                 \nActual result: {retrieved_file_str}"
     assert input_example_changelog_file_str == retrieved_file_str, error_msg
+
+    str_from_file: str = output_file_path.read_text()
+    error_msg = f"Modified string returned from method does not match string written to file\
+                \nExpected:      {new_file_str}\
+                \nActual result: {str_from_file}"
+    assert new_file_str == str_from_file, error_msg
+
+    str_from_file: str = output_file_path.read_text()
+    error_msg = f"Written file does not match expected modified changelog text\
+                \nExpected:      {expected_modified_changelog_file_str}\
+                \nActual result: {str_from_file}"
+    assert expected_modified_changelog_file_str == str_from_file, error_msg
 
     return None
 
