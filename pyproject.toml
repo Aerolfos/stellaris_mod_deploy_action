@@ -38,6 +38,9 @@ lint = [
 package = false
 default-groups = ["dev", "lint"]
 
+# make requirements.txt file with
+# uv export --no-hashes --format requirements-txt > requirements.txt
+
 # ruff
 [tool.ruff]
 line-length = 128
