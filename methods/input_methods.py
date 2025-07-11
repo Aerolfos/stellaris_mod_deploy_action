@@ -365,6 +365,7 @@ def search_and_replace_in_file(
     pattern: str | list[str],
     replacestr: str | list[str],
     *,
+    skip_regex_replace: bool = False,
     return_old_str: bool = False,
 ) -> str | tuple[str, str]:
     """
@@ -372,7 +373,15 @@ def search_and_replace_in_file(
 
     Use to update version number and similar in text descriptions
 
-    Can take in one pattern, or a list of them to go through and match
+    Can be used as:
+
+    - One pattern and one replacestr. Simple search and replace.
+
+    - List of patterns and list of replacestr. Iterates through each pair for a search and replace.
+
+    - List of patterns to match, but only one replacestr. Uses the same replacement multiple times.
+
+    Does NOT work with one pattern and multiple replacestr, how would you simultaneously replace one thing with multiple?
 
     Returns the new file string in case info from file is useful - option to also get old string
 
@@ -394,6 +403,76 @@ def search_and_replace_in_file(
     file_handle.close()
     original_file_string = file_string
 
+    if skip_regex_replace is False:
+        file_string = regex_search_and_replace_with_lists_helper(pattern, replacestr, file_string)
+    else:
+        pass
+
+    # w overwrites file
+    file_handle = Path.open(file_path, "w")
+    file_handle.write(file_string)
+    file_handle.close()
+
+    if return_old_str:
+        return original_file_string, file_string
+    else:
+        return file_string
+
+
+def generate_with_template_file(
+    template_file_path: Path,
+    generated_file_path: Path,
+    pattern: str | list,
+    replacestr: str | list,
+    *,
+    skip_regex_replace: bool = False,
+) -> str:
+    """
+    Uses a template file to generate a new file with part of it replaced via regex
+
+    Useful for filling in changelog to a release note template
+
+    Can take in one pattern, or a list of them to go through and match
+
+    If skip is enabled, skips the regex search - just pass empty strings for pattern and replacestr
+
+    Can be used as:
+
+    - One pattern and one replacestr. Simple search and replace.
+
+    - List of patterns and list of replacestr. Iterates through each pair for a search and replace.
+
+    - List of patterns to match, but only one replacestr. Uses the same replacement multiple times.
+
+    Does NOT work with one pattern and multiple replacestr, how would you simultaneously replace one thing with multiple?
+
+    Returns the file string with replacements made in case info from file is useful
+    """
+    # read template into holder string
+    file_handle = Path.open(template_file_path)
+    file_string = file_handle.read()
+    file_handle.close()
+
+    if skip_regex_replace is False:
+        # fill in to template via regex search
+        file_string = regex_search_and_replace_with_lists_helper(pattern, replacestr, file_string)
+    else:
+        pass
+
+    # w writes new file
+    file_handle = Path.open(generated_file_path, "w")
+    file_handle.write(file_string)
+    file_handle.close()
+
+    return file_string
+
+
+def regex_search_and_replace_with_lists_helper(pattern: str | list, replacestr: str | list, file_string: str) -> str:
+    """
+    Helper function to avoid duplicating logic in the two prior functions
+
+    Wraps logic for unpacking lists or str input. Could probably be done with overloads, but whatever.
+    """
     if isinstance(pattern, list):
         if isinstance(replacestr, list):
             for selected_pattern, selected_replacementstr in zip(pattern, replacestr, strict=False):
@@ -424,79 +503,6 @@ def search_and_replace_in_file(
     else:
         msg = f"Input search pattern must be a single str or a list of str, got {type(pattern)}"
         raise TypeError(msg)
-
-    # w overwrites file
-    file_handle = Path.open(file_path, "w")
-    file_handle.write(file_string)
-    file_handle.close()
-
-    if return_old_str:
-        return original_file_string, file_string
-    else:
-        return file_string
-
-
-def generate_with_template_file(
-    template_file_path: Path,
-    generated_file_path: Path,
-    pattern: str | list,
-    replacestr: str | list,
-    *,
-    skip_regex_replace: bool = False,
-) -> str:
-    """
-    Uses a template file to generate a new file with part of it replaced via regex
-
-    Useful for filling in changelog to a release note template
-
-    Can take in one pattern, or a list of them to go through and match
-
-    If skip is enabled, skips the regex search - just pass empty strings for pattern and replacestr
-
-    Returns the file string with replacements made in case info from file is useful
-    """
-    # read template into holder string
-    file_handle = Path.open(template_file_path)
-    file_string = file_handle.read()
-    file_handle.close()
-
-    if skip_regex_replace is False:
-        # fill in to template via regex search
-        if isinstance(pattern, list):
-            if isinstance(replacestr, list):
-                for selected_pattern, selected_replacementstr in zip(pattern, replacestr, strict=False):
-                    file_string = re.sub(
-                        selected_pattern,
-                        selected_replacementstr,
-                        file_string,
-                        flags=re.IGNORECASE | re.MULTILINE | re.DOTALL,
-                    )
-            elif isinstance(replacestr, str):
-                # reuse the same pattern multiple times
-                for selected_pattern in pattern:
-                    file_string = re.sub(
-                        selected_pattern,
-                        replacestr,
-                        file_string,
-                        flags=re.IGNORECASE | re.MULTILINE | re.DOTALL,
-                    )
-            else:
-                msg = f"Incompatible `replacestr` type, expected str | list[str] but got {type(replacestr)}"
-                raise TypeError(msg)
-        elif isinstance(pattern, str):
-            if isinstance(replacestr, str):
-                file_string = re.sub(pattern, replacestr, file_string, flags=re.IGNORECASE | re.MULTILINE | re.DOTALL)
-            else:
-                msg: str = "Passed only one pattern but multiple replacement strings, types must match"
-                raise TypeError(msg)
-        else:
-            msg = f"Input search pattern must be a single str or a list of str, got {type(pattern)}"
-            raise TypeError(msg)
-
-    # w writes new file
-    file_handle = Path.open(generated_file_path, "w")
-    file_handle.write(file_string)
-    file_handle.close()
 
     return file_string
 
