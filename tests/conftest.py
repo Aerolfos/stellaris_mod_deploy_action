@@ -107,6 +107,19 @@ def expected_modified_changelog_file_str() -> str:
 
 
 @pytest.fixture
+def expected_double_modified_changelog_file_str() -> str:
+    test_str = """
+---
+## [ModName Version `v1.2.3`](https://github.com/test/releases/tag/v1.2.3):
+- Some new changelog text has been written here
+---
+
+[Older versions]
+"""
+    return test_str
+
+
+@pytest.fixture
 def input_markdown_lists() -> str:
     # (markdown)
     return """

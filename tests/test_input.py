@@ -250,27 +250,18 @@ def test_increment_mod_version() -> None:
     return None
 
 
-def test_search_and_replace_in_file(
-    tmp_path: Path, input_example_changelog_file_str: str, expected_modified_changelog_file_str: str
-) -> None:
-    # TODO: implement
-    output_file_path: Path = tmp_path / "test.txt"
-    output_file_path.write_text(input_example_changelog_file_str)
-
-    changelog_search_pattern = r"(^---\n)(##\s)(.+?\s`)WIP(`)(:\n)(.*?)(^---$)"
-
-    updated_mod_version = "v1.2.3"
-    github_release_link = f"https://github.com/test/releases/tag/{updated_mod_version}"
-    changelog_replace = f"\\g<1>\\g<2>[\\g<3>{updated_mod_version}\\g<4>]({github_release_link})\\g<5>\\g<6>\\g<7>"
-
-    retrieved_file_str, new_file_str = im.search_and_replace_in_file(
-        output_file_path, changelog_search_pattern, changelog_replace, return_old_str=True
-    )
-
+def helper_search_and_replace_file_asserts(
+    input_example_str: str,
+    retrieved_file_str: str,
+    output_file_path: Path,
+    new_file_str: str,
+    expected_modified_file_str: str,
+) -> bool:
+    """Helper function to avoid repeating asserts"""
     error_msg = f"Did not succesfully return old string from file\
-                \nExpected:      {input_example_changelog_file_str}\
+                \nExpected:      {input_example_str}\
                 \nActual result: {retrieved_file_str}"
-    assert input_example_changelog_file_str == retrieved_file_str, error_msg
+    assert input_example_str == retrieved_file_str, error_msg
 
     str_from_file: str = output_file_path.read_text()
     error_msg = f"Modified string returned from method does not match string written to file\
@@ -280,9 +271,68 @@ def test_search_and_replace_in_file(
 
     str_from_file: str = output_file_path.read_text()
     error_msg = f"Written file does not match expected modified changelog text\
-                \nExpected:      {expected_modified_changelog_file_str}\
+                \nExpected:      {expected_modified_file_str}\
                 \nActual result: {str_from_file}"
-    assert expected_modified_changelog_file_str == str_from_file, error_msg
+    assert expected_modified_file_str == str_from_file, error_msg
+
+    return True
+
+
+def test_search_and_replace_in_file(
+    tmp_path: Path,
+    input_example_changelog_file_str: str,
+    expected_modified_changelog_file_str: str,
+    expected_double_modified_changelog_file_str: str,
+) -> None:
+    # TODO: implement
+    output_file_path: Path = tmp_path / "test.txt"
+    output_file_path.write_text(input_example_changelog_file_str)
+
+    # changelog entry with WIP
+    changelog_search_pattern: str = r"(^---\n)(##\s)(.+?\s`)WIP(`)(:\n)(.*?)(^---$)"
+    # changelog entry with version and a link added
+    default_versioned_changelog_entry_search_pattern: str = r"(^---\n)(##\s)(\[.+?\s`){}(`)(\]\(.+?\))(:\n)(.*?)(^---$)"
+
+    updated_mod_version: str = "v1.2.3"
+    github_release_link: str = f"https://github.com/test/releases/tag/{updated_mod_version}"
+    versioned_changelog_entry_search_pattern: str = default_versioned_changelog_entry_search_pattern.format(updated_mod_version)
+
+    changelog_replace: str = f"\\g<1>\\g<2>[\\g<3>{updated_mod_version}\\g<4>]({github_release_link})\\g<5>\\g<6>\\g<7>"
+
+    # one to one pattern to replace
+    retrieved_file_str, new_file_str = im.search_and_replace_in_file(
+        output_file_path, changelog_search_pattern, changelog_replace, return_old_str=True
+    )
+
+    helper_function_return = helper_search_and_replace_file_asserts(
+        input_example_changelog_file_str,
+        retrieved_file_str,
+        output_file_path,
+        new_file_str,
+        expected_modified_changelog_file_str,
+    )
+    assert helper_function_return is True
+
+    # two to two patterns to replace
+    output_file_path.write_text(input_example_changelog_file_str)
+
+    retrieved_file_str, new_file_str = im.search_and_replace_in_file(
+        output_file_path,
+        [changelog_search_pattern, versioned_changelog_entry_search_pattern],
+        [
+            changelog_replace,  # TODO: add new replace for the changelog entry
+        ],
+        return_old_str=True,
+    )
+
+    helper_function_return = helper_search_and_replace_file_asserts(
+        input_example_changelog_file_str,
+        retrieved_file_str,
+        output_file_path,
+        new_file_str,
+        expected_double_modified_changelog_file_str,
+    )
+    assert helper_function_return is True
 
     return None
 
