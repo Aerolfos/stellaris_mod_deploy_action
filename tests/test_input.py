@@ -278,13 +278,14 @@ def helper_search_and_replace_file_asserts(
     return True
 
 
-def test_search_and_replace_in_file(
+def test_search_and_replace_in_file(  # noqa: PLR0913
     tmp_path: Path,
     input_example_changelog_file_str: str,
+    input_example_versions_file_str: str,
     expected_modified_changelog_file_str: str,
     expected_double_modified_changelog_file_str: str,
+    expected_multipattern_modified_changelog_file_str: str,
 ) -> None:
-    # TODO: implement
     output_file_path: Path = tmp_path / "test.txt"
     output_file_path.write_text(input_example_changelog_file_str)
 
@@ -304,9 +305,9 @@ def test_search_and_replace_in_file(
     # groups based on default_versioned_changelog_entry_search_pattern
     changelog_notes_replace: str = f"\\g<1>\\g<2>\\g<3>\\g<4>\\g<5>\\g<6>\\g<7>{new_change_notes}\\g<9>"
 
-    # one to one pattern to replace
+    ## one to one pattern to replace
     retrieved_file_str, new_file_str = im.search_and_replace_in_file(
-        output_file_path, changelog_search_pattern, changelog_replace, return_old_str=True
+        output_file_path, changelog_search_pattern, changelog_replace, skip_regex_replace=False, return_old_str=True
     )
 
     helper_function_return = helper_search_and_replace_file_asserts(
@@ -318,7 +319,7 @@ def test_search_and_replace_in_file(
     )
     assert helper_function_return is True
 
-    # two to two patterns to replace
+    ## two to two patterns to replace
     output_file_path.write_text(input_example_changelog_file_str)
 
     # first replaces WIP entry header with link and version number as above
@@ -327,6 +328,7 @@ def test_search_and_replace_in_file(
         output_file_path,
         [changelog_search_pattern, versioned_changelog_entry_search_pattern],
         [changelog_replace, changelog_notes_replace],
+        skip_regex_replace=False,
         return_old_str=True,
     )
 
@@ -339,8 +341,84 @@ def test_search_and_replace_in_file(
     )
     assert helper_function_return is True
 
-    # three patterns, one replace for all
-    output_file_path.write_text(input_example_changelog_file_str)
+    ## three patterns, one replace for all
+    output_file_path.write_text(input_example_versions_file_str)
+
+    # replace three kinds of strings with version numbers with new version number (always the same version number)
+    md_header_version_pattern = r"(## ModName Version \`).+?(\`:)"
+    md_version_pattern = r"(Mod version: \`).+?(\`)"
+    steam_version_pattern = r"(Mod version: \[b\]).+?(\[/b\])"
+
+    version_number_replaced = f"\\g<1>{updated_mod_version}\\g<2>"
+
+    retrieved_file_str, new_file_str = im.search_and_replace_in_file(
+        output_file_path,
+        [md_header_version_pattern, md_version_pattern, steam_version_pattern],
+        version_number_replaced,
+        skip_regex_replace=False,
+        return_old_str=True,
+    )
+
+    helper_function_return = helper_search_and_replace_file_asserts(
+        input_example_versions_file_str,
+        retrieved_file_str,
+        output_file_path,
+        new_file_str,
+        expected_multipattern_modified_changelog_file_str,
+    )
+    assert helper_function_return is True
+
+    ## test errors and skip functionality
+    output_file_path.write_text(input_example_versions_file_str)
+
+    retrieved_file_str, new_file_str = im.search_and_replace_in_file(
+        output_file_path,
+        md_header_version_pattern,
+        version_number_replaced,
+        skip_regex_replace=True,
+        return_old_str=True,
+    )
+
+    # assert that input is equal to output
+    helper_function_return = helper_search_and_replace_file_asserts(
+        input_example_versions_file_str,
+        retrieved_file_str,
+        output_file_path,
+        new_file_str,
+        input_example_versions_file_str,
+    )
+    assert helper_function_return is True
+
+    with pytest.raises(TypeError):
+        # error from multiple replacements to one pattern
+        # arguments dont really matter
+        retrieved_file_str, new_file_str = im.search_and_replace_in_file(
+            output_file_path,
+            "search",
+            ["replace1", "replace2"],
+            skip_regex_replace=False,
+            return_old_str=True,
+        )
+
+    with pytest.raises(TypeError):
+        # error from wrong types
+        retrieved_file_str, new_file_str = im.search_and_replace_in_file(
+            output_file_path,
+            10,  # ty: ignore wrong arg on purpose
+            ["replace1", "replace2"],
+            skip_regex_replace=False,
+            return_old_str=True,
+        )
+
+    with pytest.raises(TypeError):
+        # error from wrong types
+        retrieved_file_str, new_file_str = im.search_and_replace_in_file(
+            output_file_path,
+            "search",
+            10,  # ty: ignore wrong arg on purpose
+            skip_regex_replace=False,
+            return_old_str=True,
+        )
 
     return None
 
@@ -384,3 +462,8 @@ def test_replace_with_steam_formatting(
     assert output_str == expected_markdown_to_steam_conversion, error_msg
 
     return None
+
+
+# TODO: maybe
+# does zip folder method need tests?
+# check code coverage? not sure how that works

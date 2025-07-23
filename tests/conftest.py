@@ -120,6 +120,26 @@ def expected_double_modified_changelog_file_str() -> str:
 
 
 @pytest.fixture
+def input_example_versions_file_str() -> str:
+    test_str = """
+## ModName Version `?.?.?`:
+Mod version: `?.?.?`
+Mod version: [b]?.?.?[/b]
+"""
+    return test_str
+
+
+@pytest.fixture
+def expected_multipattern_modified_changelog_file_str() -> str:
+    test_str = """
+## ModName Version `v1.2.3`:
+Mod version: `v1.2.3`
+Mod version: [b]v1.2.3[/b]
+"""
+    return test_str
+
+
+@pytest.fixture
 def input_markdown_lists() -> str:
     # (markdown)
     return """
