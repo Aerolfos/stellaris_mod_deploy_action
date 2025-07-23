@@ -327,6 +327,12 @@ def increment_mod_version(
     Possible versions list must be in the same order as the version is structured
 
     Returns dict current_semantic_versions, str updated_mod_version (concatenated from dict)
+
+    Raises
+    ------
+    ValueError
+        If the input version type to increment is not one of the possible semantic version choices
+
     """
     # break down with helper function
     current_semantic_versions, using_v_prefix, using_v_with_space_prefix = mod_version_to_dict(
@@ -396,6 +402,12 @@ def search_and_replace_in_file(
 
     file_string : str
         The str that was written to file contents, has replacements made
+
+    Raises
+    ------
+    TypeError
+        If input pattern and replacestr types are incompatible, such that one of the usecases given above does not apply
+
     """
     # read into holder string for searching
     file_handle = Path.open(file_path)
@@ -447,6 +459,12 @@ def generate_with_template_file(
     Does NOT work with one pattern and multiple replacestr, how would you simultaneously replace one thing with multiple?
 
     Returns the file string with replacements made in case info from file is useful
+
+    Raises
+    ------
+    TypeError
+        If input pattern and replacestr types are incompatible, such that one of the usecases given above does not apply
+
     """
     # read template into holder string
     file_handle = Path.open(template_file_path)
@@ -472,6 +490,12 @@ def regex_search_and_replace_with_lists_helper(pattern: str | list, replacestr: 
     Helper function to avoid duplicating logic in the two prior functions
 
     Wraps logic for unpacking lists or str input. Could probably be done with overloads, but whatever.
+
+    Raises
+    ------
+    TypeError
+        If input pattern and replacestr types are incompatible, such that one of the function usecases does not apply
+
     """
     if isinstance(pattern, list):
         if isinstance(replacestr, list):
