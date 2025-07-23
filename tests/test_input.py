@@ -291,13 +291,18 @@ def test_search_and_replace_in_file(
     # changelog entry with WIP
     changelog_search_pattern: str = r"(^---\n)(##\s)(.+?\s`)WIP(`)(:\n)(.*?)(^---$)"
     # changelog entry with version and a link added
-    default_versioned_changelog_entry_search_pattern: str = r"(^---\n)(##\s)(\[.+?\s`){}(`)(\]\(.+?\))(:\n)(.*?)(^---$)"
+    default_versioned_changelog_entry_search_pattern: str = r"(^---\n)(##\s)(\[.+?\s`)({})(`)(\]\(.+?\))(:\n)(.*?)(^---$)"
 
     updated_mod_version: str = "v1.2.3"
     github_release_link: str = f"https://github.com/test/releases/tag/{updated_mod_version}"
     versioned_changelog_entry_search_pattern: str = default_versioned_changelog_entry_search_pattern.format(updated_mod_version)
 
     changelog_replace: str = f"\\g<1>\\g<2>[\\g<3>{updated_mod_version}\\g<4>]({github_release_link})\\g<5>\\g<6>\\g<7>"
+
+    # needs an explicit newline, the search pattern eats a newline
+    new_change_notes: str = "- Some new changelog text has been written here\n"
+    # groups based on default_versioned_changelog_entry_search_pattern
+    changelog_notes_replace: str = f"\\g<1>\\g<2>\\g<3>\\g<4>\\g<5>\\g<6>\\g<7>{new_change_notes}\\g<9>"
 
     # one to one pattern to replace
     retrieved_file_str, new_file_str = im.search_and_replace_in_file(
@@ -316,12 +321,12 @@ def test_search_and_replace_in_file(
     # two to two patterns to replace
     output_file_path.write_text(input_example_changelog_file_str)
 
+    # first replaces WIP entry header with link and version number as above
+    # then finds the entry via version number and overwrites the notes inside it
     retrieved_file_str, new_file_str = im.search_and_replace_in_file(
         output_file_path,
         [changelog_search_pattern, versioned_changelog_entry_search_pattern],
-        [
-            changelog_replace,  # TODO: add new replace for the changelog entry
-        ],
+        [changelog_replace, changelog_notes_replace],
         return_old_str=True,
     )
 
@@ -333,6 +338,9 @@ def test_search_and_replace_in_file(
         expected_double_modified_changelog_file_str,
     )
     assert helper_function_return is True
+
+    # three patterns, one replace for all
+    output_file_path.write_text(input_example_changelog_file_str)
 
     return None
 
