@@ -31,7 +31,7 @@ Trigger the workflow from the button, and fill in the necessary inputs in the dr
 
 ![action run button UI](https://github.com/user-attachments/assets/da909f08-7a52-4e7f-b7f8-eb74b546b80c)
 
-If using the changelog feature, do not forget to double check that your changelog file (default, `CHANGELOG.md`) has the appropriate entries for the update (I like to write these as I'm working on an update, both as a todo-list and a reminder of what I finished already). The most recent changelog entries should be under `WIP` (insert picture here).
+If using the changelog feature, do not forget to double check that your changelog file (default, `CHANGELOG.md`) has the appropriate entries for the update ([example of a changelog](https://github.com/Aerolfos/nod_voice_advisor/blob/main/CHANGELOG.md)). I like to write these as I'm working on an update, both as a todo-list and a reminder of what I finished already, like mentioned in [Keep a Changelog](https://keepachangelog.com/en/1.1.0/#effort). The most recent changelog entries should be under `WIP` (insert picture here).
 
 The workflow will take a few seconds to start (reload the actions page to see it), and then finish within a minute or less. Once a workflow shows success in the UI, there should be a new commit to the repository ([example](https://github.com/Aerolfos/dubstep_launchers/commit/848613fd8d76b55532b5087a33e3b9dfb22106e6)), and a new release ([example](https://github.com/Aerolfos/dubstep_launchers/releases/tag/v1.2.1)).
 
