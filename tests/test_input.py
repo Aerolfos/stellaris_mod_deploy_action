@@ -467,3 +467,4 @@ def test_replace_with_steam_formatting(
 # TODO: maybe
 # does zip folder method need tests?
 # check code coverage? not sure how that works
+# consider integration test that effectively just runs one of the main files by import
