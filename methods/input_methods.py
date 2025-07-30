@@ -58,13 +58,17 @@ def parse_descriptor_to_dict(descriptor_file_path: Path, debug_level: str = "SIL
     """
     Creates a dict of entries from a paradox descriptor.mod file
 
-    This method relies on the fixed structure of .mod files set by paradox
+    This method relies on the fixed structure of .mod files set by paradox.
     Stellaris and its mod upload tools are more restrictive than this parser, be wary of that.
     Specifically, this parser has extensions to allow for use with overrides,
-    like supporting {} blocks for later formatting in Python
+    like supporting {} blocks for later formatting in Python in single lines.
 
-    Parser will skip empty lines and comments, indicated with #. This includes empty lines in multi-line blocks.'
+    Parser will skip empty lines and comments, indicated with #. This includes empty lines in multi-line blocks.
     In-line comments are NOT supported (Stellaris does not support this either).
+
+    NOTE: Curly brackets {} are NOT supported in multi-line blocks and will break parsing.
+    No placeholder-fill-in allowed in 'tags' or similar.
+    Needs some special case handling which I don't even know if anyone wants
 
     Parameters
     ----------
