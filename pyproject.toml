@@ -18,7 +18,7 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "pytest==8.4.*",
-    "ty==0.0.1a21",
+    "ty==0.0.1a25",
 ]
 lint = [
     "ruff==0.14.*",
@@ -27,7 +27,7 @@ lint = [
 [dependency-groups]
 dev = [
     "pytest==8.4.*",
-    "ty==0.0.1a21",
+    "ty==0.0.1a25",
 ]
 lint = [
     "ruff==0.14.*",
