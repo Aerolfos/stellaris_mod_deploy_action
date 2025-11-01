@@ -1,6 +1,4 @@
-# To get started with Dependabot version updates, you'll need to specify which
-# package ecosystems to update and where the package manifests are located.
-# Please see the documentation for all configuration options:
+# documentation for all configuration options:
 # https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
 
 version: 2
@@ -11,8 +9,10 @@ updates:
       - dependency-type: "all"
     directory: "/"
     schedule:
-      interval: "monthly"
-      time: "12:05"
+      # switch to cron schedule to stagger from uv updates (they can interfere, apparently)
+      # run in the middle of the month rather than 1st day of
+      interval: "cron"
+      cronjob: "5 10 15 * *"
     # see: https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/optimizing-pr-creation-version-updates#example-3-individual-pull-requests-for-major-updates-and-grouped-for-minorpatch-updates
     groups:
       pip-version-bump:
@@ -36,8 +36,9 @@ updates:
       - dependency-type: "all"
     directory: "/"
     schedule:
+      # 1st day of the month, UTC 10:05
       interval: "monthly"
-      time: "12:05"
+      time: "10:05"
     groups:
       uv-version-bump:
         applies-to: version-updates
@@ -61,7 +62,12 @@ updates:
     directory: "/"
     schedule:
       interval: "monthly"
-      time: "12:05"
+      time: "10:05"
+    cooldown:
+      # major action releases should have existed for a month before updating
+      # let major releases stabilize before trying to update
+      default-days: 1
+      semver-major-days: 30
     groups:
       actions-version-bump:
         applies-to: version-updates
