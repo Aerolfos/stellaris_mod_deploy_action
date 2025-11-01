@@ -69,3 +69,6 @@ jobs:
       shell: bash
 
     # TODO: need to check these results back in to version control somehow
+    # probably pre-commit to document params from the dev side, otherwise they would upload every time a pull request tests
+    # then test if param output is different from what's in version control
+    # (should this just be a test in the python test suite?)
