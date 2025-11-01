@@ -66,8 +66,7 @@ updates:
     cooldown:
       # major action releases should have existed for a month before updating
       # let major releases stabilize before trying to update
-      default-days: 1
-      semver-major-days: 30
+      default-days: 30
     groups:
       actions-version-bump:
         applies-to: version-updates
