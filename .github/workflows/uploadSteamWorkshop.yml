@@ -42,7 +42,7 @@ jobs:
 
     steps:
     - name: Clone the mod repo
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         # actions/checkout does not allow cloning to a folder above the default working folder, so to separate from tools place in this folder
         # the path names become very long but needs tools to fix before change
@@ -51,7 +51,7 @@ jobs:
         ref: ${{ github.ref }}
     
     - name: Checkout tools repo
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         repository: aerolfos/stellaris_mod_deploy_action
         # actions/checkout does not allow cloning to a folder above the default working folder, so to separate from mod files place in this folder
