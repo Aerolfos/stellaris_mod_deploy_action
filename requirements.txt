@@ -12,4 +12,4 @@ pygments==2.19.2
     # via pytest
 pytest==9.0.1
 ruff==0.14.5
-ty==0.0.1a21
+ty==0.0.1a26
