@@ -17,7 +17,7 @@ dependencies = [
 # support is "Soon(TM)"
 [project.optional-dependencies]
 dev = [
-    "pytest==8.4.*",
+    "pytest==9.0.*",
     "ty==0.0.1a21",
 ]
 lint = [
@@ -26,7 +26,7 @@ lint = [
 
 [dependency-groups]
 dev = [
-    "pytest==8.4.*",
+    "pytest==9.0.*",
     "ty==0.0.1a21",
 ]
 lint = [
