@@ -62,7 +62,7 @@ jobs:
     - name: Set up Python latest
       uses: actions/setup-python@v6
       with:
-        python-version-file: "pyproject.toml"
+        python-version-file: "stellaris_mod_deploy_action/pyproject.toml"
     
     # action expects to be run from a directory that's alongside the relevant mod repo, see tools step above
     - name: Run supporting Python release script
