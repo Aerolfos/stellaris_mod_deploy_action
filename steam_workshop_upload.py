@@ -39,7 +39,9 @@ if home_dir_env_var is None:
     raise ValueError(msg)
 home_dir_path: Path = Path(home_dir_env_var).resolve()
 
-steam_home_env_var = get_env_variable("STEAM_HOME", home_dir_path / ".local/share/Steam", debug_level=cao.debug_level)
+steam_home_env_var = get_env_variable(
+    "STEAM_HOME", (home_dir_path / ".local/share/Steam").as_posix(), debug_level=cao.debug_level
+)
 steam_home_dir_path: Path = Path(steam_home_env_var)
 
 ### Errors ###
@@ -290,5 +292,9 @@ retcode = steamcmd_run(upload_command, timeout_time)
 # Output the manifest path
 # uses github upload artifact to upload the manifest file for inspection
 github_output = get_env_variable("GITHUB_OUTPUT", None, debug_level=cao.debug_level)
-with Path.open(github_output, "a") as gh_output_file:
-    gh_output_file.write(f"manifest_path={cao.manifest_file_path}\n")
+if github_output:
+    with Path.open(Path(github_output), "a") as gh_output_file:
+        gh_output_file.write(f"manifest_path={cao.manifest_file_path}\n")
+else:
+    msg = f"Error while writing manifest path to github output, env variable 'GITHUB_OUTPUT' was: {github_output}"
+    raise ValueError(msg)

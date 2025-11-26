@@ -29,7 +29,7 @@ def descriptor_test_file_path() -> Path:
 
 
 @pytest.fixture
-def expected_test_descriptor_dict() -> dict[str, str]:
+def expected_test_descriptor_dict() -> dict[str, str | list[str]]:
     return {
         "name": "test name",
         "version": "v0.2.3",
@@ -47,7 +47,7 @@ def input_test_descriptor_dict(expected_test_descriptor_dict: dict[str, str]) ->
 
 
 @pytest.fixture
-def expected_test_override_dict() -> dict[str, str]:
+def expected_test_override_dict() -> dict[str, str | list[str]]:
     return {
         "name_override": "Display name {stellaris_version}",
         "remote_file_id_override": "314159265",

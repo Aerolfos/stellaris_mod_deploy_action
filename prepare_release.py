@@ -295,13 +295,17 @@ loc_replace_path = cao.mod_files_folder_path / "localisation/replace/"
 loc_replace_folder_exists = "true" if loc_replace_path.is_dir() else "false"
 
 github_output = get_env_variable("GITHUB_OUTPUT", None, debug_level=cao.debug_level)
-with Path.open(github_output, "a") as gh_output_file:
-    gh_output_file.write(f"loc_folder_exists={loc_folder_exists}\n")
-    gh_output_file.write(f"loc_replace_folder_exists={loc_replace_folder_exists}\n")
+if github_output:
+    with Path.open(Path(github_output), "a") as gh_output_file:
+        gh_output_file.write(f"loc_folder_exists={loc_folder_exists}\n")
+        gh_output_file.write(f"loc_replace_folder_exists={loc_replace_folder_exists}\n")
 
-if cao.debug_level in ["INFO", "DEBUG"]:
-    print("- Output being passed to github: -")
-    print(f"{(Path.open(github_output, 'r')).read()}")
+    if cao.debug_level in ["INFO", "DEBUG"]:
+        print("- Output being passed to github: -")
+        print(f"{(Path.open(Path(github_output), 'r')).read()}")
+else:
+    msg = f"Error while writing manifest path to github output, env variable 'GITHUB_OUTPUT' was: {github_output}"
+    raise ValueError(msg)
 
 # create title from mod name + the release tag - used for commit message and release title
 release_title = f"{descriptor_dict['name']} {github_release_tag}"

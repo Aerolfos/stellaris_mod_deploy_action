@@ -5,6 +5,7 @@ import os
 import re
 import zipfile
 from pathlib import Path
+from typing import overload
 
 
 def str2bool(v: str | None) -> bool:
@@ -46,7 +47,13 @@ def str2bool(v: str | None) -> bool:
         raise argparse.ArgumentTypeError(msg)
 
 
-def get_env_variable(env_var_name: str, default: str | None = None, debug_level: str = "INFO") -> str | None:
+@overload
+def get_env_variable(env_var_name: str, default: str, debug_level: str = "INFO") -> str: ...
+@overload
+def get_env_variable(env_var_name: str, default: None, debug_level: str = "INFO") -> str | None: ...
+
+
+def get_env_variable(env_var_name: str, default=None, debug_level: str = "INFO"):
     """Simple getenv wrapper with debug print"""
     env_var = os.getenv(env_var_name, default)
     if debug_level in ["INFO", "DEBUG"]:
