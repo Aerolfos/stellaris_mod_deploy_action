@@ -273,6 +273,8 @@ def steamcmd_run(command: str, timeout_time: int = 60) -> int:
                     print(f"######## {log_filename}")
                     print(f.read())
 
+        # NOTE: Steamcmd via subprocess raising error code 5 seems to be login expired
+        # maybe figure out how to parse/pass this properly to raise a "login expired" error specifically
         msg = "Stemcmd failed during upload"
         raise subprocess.CalledProcessError(returncode=3, cmd=command, output=msg, stderr=msg) from err
 
