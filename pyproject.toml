@@ -21,7 +21,7 @@ dev = [
     "ty==0.0.1a28",
 ]
 lint = [
-    "ruff==0.14.6",
+    "ruff==0.14.7",
 ]
 
 [dependency-groups]
@@ -30,7 +30,7 @@ dev = [
     "ty==0.0.1a28",
 ]
 lint = [
-    "ruff==0.14.6",
+    "ruff==0.14.7",
 ]
 
 # uv
