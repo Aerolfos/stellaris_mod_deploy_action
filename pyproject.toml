@@ -17,20 +17,20 @@ dependencies = [
 # support is "Soon(TM)"
 [project.optional-dependencies]
 dev = [
-    "pytest==9.0.1",
+    "pytest==9.0.2",
     "ty==0.0.1a29",
 ]
 lint = [
-    "ruff==0.14.7",
+    "ruff==0.14.9",
 ]
 
 [dependency-groups]
 dev = [
-    "pytest==9.0.1",
+    "pytest==9.0.2",
     "ty==0.0.1a29",
 ]
 lint = [
-    "ruff==0.14.7",
+    "ruff==0.14.9",
 ]
 
 # uv
