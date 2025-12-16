@@ -55,6 +55,8 @@ class OverrideClass:
     @overload
     def get_parameter(self, parameter_name: str, parameter_default: bool) -> bool: ...  # noqa: FBT001 we want bool overload
     @overload
+    def get_parameter(self, parameter_name: str, parameter_default: Path) -> Path: ...
+    @overload
     def get_parameter(self, parameter_name: str, parameter_default: None) -> str | None: ...
 
     def get_parameter(self, parameter_name: str, parameter_default):
@@ -78,6 +80,8 @@ class OverrideClass:
                     parameter: list[str] = list(parameter)
                 elif isinstance(parameter_default, bool):
                     parameter: bool = bool(parameter)
+                elif isinstance(parameter_default, Path):
+                    parameter: Path = Path(parameter)
                 # if None do nothing
             except KeyError:
                 self.overriden_params[parameter_name] = False

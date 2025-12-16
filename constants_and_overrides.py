@@ -35,7 +35,7 @@ default_generated_release_notes_filename = "generated_release_notes.md"
 default_manifest_file_name = "manifest.vdf"
 
 ## Paths
-mod_folder_name = get_env_variable("modFolderName", None, debug_level=debug_level)
+mod_folder_name: str | None = get_env_variable("modFolderName", None, debug_level=debug_level)
 # bypass if file ran directly as a standalone
 if __name__ == "__main__":
     mod_folder_name = "Placeholder"
@@ -44,13 +44,13 @@ if not mod_folder_name:
     msg = "Mod folder name is missing or incomplete, must set an env variable with calling Github repo name"
     raise ValueError(msg)
 
-mod_repo_name = mod_folder_name  # NOTE part of expected `modname/modname/common` structure
+mod_repo_name: str = mod_folder_name  # NOTE part of expected `modname/modname/common` structure
 
 # cwd is set to where the python file is,
 # which should be next to the folder with the mod files from the originating mod repository
-mod_github_folder_path = (Path.cwd() / f"../{mod_folder_name}").resolve()
+mod_github_folder_path: Path = (Path.cwd() / f"../{mod_folder_name}").resolve()
 # and the folder with the actual game mod files (nested one down from github)
-mod_files_folder_path = mod_github_folder_path / mod_folder_name
+mod_files_folder_path: Path = mod_github_folder_path / mod_folder_name
 
 # file to output the current set of overrideable parameters for convenience
 # NOTE: files for the tool repo don't get committed during a workflow run
@@ -66,7 +66,7 @@ default_release_note_template_no_changelog_filename = "release_note_template_no_
 default_workshop_change_note_template_filename = "workshop_change_note_template.md"
 
 # file for giving (potential) extra information to web tools
-default_webhook_json_file_path = mod_github_folder_path / ".github/" / "supported_stellaris_version.json"
+default_webhook_json_file_path: Path = mod_github_folder_path / ".github/" / "supported_stellaris_version.json"
 
 ## Regex search patterns
 # loc_something:0 "something"
@@ -150,7 +150,7 @@ readme_file_path = mod_github_folder_path / readme_file_name
 changelog_file_name = Overrides.get_parameter("changelog_file_name", default_changelog_file_name)
 changelog_file_path = mod_github_folder_path / changelog_file_name
 
-webhook_json_file_path = Overrides.get_parameter("webhook_json_file_path", default_webhook_json_file_path)
+webhook_json_file_path: Path = Overrides.get_parameter("webhook_json_file_path", default_webhook_json_file_path)
 
 # temp files used by script, kept out of mod files repository so as to not be committed
 generated_release_notes_filename = Overrides.get_parameter(
