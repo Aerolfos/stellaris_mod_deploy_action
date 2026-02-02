@@ -89,7 +89,7 @@ jobs:
 
     - name: Upload result manifest file as artifact
       id: steam_workshop_upload_step_manifest_archive
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       with:
           name: output-manifest-file
           path: ${{ steps.steam_workshop_upload_step_python.outputs.manifest_path }}
