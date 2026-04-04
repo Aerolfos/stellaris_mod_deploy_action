@@ -63,7 +63,7 @@ def expected_test_override_dict() -> dict[str, str | list[str]]:
 
 
 @pytest.fixture
-def expected_test_overriden_params_dict() -> dict[str, bool]:
+def expected_test_overridden_params_dict() -> dict[str, bool]:
     return {
         "name": True,
         "version": False,
