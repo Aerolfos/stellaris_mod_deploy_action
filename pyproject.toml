@@ -6,7 +6,7 @@ license = "GPL-3.0-or-later"
 readme = "README.md"
 
 authors = [
-   { name = "Aerolfos" },
+    { name = "Aerolfos" },
 ]
 
 dependencies = [

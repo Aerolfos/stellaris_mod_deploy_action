@@ -4,9 +4,9 @@ import methods.override_methods as om
 
 
 def test_override_class(
-    override_test_folder_path: Path,
-    expected_test_override_dict: dict[str, str],
-        expected_test_overridden_params_dict,
+        override_test_folder_path: Path,
+        expected_test_override_dict: dict[str, str],
+        expected_test_overridden_params_dict: dict[str, bool],
 ) -> None:
     # test reading an override file
     overrides = om.OverrideClass(override_test_folder_path, debug_level="INFO")
@@ -38,7 +38,8 @@ def test_override_class(
     assert descriptor_override_remote_file_id == "314159265"
 
     overriden_params_dict = overrides.overriden_params
-    for override_key, test_key in zip(overriden_params_dict.keys(), expected_test_overridden_params_dict.keys(), strict=True):
+    for override_key, test_key in zip(overriden_params_dict.keys(), expected_test_overridden_params_dict.keys(),
+                                      strict=True):
         assert override_key == test_key, f"Mismatching extracted key vs test key: {override_key} =/= {test_key}"
         assert overriden_params_dict[override_key] == expected_test_overridden_params_dict[test_key], (
             f"Mismatching override active value vs test value: \
