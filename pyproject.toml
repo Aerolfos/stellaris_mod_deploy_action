@@ -37,6 +37,7 @@ lint = [
 [tool.uv]
 package = false
 default-groups = ["dev", "lint"]
+exclude-newer = "24 hours" # cooldown for dependencies, hopefully avoid the worst of any supply chain attacks
 
 # make requirements.txt file with
 # uv export --no-hashes --format requirements-txt > requirements.txt
