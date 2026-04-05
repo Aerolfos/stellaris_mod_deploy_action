@@ -20,7 +20,7 @@ Paradox doesn't supply a user-facing API so this simply can't be done.
 
 Currently, mods must be nested in a particular format. Changing this would require a way of specifying what files to include as actual mod files to be uploaded/zipped, so a blacklist/whitelist system. The whitelist must be maintained by the user, and could be a source of issues if for example new folders are added to the base game. If a user forgets to update their whitelist, new folders would not be included and the mod breaks.
 
-The [`mod/mod_name/mod_name/common/` structure](./expected_mod_structure.md) would probably still be recommended.
+The [`mod/mod_name/mod_name/common/` structure](../Tool%20support/expected_mod_structure.md) would probably still be recommended.
 
 ## Starter workflow/workflow template
 

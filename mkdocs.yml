@@ -4,5 +4,30 @@ site_url: https://Aerolfos.github.io/stellaris_mod_deploy_action/
 theme:
   name: readthedocs
 
+repo_url: https://github.com/Aerolfos/stellaris_mod_deploy_action
+site_description: "GitHub actions setup to automate deploying Stellaris mods"
+
+edit_uri_template: "blob/main/docs/{path}"
+
+nav:
+  - Home: "README.md"
+  - General Stellaris Mod Support:
+      - Installing from GitHub: General Stellaris mod support/mod_installation.md
+      - Mod file locations on disk: General Stellaris mod support/mod_file_locations.md
+
+  - Tool Support:
+      - Setting up the tool: Tool support/tool_setup.md
+      - Expected mod folder structure: Tool support/expected_mod_structure.md
+  - Miscellaneous:
+      - Potential tool features: Miscellaneous/potential_tool_features.md
+  - About:
+      Readme: "/README.md"
+      License: "/LICENSE"
+
+markdown_extensions:
+  - toc:
+      permalink: "#"
+      separator: "_"
+
 # base64 encoded starbase icon (used as logo for docs)
 # &logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAEiSURBVDhPpdNNK0RRHMfxGZOnhYesKa9AsVBT9haysPESvArlfXgDytaaYoOalUhZEEnJRjYYruv7vd0z7p17bk351adbp//5n4c500zTtPGfxBrMYgVtLDhALnCOEzw60IsNcqPYRgd1ucQOxpDNC5PnsI9BcwDnZA2WcI9Bk+TfZ6wNcYoNfOAB7/hCXbwwa7wH56y7gxb8juAYXdTF1U8R7qDlDhKYb8xgGF0H+vID6ydgrUkcCLFgF3sITYv5xB0OERqUfsZgHK/ozxPCcXuKOwhxdS/LFb1Qj+OKjrvLUmINLPLlLeIFm7jGKiqJNWiig1vY6ApHuEHl3ZfOk/P/MYkpnGEZsbpMbAeu8oYtzMOHNo14Yl0L2qjc/J+08QsSm7YScC+/WAAAAABJRU5ErkJggg==
