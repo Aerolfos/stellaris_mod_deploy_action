@@ -18,25 +18,29 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "pytest==9.0.2",
-    "ty==0.0.27",
+    "ty==0.0.28",
 ]
 lint = [
-    "ruff==0.15.8",
+    "ruff==0.15.9",
 ]
 
 [dependency-groups]
 dev = [
     "pytest==9.0.2",
-    "ty==0.0.27",
+    "ty==0.0.28",
 ]
 lint = [
-    "ruff==0.15.8",
+    "ruff==0.15.9",
+]
+docs = [
+    "mkdocs>=1.6.1",
+    "mkdocs-material>=9.7.6",
 ]
 
 # uv
 [tool.uv]
 package = false
-default-groups = ["dev", "lint"]
+default-groups = ["dev", "lint", "docs"]
 exclude-newer = "24 hours" # cooldown for dependencies, hopefully avoid the worst of any supply chain attacks
 
 # make requirements.txt file with
