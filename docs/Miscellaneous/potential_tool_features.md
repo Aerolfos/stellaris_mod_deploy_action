@@ -4,7 +4,7 @@ A list of potential features I thought of but didn't get around to actually impl
 
 ## Paradox mods auto uploading
 
-Paradox doesn't supply a user-facing API so this simply can't be done.
+Paradox doesn't supply a user-facing API so this simply can't be done. If we get one, that could change.
 
 ## Extra overrides
 
@@ -22,11 +22,19 @@ Currently, mods must be nested in a particular format. Changing this would requi
 
 The [`mod/mod_name/mod_name/common/` structure](../Tool%20support/expected_mod_structure.md) would probably still be recommended.
 
+## Other Paradox games
+
+The Grand Strategy titles that use the launcher and `.mod` file system should already be supported. This is only here because I haven't actually tested compatibility.
+
 ## Starter workflow/workflow template
 
 See: https://docs.github.com/en/actions/using-workflows/creating-starter-workflows-for-your-organization
 
 Might be helpful as one way to improve setup/onboarding?
+
+## Repository template
+
+In a similar vein, provide a clean repository that one can fork/clone and then either start a new mod or copy an existing one's file and information into the repository. The necessary hookups for the deployment tool would already be provided.
 
 ## Webhook compat
 

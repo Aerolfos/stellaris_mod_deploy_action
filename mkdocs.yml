@@ -18,6 +18,7 @@ nav:
   - Tool Support:
       - Setting up the tool: Tool support/tool_setup.md
       - Expected mod folder structure: Tool support/expected_mod_structure.md
+      - Usage (main README): "https://github.com/Aerolfos/stellaris_mod_deploy_action/blob/main/README.md#usage"
   - Miscellaneous:
       - Potential tool features: Miscellaneous/potential_tool_features.md
   - About:
