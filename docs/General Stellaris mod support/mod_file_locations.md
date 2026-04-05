@@ -33,4 +33,4 @@ Alternatively,
 
 Mods should come as a folder `mod_folder_name` and a `.mod` file with the same name as the folder. The file is a simple text type, the extension is just an identifier for the paradox launcher.
 
-## See also: https://stellaris.paradoxwikis.com/Mods
+## See also: [https://stellaris.paradoxwikis.com/Mods](https://stellaris.paradoxwikis.com/Mods)

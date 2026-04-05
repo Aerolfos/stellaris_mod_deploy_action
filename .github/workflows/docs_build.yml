@@ -1,0 +1,42 @@
+# based on: https://squidfunk.github.io/mkdocs-material/publishing-your-site/
+name: Build documentation
+on:
+  push:
+    branches:
+      - main
+permissions:
+  contents: write
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          # (root folder loose files are always cloned)
+          sparse-checkout: |
+            docs
+      - name: "Configure Git credentials"
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        shell: bash
+      - name: "Install uv"
+        uses: astral-sh/setup-uv@v7
+        with:
+          version: "latest"
+          enable-cache: true
+          activate-environment: true
+      - uses: actions/setup-python@v6
+        with:
+          python-version-file: "pyproject.toml"
+      - run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV
+      - uses: actions/cache@v5
+        with:
+          key: mkdocs-material-${{ env.cache_id }}
+          path: ~/.cache
+          restore-keys: |
+            mkdocs-material-
+      # install only the docs dependencies and not the others
+      - run: uv sync --no-group dev --no-group lint --group docs
+      - name: "Run mkdocs, set up and deploy documentation"
+        run: mkdocs gh-deploy --force
