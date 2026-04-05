@@ -21,8 +21,8 @@ nav:
   - Miscellaneous:
       - Potential tool features: Miscellaneous/potential_tool_features.md
   - About:
-      Readme: "/README.md"
-      License: "/LICENSE"
+      Readme: "https://github.com/Aerolfos/stellaris_mod_deploy_action/blob/main/README.md"
+      License: "https://github.com/Aerolfos/stellaris_mod_deploy_action/blob/main/LICENSE"
 
 markdown_extensions:
   - toc:
