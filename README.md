@@ -7,7 +7,6 @@
 [![Repository License](https://img.shields.io/github/license/aerolfos/stellaris_mod_deploy_action?style=flat&color=brightgreen)](LICENSE)
 <!---[![Discord](https://img.shields.io/discord/739835273969664050?style=flat&label=Discord&logo=discord&logoColor=white&color=7289DA)](https://discord.com/invite/xUrG9wh)--->
 
-
 This is a custom tool to aid in updating Stellaris mods. It only makes sense to use this tool if you structure mods similarly, see below under quick setup.
 
 > [!NOTE]
@@ -42,7 +41,6 @@ If using the changelog feature, do not forget to double-check that your changelo
 
 <img width="587" height="435" alt="[changelog with WIP section at top, filled out](https://github.com/Aerolfos/dubstep_launchers/blob/main/CHANGELOG.md)" src="https://github.com/user-attachments/assets/55f255df-3a4e-4c41-aef2-bf60d576905b" />
 
-
 The workflow will take a few seconds to start (reload the actions page to see it), and then finish within a minute or less. Once a workflow shows success in the UI, there should be a new commit to the repository ([example](https://github.com/Aerolfos/dubstep_launchers/commit/848613fd8d76b55532b5087a33e3b9dfb22106e6)), and a new release ([example](https://github.com/Aerolfos/dubstep_launchers/releases/tag/v1.2.1)).
 
 Remember to pull these changes to your local repository, and then upload the mod to the steam workshop.
@@ -73,4 +71,3 @@ This project is meant to support creating Stellaris mods, which are subject to t
 If you for some reason want to contribute, why not. Open a pull request.
 
 With one exception, do not submit fully AI-written pull requests/bug reports. If I wanted a chatbot's input, I'd prompt it myself. Please don't act as a middleman dumping output that I have to sort through and fix.
-
