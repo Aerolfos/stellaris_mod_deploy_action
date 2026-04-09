@@ -2,6 +2,8 @@
 
 ![Testing Status](https://github.com/aerolfos/stellaris_mod_deploy_action/actions/workflows/Testing.yml/badge.svg)
 [![GitHub Release Badge](https://img.shields.io/github/v/release/aerolfos/stellaris_mod_deploy_action?logo=github&style=flat)](https://github.com/Aerolfos/stellaris_mod_deploy_action/releases/latest)
+
+[![Build documentation](https://github.com/Aerolfos/stellaris_mod_deploy_action/actions/workflows/docs_build.yml/badge.svg?branch=main)](https://github.com/Aerolfos/stellaris_mod_deploy_action/actions/workflows/docs_build.yml)
 [![Repository License](https://img.shields.io/github/license/aerolfos/stellaris_mod_deploy_action?style=flat&color=brightgreen)](LICENSE)
 <!---[![Discord](https://img.shields.io/discord/739835273969664050?style=flat&label=Discord&logo=discord&logoColor=white&color=7289DA)](https://discord.com/invite/xUrG9wh)--->
 
