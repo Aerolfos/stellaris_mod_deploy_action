@@ -80,7 +80,7 @@ requests==2.33.1
 ruff==0.15.10
 six==1.17.0
     # via python-dateutil
-ty==0.0.29
+ty==0.0.30
 urllib3==2.6.3
     # via requests
 watchdog==6.0.0
