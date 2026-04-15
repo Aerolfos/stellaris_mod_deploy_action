@@ -14,6 +14,8 @@ updates:
       interval: "cron"
       cronjob: "5 10 15 * *"
     # see: https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/optimizing-pr-creation-version-updates#example-3-individual-pull-requests-for-major-updates-and-grouped-for-minorpatch-updates
+    cooldown:
+      default-days: 1
     groups:
       pip-version-bump:
         applies-to: version-updates
@@ -39,6 +41,8 @@ updates:
       # 1st day of the month, UTC 10:05
       interval: "monthly"
       time: "10:05"
+    cooldown:
+      default-days: 1
     groups:
       uv-version-bump:
         applies-to: version-updates
