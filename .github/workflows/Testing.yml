@@ -37,12 +37,12 @@ jobs:
       run: uv sync --all-extras
 
     - name: "Automatically format files via ruff"
-      uses: astral-sh/ruff-action@v3
+      uses: astral-sh/ruff-action@v3.6.1
       with:
         args: "format"
 
     - name: "Report on linting problems found, but do not crash the action"
-      uses: astral-sh/ruff-action@v3
+      uses: astral-sh/ruff-action@v3.6.1
       with:
         args: "check --output-format=github --exit-zero"
     
