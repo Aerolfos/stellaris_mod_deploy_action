@@ -7,7 +7,7 @@
 [![Repository License](https://img.shields.io/github/license/aerolfos/stellaris_mod_deploy_action?style=flat&color=brightgreen)](LICENSE)
 <!---[![Discord](https://img.shields.io/discord/739835273969664050?style=flat&label=Discord&logo=discord&logoColor=white&color=7289DA)](https://discord.com/invite/xUrG9wh)--->
 
-This is a custom tool to aid in updating Stellaris mods. It only makes sense to use this tool if you structure mods similarly, see below under quick setup.
+This is a custom tool to aid in updating Stellaris mods. It only makes sense to use this tool if you structure mods similarly, see [this page about mod structure](https://aerolfos.github.io/stellaris_mod_deploy_action/Tool%20support/expected_mod_structure/).
 
 > [!NOTE]
 > This tool has [the full documentation](https://aerolfos.github.io/stellaris_mod_deploy_action/) hosted on GitHub Pages, see that for details. This README is meant for a quick overview.
