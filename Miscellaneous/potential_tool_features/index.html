@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://Aerolfos.github.io/stellaris_mod_deploy_action/Miscellaneous/potential_tool_features/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Potential tool features - Stellaris Mod Deploy Tool</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Potential tool features";
+        var mkdocs_page_input_path = "Miscellaneous/potential_tool_features.md";
+        var mkdocs_page_url = "/stellaris_mod_deploy_action/Miscellaneous/potential_tool_features/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> Stellaris Mod Deploy Tool
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">General Stellaris Mod Support</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../General%20Stellaris%20mod%20support/mod_installation/">Installing from GitHub</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../General%20Stellaris%20mod%20support/mod_file_locations/">Mod file locations on disk</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Tool Support</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../Tool%20support/tool_setup/">Setting up the tool</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../Tool%20support/expected_mod_structure/">Expected mod folder structure</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="https://github.com/Aerolfos/stellaris_mod_deploy_action/blob/main/README.md#usage">Usage (main README)</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Miscellaneous</span></p>
+              <ul class="current">
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Potential tool features</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#paradox_mods_auto_uploading">Paradox mods auto uploading</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#extra_overrides">Extra overrides</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#different_supported_mod_structures">Different supported mod structures</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#other_paradox_games">Other Paradox games</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#starter_workflowworkflow_template">Starter workflow/workflow template</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#repository_template">Repository template</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#webhook_compat">Webhook compat</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#webhook_output">Webhook output</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#steam_workshop_auto_uploading">Steam workshop auto uploading</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#mirroring_workshop_description_and_github_readme">Mirroring workshop description and GitHub README</a>
+    </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">About</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="" href="https://github.com/Aerolfos/stellaris_mod_deploy_action/blob/main/README.md">Readme</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="https://github.com/Aerolfos/stellaris_mod_deploy_action/blob/main/LICENSE">License</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">Stellaris Mod Deploy Tool</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Miscellaneous</li>
+      <li class="breadcrumb-item active">Potential tool features</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/Aerolfos/stellaris_mod_deploy_action/blob/main/docs/Miscellaneous/potential_tool_features.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="potential_features">Potential features<a class="headerlink" href="#potential_features" title="Permanent link">#</a></h1>
+<p>A list of potential features I thought of but didn't get around to actually implementing, or which are not possible for some reason. This is a list of ideas and not a TODO-list or similar, most of these are scope creep not worth working on.</p>
+<h2 id="paradox_mods_auto_uploading">Paradox mods auto uploading<a class="headerlink" href="#paradox_mods_auto_uploading" title="Permanent link">#</a></h2>
+<p>Paradox doesn't supply a user-facing API so this simply can't be done. If we get one, that could change.</p>
+<h2 id="extra_overrides">Extra overrides<a class="headerlink" href="#extra_overrides" title="Permanent link">#</a></h2>
+<ul>
+<li>
+<p>Override changelog format to use - probably in file in target mod repo</p>
+</li>
+<li>
+<p>Override for both template file and search string to pair with it</p>
+</li>
+<li>
+<p>Mod folder name</p>
+</li>
+<li>
+<p>Ability to override repo name being the same as mod folder name</p>
+</li>
+</ul>
+<h2 id="different_supported_mod_structures">Different supported mod structures<a class="headerlink" href="#different_supported_mod_structures" title="Permanent link">#</a></h2>
+<p>Currently, mods must be nested in a particular format. Changing this would require a way of specifying what files to include as actual mod files to be uploaded/zipped, so a blacklist/whitelist system. The whitelist must be maintained by the user, and could be a source of issues if for example new folders are added to the base game. If a user forgets to update their whitelist, new folders would not be included and the mod breaks.</p>
+<p>The <a href="../../Tool%20support/expected_mod_structure/"><code>mod/mod_name/mod_name/common/</code> structure</a> would probably still be recommended.</p>
+<h2 id="other_paradox_games">Other Paradox games<a class="headerlink" href="#other_paradox_games" title="Permanent link">#</a></h2>
+<p>The Grand Strategy titles that use the launcher and <code>.mod</code> file system should already be supported. This is only here because I haven't actually tested compatibility.</p>
+<h2 id="starter_workflowworkflow_template">Starter workflow/workflow template<a class="headerlink" href="#starter_workflowworkflow_template" title="Permanent link">#</a></h2>
+<p>See: https://docs.github.com/en/actions/using-workflows/creating-starter-workflows-for-your-organization</p>
+<p>Might be helpful as one way to improve setup/onboarding?</p>
+<h2 id="repository_template">Repository template<a class="headerlink" href="#repository_template" title="Permanent link">#</a></h2>
+<p>In a similar vein, provide a clean repository that one can fork/clone and then either start a new mod or copy an existing one's file and information into the repository. The necessary hookups for the deployment tool would already be provided.</p>
+<h2 id="webhook_compat">Webhook compat<a class="headerlink" href="#webhook_compat" title="Permanent link">#</a></h2>
+<p>Set up workflow to be triggerable from a webhook, rather than from inside GitHub actions panel. In theory, it should be possible to trigger an update from say a discord channel command. Scope creep, really.</p>
+<h2 id="webhook_output">Webhook output<a class="headerlink" href="#webhook_output" title="Permanent link">#</a></h2>
+<p>You can get action runs as is via webhook, but it might be valuable to have a custom message that outputs a release link and/or posts the changelog somewhere, automatically. Requires a disproportionate amount of setup to make happen.</p>
+<h2 id="steam_workshop_auto_uploading">Steam workshop auto uploading<a class="headerlink" href="#steam_workshop_auto_uploading" title="Permanent link">#</a></h2>
+<p>(Yeah this worked it's implemented now)</p>
+<p>TODO clean up here</p>
+<p>So <em>in theory</em> this is possible by using and setting up <a href="https://developer.valvesoftware.com/wiki/SteamCMD">SteamCMD</a> somehow. However, having SteamCMD running conflicts with the normal steam app and there's no way you should be handing your main account over to the cloud for use like this.</p>
+<p>But, since it's now actually possible to update mod files as a contributor, it's in theory possible to make a development account, add it as contributor, save the credentials via the GitHub secret system (which should properly encrypt them) and then it might work out to have that account get logged in to upload files from one of GitHub's runners. Problem is you must own the game to use the workshop for it, so you'd have to buy Stellaris for a test account, just to see if it will even work after all the work of implementing the upload system.</p>
+<h2 id="mirroring_workshop_description_and_github_readme">Mirroring workshop description and GitHub README<a class="headerlink" href="#mirroring_workshop_description_and_github_readme" title="Permanent link">#</a></h2>
+<p>Changing over Markdown formatting to the closest equivalent Steam BBCode. Wouldn't be perfect and copying formatting and description exactly may be undesirable. </p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../../Tool%20support/expected_mod_structure/" class="btn btn-neutral float-left" title="Expected mod folder structure"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Aerolfos/stellaris_mod_deploy_action" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../../Tool%20support/expected_mod_structure/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
