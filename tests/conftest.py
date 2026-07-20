@@ -1,6 +1,6 @@
 from pathlib import Path
 
-import pytest  # ty: ignore ty tooltip fails on a dev dependency?
+import pytest
 
 
 @pytest.fixture

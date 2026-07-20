@@ -63,7 +63,7 @@ def get_env_variable(env_var_name: str, default=None, debug_level: str = "INFO")
     return env_var
 
 
-def parse_descriptor_to_dict(descriptor_file_path: Path, debug_level: str = "SILENT") -> dict[str, str]:
+def parse_descriptor_to_dict(descriptor_file_path: Path, debug_level: str = "SILENT") -> dict[str, str | list[str]]:
     """
     Creates a dict of entries from a paradox descriptor.mod file
 
@@ -89,7 +89,7 @@ def parse_descriptor_to_dict(descriptor_file_path: Path, debug_level: str = "SIL
 
     Returns
     -------
-    descriptor_dict : dict[str: str]
+    descriptor_dict : dict[str: str | list[str]]
         A Python-appropriate representation of the key-value content that was in the descriptor file.
         See tests for examples, like `expected_test_descriptor_dict` in `conftest.py`.
 
@@ -97,8 +97,8 @@ def parse_descriptor_to_dict(descriptor_file_path: Path, debug_level: str = "SIL
     if debug_level == "DEBUG":
         print("- Parsing descriptor style file -")
         print(f"Path: {descriptor_file_path}")
-    descriptor_dict = {}
-    line_container = []
+    descriptor_dict: dict[str, str | list[str]] = {}
+    line_container: list[str] = []
     multiline_flag = False
     with Path.open(descriptor_file_path, encoding="utf-8") as descriptor_object:
         for line in descriptor_object:
@@ -178,7 +178,7 @@ def parse_descriptor_to_dict(descriptor_file_path: Path, debug_level: str = "SIL
                                 print(f"'{multiline_key}' : '{line_container}'")
 
                             # clear list of saved tags
-                            line_container = []
+                            line_container: list[str] = []
 
             # alternate flow
             elif multiline_flag:

@@ -25,12 +25,14 @@ class OverrideClass:
         self.overrides_enabled: bool = False
         """Class instance top-level setting, whether overrides were found"""
 
-        self.override_dict: dict[str, str] = {}
+        self.override_dict: dict[str, str | list[str]] = {}
         """Output dict from the overrides parsing, contains all current override values for this class instance"""
 
         if override_file_path.exists():
             self.overrides_enabled = True
-            self.override_dict: dict[str, str] = parse_descriptor_to_dict(override_file_path, debug_level=debug_level)
+            self.override_dict: dict[str, str | list[str]] = parse_descriptor_to_dict(
+                override_file_path, debug_level=debug_level
+            )
 
         self.overriden_params: dict[str, bool] = {}
         """
@@ -72,7 +74,7 @@ class OverrideClass:
             return parameter_default
         else:
             try:
-                parameter: str = self.override_dict[f"{parameter_name}_override"]
+                parameter: str | list[str] = self.override_dict[f"{parameter_name}_override"]
                 self.overriden_params[parameter_name] = True
                 # convert str read in from file to appropriate python type based on what the default param is supplied as
                 # must supply python compatible values in file or conversion fails, which is as expected
@@ -81,6 +83,12 @@ class OverrideClass:
                 elif isinstance(parameter_default, bool):
                     parameter: bool = bool(parameter)
                 elif isinstance(parameter_default, Path):
+                    if isinstance(parameter, list):
+                        msg = (
+                            f"Tried to use default {parameter_default} of type `Path` with parameter {parameter} of type `list`"
+                        )
+                        raise TypeError(msg)
+
                     parameter: Path = Path(parameter)
                 # if None do nothing
             except KeyError:

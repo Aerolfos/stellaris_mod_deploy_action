@@ -16,6 +16,8 @@ from methods.input_methods import (
     str2bool,
 )
 
+# TODO: set up `descriptor_dict` as a TypeDict with all expected entries
+
 ### Command line inputs ###
 # the user shouldn't even see these, they're for the github action to call
 parser = argparse.ArgumentParser()
@@ -58,7 +60,7 @@ if cao.debug_level == "DEBUG":
 # takes the mod version str and increments the selected bit according to semantic versioning
 # also returns a dict with the split up semantic pieces (usually major version, minor version, and patch version)
 current_semantic_versions, updated_mod_version = increment_mod_version(
-    descriptor_dict["version"],
+    descriptor_dict["version"],  # ty:ignore[invalid-argument-type] version is always a str
     args.versionType,
     possible_version_types=cao.possible_version_types,
     regex_version_pattern=cao.regex_version_pattern,

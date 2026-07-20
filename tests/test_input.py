@@ -3,7 +3,7 @@ import random
 import re
 from pathlib import Path
 
-import pytest  # ty: ignore ty tooltip fails on a dev dependency?
+import pytest
 
 import methods.input_methods as im
 

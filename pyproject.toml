@@ -17,20 +17,20 @@ dependencies = [
 # support is "Soon(TM)"
 [project.optional-dependencies]
 dev = [
-    "pytest==9.0.3",
-    "ty==0.0.35",
+    "pytest==9.1.1",
+    "ty==0.0.60",
 ]
 lint = [
-    "ruff==0.15.12",
+    "ruff==0.15.20",
 ]
 
 [dependency-groups]
 dev = [
-    "pytest==9.0.3",
-    "ty==0.0.35",
+    "pytest==9.1.1",
+    "ty==0.0.60",
 ]
 lint = [
-    "ruff==0.15.12",
+    "ruff==0.15.20",
 ]
 docs = [
     "mkdocs>=1.6.1",

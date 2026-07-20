@@ -89,7 +89,7 @@ except KeyError as err:
 
 # versioning
 try:
-    mod_version = descriptor_dict["version"]
+    mod_version: str = descriptor_dict["version"]  # ty:ignore[invalid-assignment] version is always a str
 except KeyError as err:
     msg = "Mod version is missing or incomplete, must have version in descriptor for this tool"
     raise ValueError(msg) from err
