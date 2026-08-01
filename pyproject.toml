@@ -18,19 +18,19 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "pytest==9.1.1",
-    "ty==0.0.61",
+    "ty==0.0.65",
 ]
 lint = [
-    "ruff==0.15.22",
+    "ruff==0.16.1",
 ]
 
 [dependency-groups]
 dev = [
     "pytest==9.1.1",
-    "ty==0.0.61",
+    "ty==0.0.65",
 ]
 lint = [
-    "ruff==0.15.22",
+    "ruff==0.16.1",
 ]
 docs = [
     "mkdocs>=1.6.1",
