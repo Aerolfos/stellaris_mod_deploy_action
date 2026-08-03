@@ -64,7 +64,7 @@ jobs:
           templates
     
     - name: Set up Python latest
-      uses: actions/setup-python@v6.2.0
+      uses: actions/setup-python@v6.3.0
       with:
         python-version-file: "stellaris_mod_deploy_action/pyproject.toml"
     
