@@ -18,7 +18,7 @@ jobs:
 
     steps:
     - name: "Clone repository"
-      uses: actions/checkout@v7.0.0
+      uses: actions/checkout@v7.0.1
 
     - name: "Install uv"
       uses: astral-sh/setup-uv@v8.2.0
@@ -37,12 +37,12 @@ jobs:
       run: uv sync --all-extras
 
     - name: "Automatically format files via ruff"
-      uses: astral-sh/ruff-action@v4.0.0
+      uses: astral-sh/ruff-action@v4.1.0
       with:
         args: "format"
 
     - name: "Report on linting problems found, but do not crash the action"
-      uses: astral-sh/ruff-action@v4.0.0
+      uses: astral-sh/ruff-action@v4.1.0
       with:
         args: "check --output-format=github --exit-zero"
     
