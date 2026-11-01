@@ -17,24 +17,24 @@ dependencies = [
 # support is "Soon(TM)"
 [project.optional-dependencies]
 dev = [
-    "pytest==9.1.1",
-    "ty==0.0.87",
+    "pytest==9.2.0",
+    "ty==0.0.95",
 ]
 lint = [
-    "ruff==0.17.0",
+    "ruff==0.17.3",
 ]
 
 [dependency-groups]
 dev = [
-    "pytest==9.1.1",
-    "ty==0.0.87",
+    "pytest==9.2.0",
+    "ty==0.0.95",
 ]
 lint = [
-    "ruff==0.17.0",
+    "ruff==0.17.3",
 ]
 docs = [
     "mkdocs>=1.6.1",
-    "mkdocs-material>=9.7.7",
+    "mkdocs-material>=9.8.0",
 ]
 
 # uv
